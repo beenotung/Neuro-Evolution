@@ -2,13 +2,14 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define Ncycle  1000
-#define Ntrain  10
-#define Ninp    1
-#define Nhid    10
-#define Nout    1
-#define eta     0.5
-#define alpha   0.5
+#define Ncycle  1000                //number of Learning Iteration
+#define Ntrain  10                  //number of training example
+#define Ninp    2                   //number of input node
+#define Nout    1                   //number of output node
+#define Nhid    (Ninp+Nout+1)/2+1   //number of node in each hidden layer
+#define NhL     2                   //number of hidden layer
+#define eta     0.5                 //intense to learn from new data
+#define alpha   0.5                 //inertia (similar to swarm algorithm)
 #define train_file  "test.tra"
 #define weight_file "test.wei"
 #define mse_file    "test.mse"
@@ -18,15 +19,19 @@ float random_value(void);
 void back1_main()
 {
     FILE    *fp1,*fp2,*fp3;
-    float   X[Ninp],T[Nout],H[Nhid],Y[Nout];
+    float   X[Ninp],H[NhL][Nhid],Y[Nout],T[Nout];
     float   W_xh[Ninp][Nhid],W_hy[Nhid][Nout];
     float   dW_xh[Ninp][Nhid],dW_hy[Nhid][Nout];
-    float   Q_h[Nhid],Q_y[Nout];
-    float   dQ_h[Nhid],dQ_y[Nout];
-    float   delta_h[Nhid],delta_y[Nout];
+#if (NhL>1)
+    float   W_hh[NhL-2][Nhid][Nhid];
+    float   dW_hh[NhL-2][Nhid][Nhid];
+#endif
+    float   Q_h[NhL][Nhid],Q_y[Nout];
+    float   dQ_h[NhL][Nhid],dQ_y[Nout];
+    float   delta_h[NhL][Nhid],delta_y[Nout];
     float   sum,mse;
     int     Icycle,Itrain;
-    int     i,j,h;
+    int     i,Iout,h,hl;
     long int now;
 
     /*----- open files -------*/
@@ -41,29 +46,36 @@ void back1_main()
 
     /*----- initialize weights ---*/
     srand(time(&now)%1000);
-    for (h=0;h<Nhid;h++)
-        for (i=0;i<Ninp;i++)
+    for (h=0;h<Nhid;Ihid++)
+        for (Iin=0;i<Ninp;Iin++)
         {
-            W_xh[i][h]=random_value();
-            dW_xh[i][h]=0;
+            W_xh[Iin][Ihid]=random_value();
+            dW_xh[Iin][Ihid]=0;
         }
-    for (j=0;j<Nout;j++)
-        for (h=0;h<Nhid;h++)
+    for (hl=0;hl<NhL;hl++)
+        for (h=0;h<Nhid;Ihid++)
+            for (Iin=0;i<Ninp;Iin++)
+            {
+                W_hh[Iin][Ihid]=random_value();
+                dW_hh[Iin][Ihid]=0;
+            }
+    for (Iout=0;Iout<Nout;Iout++)
+        for (h=0;h<Nhid;Ihid++)
         {
-            W_hy[h][j]=random_value();
-            dW_hy[h][j]=0;
+            W_hy[Ihid][Iout]=random_value();
+            dW_hy[Ihid][Iout]=0;
         }
-    for (h=0;h<Nhid;h++)
+    for (h=0;h<Nhid;Ihid++)
     {
-        Q_h[h]=0;
-        dQ_h[h]=0;
-        delta_h[h]=0;
+        Q_h[Ihid]=0;
+        dQ_h[Ihid]=0;
+        delta_h[Ihid]=0;
     }
-    for (j=0;j<Nout;j++)
+    for (Iout=0;Iout<Nout;Iout++)
     {
-        Q_y[j]=random_value();
-        dQ_y[j]=0;
-        delta_y[j]=0;
+        Q_y[Iout]=random_value();
+        dQ_y[Iout]=0;
+        delta_y[Iout]=0;
     }
 
     /*-------- Start Learning ---------*/
@@ -74,72 +86,72 @@ void back1_main()
         fseek(fp1,0,0);
         for (Itrain=0;Itrain<Ntrain;Itrain++)
         {
-            for (i=0;i<Ninp;i++)
-                fscanf(fp1,"%f",&X[i]);
-            for (j=0;j<Nout;j++)
-                fscanf(fp1,"%f",&T[j]);
+            for (Iin=0;i<Ninp;Iin++)
+                fscanf(fp1,"%f",&X[Iin]);
+            for (Iout=0;Iout<Nout;Iout++)
+                fscanf(fp1,"%f",&T[Iout]);
 
             /*..... compute H,Y .....*/
-            for (h=0;h<Nhid;h++)
+            for (h=0;h<Nhid;Ihid++)
             {
                 sum=0.0;
-                for (i=0;i<Ninp;i++)
-                    sum+=X[i]*W_xh[i][h];
-                H[h]=(float)1.0/(1.0+exp(-(sum-Q_h[h])));
+                for (Iin=0;i<Ninp;Iin++)
+                    sum+=X[Iin]*W_xh[Iin][Ihid];
+                H[Ihid]=(float)1.0/(1.0+exp(-(sum-Q_h[Ihid])));
             }
-            for (j=0;j<Nout;j++)
+            for (Iout=0;Iout<Nout;Iout++)
             {
                 sum=0.0;
-                for (h=0;h<Nhid;h++)
-                    sum+=H[h]*W_hy[h][j];
-                Y[j]=(float)1.0/(1.0+exp(-(sum-Q_y[j])));
+                for (h=0;h<Nhid;Ihid++)
+                    sum+=H[Ihid]*W_hy[Ihid][Iout];
+                Y[Iout]=(float)1.0/(1.0+exp(-(sum-Q_y[Iout])));
             }
 
             /*..... compute delta .....*/
-            for (j=0;j<Nout;j++)
-                delta_y[j]=Y[j]*(1-Y[j])*(T[j]-Y[j]);
+            for (Iout=0;Iout<Nout;Iout++)
+                delta_y[Iout]=Y[Iout]*(1-Y[Iout])*(T[Iout]-Y[Iout]);
 
-            for (h=0;h<Nhid;h++)
+            for (h=0;h<Nhid;Ihid++)
             {
                 sum=0.0;
-                for (j=0;j<Nout;j++)
-                    sum+=W_hy[h][j]*delta_y[j];
-                delta_h[h]=H[h]*(1-H[h])*sum;
+                for (Iout=0;Iout<Nout;Iout++)
+                    sum+=W_hy[Ihid][Iout]*delta_y[Iout];
+                delta_h[Ihid]=H[Ihid]*(1-H[Ihid])*sum;
             }
 
             /*..... compute dW,dQ .....*/
-            for (j=0;j<Nout;j++)
-                for (h=0;h<Nhid;h++)
-                    dW_hy[h][j]=eta*delta_y[j]*H[h]+alpha*dW_hy[h][j];
+            for (Iout=0;Iout<Nout;Iout++)
+                for (h=0;h<Nhid;Ihid++)
+                    dW_hy[Ihid][Iout]=eta*delta_y[Iout]*H[Ihid]+alpha*dW_hy[Ihid][Iout];
 
-            for (j=0;j<Nout;j++)
-                dQ_y[j]=-eta*delta_y[j]+alpha*dQ_y[j];
+            for (Iout=0;Iout<Nout;Iout++)
+                dQ_y[Iout]=-eta*delta_y[Iout]+alpha*dQ_y[Iout];
 
-            for (h=0;h<Nhid;h++)
-                for (i=0;i<Ninp;i++)
-                    dW_xh[i][h]=eta*delta_h[h]*X[i]+alpha*dW_xh[i][h];
+            for (h=0;h<Nhid;Ihid++)
+                for (Iin=0;i<Ninp;Iin++)
+                    dW_xh[Iin][Ihid]=eta*delta_h[Ihid]*X[Iin]+alpha*dW_xh[Iin][Ihid];
 
-            for (h=0;h<Nhid;h++)
-                dQ_h[h]=-eta*delta_h[h]+alpha*dQ_h[h];
+            for (h=0;h<Nhid;Ihid++)
+                dQ_h[Ihid]=-eta*delta_h[Ihid]+alpha*dQ_h[Ihid];
 
             /*..... compute new W,Q .....*/
-            for (j=0;j<Nout;j++)
-                for (h=0;h<Nhid;h++)
-                    W_hy[h][j]+=dW_hy[h][j];
+            for (Iout=0;Iout<Nout;Iout++)
+                for (h=0;h<Nhid;Ihid++)
+                    W_hy[Ihid][Iout]+=dW_hy[Ihid][Iout];
 
-            for (j=0;j<Nout;j++)
-                Q_y[j]+=dQ_y[j];
+            for (Iout=0;Iout<Nout;Iout++)
+                Q_y[Iout]+=dQ_y[Iout];
 
-            for (h=0;h<Nhid;h++)
-                for (i=0;i<Ninp;i++)
-                    W_xh[i][h]+=dW_xh[i][h];
+            for (h=0;h<Nhid;Ihid++)
+                for (Iin=0;i<Ninp;Iin++)
+                    W_xh[Iin][Ihid]+=dW_xh[Iin][Ihid];
 
-            for (h=0;h<Nhid;h++)
-                Q_h[h]+=dQ_h[h];
+            for (h=0;h<Nhid;Ihid++)
+                Q_h[Ihid]+=dQ_h[Ihid];
 
             /*... compute the mean_square_error ...*/
-            for (j=0;j<Nout;j++)
-                mse+=(T[j]-Y[j])*(T[j]-Y[j]);
+            for (Iout=0;Iout<Nout;Iout++)
+                mse+=(T[Iout]-Y[Iout])*(T[Iout]-Y[Iout]);
 
         }   /* end of 1 learning cycle */
 
@@ -155,41 +167,41 @@ void back1_main()
 
     /*---- Write the weights to weight_file -----*/
     printf("\n");
-    for (h=0;h<Nhid;h++)
+    for (h=0;h<Nhid;Ihid++)
     {
-        for (i=0;i<Ninp;i++)
+        for (Iin=0;i<Ninp;Iin++)
         {
-            printf("W_xh[%2d][%2d]=%-8.12f\t",i,h,W_xh[i][h]);
-            fprintf(fp2,"%-8.12f\t",W_xh[i][h]);
+            printf("W_xh[%2d][%2d]=%-8.12f\t",i,h,W_xh[Iin][Ihid]);
+            fprintf(fp2,"%-8.12f\t",W_xh[Iin][Ihid]);
         }
         printf("\n");
         fprintf(fp2,"\n");
     }
     printf("\n");
     fprintf(fp2,"\n");
-    for (j=0;j<Nout;j++)
+    for (Iout=0;Iout<Nout;Iout++)
     {
-        for (h=0;h<Nhid;h++)
+        for (h=0;h<Nhid;Ihid++)
         {
-            printf("W_hy[%2d][%2d]=%-8.12f\t",h,j,W_hy[h][j]);
-            fprintf(fp2,"%-8.12f\t",W_hy[h][j]);
+            printf("W_hy[%2d][%2d]=%-8.12f\t",h,Iout,W_hy[Ihid][Iout]);
+            fprintf(fp2,"%-8.12f\t",W_hy[Ihid][Iout]);
         }
         printf("\n");
         fprintf(fp2,"\n");
     }
     printf("\n");
     fprintf(fp2,"\n");
-    for (h=0;h<Nhid;h++)
+    for (h=0;h<Nhid;Ihid++)
     {
-        printf("Q_h[%2d]=%-8.12f\t",h,Q_h[h]);
-        fprintf(fp2,"%-8.12f\t",Q_h[h]);
+        printf("Q_h[%2d]=%-8.12f\t",h,Q_h[Ihid]);
+        fprintf(fp2,"%-8.12f\t",Q_h[Ihid]);
     }
     printf("\n\n");
     fprintf(fp2,"\n\n");
-    for (j=0;j<Nout;j++)
+    for (Iout=0;Iout<Nout;Iout++)
     {
-        printf("Q_y[%2d]=%-8.12f\t",j,Q_y[j]);
-        fprintf(fp2,"%-8.12f\t",Q_y[j]);
+        printf("Q_y[%2d]=%-8.12f\t",Iout,Q_y[Iout]);
+        fprintf(fp2,"%-8.12f\t",Q_y[Iout]);
     }
     printf("\n\n");
     fprintf(fp2,"\n\n");
