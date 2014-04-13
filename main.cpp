@@ -3,8 +3,8 @@
  *Modified by Beeno Tung Cheung Leong
 */
 #include <iostream>
-#include "back1.c"
-#include "back2.c"
+#include "BackNN_train.c"
+#include "BackNN_test.c"
 
 using namespace std;
 
