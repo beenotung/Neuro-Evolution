@@ -117,13 +117,13 @@ void BackNN_train()
 
             for (Ilayer=Nlayer-2; Ilayer>0; Ilayer--)
 
-                for (Inx=0; (unsigned)Inx<node[Ilayer-1].size(); Inx++)
+                for (Inx=0; (unsigned)Inx<node[Nlayer-1].size(); Inx++)
                 {
                     sum=0.0;
 
-                    for (Iny=0; (unsigned)Iny<node[Ilayer].size(); Iny++)
-                        sum+=node[Ilayer][Iny].W[Inx]*node[Ilayer+1].[Iny].delta;
-                        node[Ilayer-1].[Iny].delta=node[Ilayer-1].[Iny].Output*(1-node[Ilayer-1].[Iny].Output)*(T[Iny]-node[Ilayer-1].[Iny].Output);
+                    for (Iny=0; (unsigned)Iny<node[Nlayer].size(); Iny++)
+                        sum+=node[Ilayer+1][Iny].W[Inx]*node[Ilayer+1].[Iny].delta;
+                        node[Ilayer].[Inx].delta=node[Ilayer][Inx].Output*(1-node[Ilayer][Inx].Output)*sum;
                 }
 
 
