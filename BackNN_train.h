@@ -19,14 +19,14 @@ using namespace std;
 #define mse_file    "test.mse"
 
 //float random_value(void);
-/*
-struct nodetype
+
+struct trainnodetype
 {
     vector<float> W,dW;
     float Q,dQ,delta,Output;
 };
 
-
+/*
 int Lsize(int i)
 {
     int size;
@@ -48,7 +48,7 @@ int Lsize(int i)
 void BackNN_train()
 {
     FILE    *fp1,*fp2,*fp3;
-    vector<nodetype> node[Nlayer];      //node[layer in the NN][node in a layer]
+    vector<trainnodetype> node[Nlayer];      //node[layer in the NN][node in a layer]
     float   T[Nout];                    //Training target output (sample)
     float   sum,mse;
     int     Icycle,Itrain;
@@ -72,7 +72,7 @@ void BackNN_train()
         for (Iny=0; Iny<Lsize(Ilayer); Iny++)
         {
             node[Ilayer].clear();
-            nodetype dnode;
+            trainnodetype dnode;
             dnode.W.clear();
             dnode.dW.clear();
             for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
@@ -103,9 +103,9 @@ void BackNN_train()
             /*..... compute Output .....*/
             for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
             {
-                sum=0.0;
                 for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
                 {
+                    sum=0.0;
                     for (Inx=0; (unsigned)Inx<node[Ilayer-1].size(); Inx++)
                         sum+=node[Ilayer-1][Inx].Output*node[Ilayer][Iny].W[Inx];
                     node[Ilayer][Iny].Output=(float)1.0/(1.0+exp(-(sum-node[Ilayer][Iny].Q)));

@@ -19,15 +19,20 @@ using namespace std;
 
 //float random_value(void);
 
+struct testnodetype
+{
+    vector<float> W;
+    float Q,Output;
+};
+
 void BackNN_test()
 {
     FILE    *fp1,*fp2,*fp3;
-    float   X[Ninp],H[NhL][Nhid],Y[Nout],T[Nout];
-    float   W_xh[Ninp][Nhid],W_hy[Nhid][Nout];
-    float   Q_h[Nhid],Q_y[Nout];
+    vector<testnodetype> node[Nlayer];      //node[layer in the NN][node in a layer]
+    float   T[Nout];                    //Training target output (sample)
     float   sum,mse;
     int     Itest;
-    int     i,j,h;
+    int     Ilayer,Inx,Iny;             //Inodex and Inodey
 
     /*----- open files -------*/
     fp1=fopen(weight_file,"r");
@@ -44,67 +49,69 @@ void BackNN_test()
         exit(1);
     }
 
-    /*----- input weights  from weight_file ----*/
-    fseek(fp1,0,0);
-    for (h=0; h<Nhid; h++)
-        for (i=0; i<Ninp; i++)
-            fscanf(fp1,"%f",&W_xh[i][h]);
+    /*----- input vector node[] form weight_file ----*/
+    for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
+    {
+        float W,Q;
+        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
+        {
+            node[Ilayer].clear();
+            testnodetype dnode;
+            dnode.W.clear();
+            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            {
+                fscanf(fp1,"%f",&W);
+                dnode.W.push_back(W);
+            }
+            fscanf(fp1,"%f",&Q);
+            dnode.Q=Q;
+            node[Ilayer].push_back(dnode);
+        }
+    }
 
-    for (j=0; j<Nout; j++)
-        for (h=0; h<Nhid; h++)
-            fscanf(fp1,"%f",&W_hy[h][j]);
-
-    for (h=0; h<Nhid; h++)
-        fscanf(fp1,"%f",&Q_h[h]);
-
-    for (j=0; j<Nout; j++)
-        fscanf(fp1,"%f",&Q_y[j]);
-
-    /*---------- Start Testing ---------*/
+    /*---------- Start Testing ---------*/    
     fseek(fp2,0,0);
     for (Itest=0; Itest<Ntest; Itest++)
-    {
+    {        
         /*..... input one testing example ....*/
-        for (i=0; i<Ninp; i++)
-            fscanf(fp2,"%f",&X[i]);
-        for (j=0; j<Nout; j++)
-            fscanf(fp2,"%f",&T[j]);
+        for (Inx=0; Inx<Ninp; Inx++)
+            fscanf(fp2,"%f",&node[0].[Inx].Output);
 
-        /*..... compute H,Y .....*/
-        for (h=0; h<Nhid; h++)
+        for (Iny=0; Iny<Nout; Iny++)
+            fscanf(fp2,"%f",&T[Iny]);
+
+        /*..... compute Output .....*/
+        for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
         {
-            sum=0.0;
-            for (i=0; i<Ninp; i++)
-                sum+=X[i]*W_xh[i][h];
-            H[h]=(float)1.0/(1.0+exp(-(sum-Q_h[h])));
-        }
-        for (j=0; j<Nout; j++)
-        {
-            sum=0.0;
-            for (h=0; h<Nhid; h++)
-                sum+=H[h]*W_hy[h][j];
-            Y[j]=(float)1.0/(1.0+exp(-(sum-Q_y[j])));
+            for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
+            {
+                sum=0.0;
+                for (Inx=0; (unsigned)Inx<node[Ilayer-1].size(); Inx++)
+                    sum+=node[Ilayer-1][Inx].Output*node[Ilayer][Iny].W[Inx];
+                node[Ilayer][Iny].Output=(float)1.0/(1.0+exp(-(sum-node[Ilayer][Iny].Q)));
+            }
         }
 
         /*..... compute the mean_square_error ....*/
         mse=0.0;
-        for (j=0; j<Nout; j++)
-            mse+=(T[j]-Y[j])*(T[j]-Y[j]);
+        for (Iny=0; Iny<Nout; Iny++)
+            mse+=(T[j]-node[Nlayer-1][Iny].Output)*(T[j]-node[Nlayer-1][Iny].Output);
 
+        ///
         /*---- Write the results to recall_file -----*/
         printf("T[%d]= ",Itest);
         fprintf(fp3,"T[%d]= ",Itest);
-        for (j=0; j<Nout; j++)
+        for (Iny=0; Iny<Nout; Iny++)
         {
             printf("%-8.2f\t",T[j]);
             fprintf(fp3,"%-8.2f\t",T[j]);
         }
         printf("Y[%d]= ",Itest);
         fprintf(fp3,"Y[%d]= ",Itest);
-        for (j=0; j<Nout; j++)
+        for (Iny=0; Iny<Nout; Iny++)
         {
-            printf("%-8.2f\t",Y[j]);
-            fprintf(fp3,"%-8.2f\t",Y[j]);
+            printf("%-8.2f\t",node[Nlayer-1][Iny].Output);
+            fprintf(fp3,"%-8.2f\t",node[Nlayer-1][Iny].Output);
         }
         printf("  mse= %-8.4f\n\n",mse);
         fprintf(fp3,"  mse= %-8.4f\n\n",mse);
