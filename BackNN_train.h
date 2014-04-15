@@ -78,9 +78,9 @@ void BackNN_train()
                     dnode.W.push_back(random_value());
                     dnode.dW.push_back(0);
                 }
-            dnode.Q=0;          //??//random for the last one?
-            dnode.dQ=0;
-            dnode.delta=0;
+            dnode.Q=0.0;          //??//random for the last one?
+            dnode.dQ=0.0;
+            dnode.delta=0.0;
             node[Ilayer].push_back(dnode);
         }
     }
@@ -101,7 +101,7 @@ void BackNN_train()
             /*..... compute Output .....*/
             for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
             {
-                sum=0;
+                sum=0.0;
                 for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
                 {
                     for (Inx=0; (unsigned)Inx<node[Ilayer-1].size(); Inx++)
@@ -111,16 +111,23 @@ void BackNN_train()
             }
 
             /*..... compute delta .....*/
-                for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
-                        node[Ilayer-1].[Iny].delta=
+            for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
+                node[Nlayer-1].[Iny].delta=node[Nlayer-1].[Iny].Output*(1-node[Nlayer-1].[Iny].Output)*(T[Iny]-node[Nlayer-1].[Iny].Output);
 
 
-            for (Ilayer=Nlayer-1;Ilayer>-1;Ilayer--)
+            for (Ilayer=Nlayer-2; Ilayer>0; Ilayer--)
+
+                for (Inx=0; (unsigned)Inx<node[Ilayer-1].size(); Inx++)
+                {
+                    sum=0.0;
+
+                    for (Iny=0; (unsigned)Iny<node[Ilayer].size(); Iny++)
+                        sum+=node[Ilayer][Iny].W[Inx]*node[Ilayer+1].[Iny].delta;
+                        node[Ilayer-1].[Iny].delta=node[Ilayer-1].[Iny].Output*(1-node[Ilayer-1].[Iny].Output)*(T[Iny]-node[Ilayer-1].[Iny].Output);
+                }
 
 
-
-
-                        /// editing up to here
+            /// editing up to here
             for (Iy=0; Iy<Nout; Iy++)
                 delta_y[Iy]=Y[Iy]*(1-Y[Iy])*(T[Iy]-Y[Iy]);
 
