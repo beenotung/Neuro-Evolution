@@ -134,7 +134,6 @@ void BackNN_train()
                     node[Ilayer][Iny].dQ=-eta*node[Ilayer][Iny].delta+alpha*node[Ilayer][Iny].dQ;
 
             /*..... compute new W,Q .....*/
-
             for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
                 for (Iny=0; Iny<node[Ilayer].size(); Iny++)
                     for (Inx=0; Inx<node[Ilayer-1].size(); Inx++)
@@ -145,9 +144,10 @@ void BackNN_train()
                     node[Ilayer][Iny].Q+=node[Ilayer][Iny].dQ;
 
             /*... compute the mean_square_error ...*/
+
+            for (Iny=0; Iny<node[Nlayer-1].size(); Iny++)
+                mse+=(T[Iy]-node[Nlayer-1][Iny].Output)*(T[Iy]-node[Nlayer-1][Iny].Output);
             /// editing up to here
-            for (Iy=0; Iy<Nout; Iy++)
-                mse+=(T[Iy]-Y[Iy])*(T[Iy]-Y[Iy]);
 
         }   /* end of 1 learning cycle */
 
