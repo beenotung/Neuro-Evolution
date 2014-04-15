@@ -53,12 +53,12 @@ void BackNN_test()
     for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
     {
         float W,Q;
-        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
+        for (Iny=0; Iny<Lsize(Ilayer,Ninp,Nout); Iny++)
         {
             node[Ilayer].clear();
             testnodetype dnode;
             dnode.W.clear();
-            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            for (Inx=0; Inx<Lsize(Ilayer-1,Ninp,Nout); Inx++)
             {
                 fscanf(fp1,"%f",&W);
                 dnode.W.push_back(W);

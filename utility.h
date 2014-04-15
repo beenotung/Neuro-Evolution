@@ -15,7 +15,7 @@ struct nodetype
     float Q,dQ,delta,Output;
 };
 
-int Lsize(int i)
+int Lsize(int i,int Ninp,int Nout)
 {
     int size;
     switch (i)

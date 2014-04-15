@@ -69,13 +69,13 @@ void BackNN_train()
     srand(time(&now)%1000);
     for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
     {
-        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
+        for (Iny=0; Iny<Lsize(Ilayer,Ninp,Nout); Iny++)
         {
             node[Ilayer].clear();
             trainnodetype dnode;
             dnode.W.clear();
             dnode.dW.clear();
-            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            for (Inx=0; Inx<Lsize(Ilayer-1,Ninp,Nout); Inx++)
             {
                 dnode.W.push_back(random_value());
                 dnode.dW.push_back(0);
@@ -165,9 +165,9 @@ void BackNN_train()
 
     for (Ilayer=1; Ilayer<Nlayer; Ilayer++)    
     {
-        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
+        for (Iny=0; Iny<Lsize(Ilayer,Ninp,Nout); Iny++)
         {
-            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            for (Inx=0; Inx<Lsize(Ilayer-1,Ninp,Nout); Inx++)
             {
                 printf("node[%d][%d].W[%d]=%-8.12f\t",Ilayer,Iny,Inx,node[Ilayer][Iny].W[Inx]);
                 fprintf(fp2,"%-8.12f\t",node[Ilayer][Iny].W[Inx]);
@@ -184,9 +184,9 @@ void BackNN_train()
 
     for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
     {
-        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
+        for (Iny=0; Iny<Lsize(Ilayer,Ninp,Nout); Iny++)
         {
-            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            for (Inx=0; Inx<Lsize(Ilayer-1,Ninp,Nout); Inx++)
             {
                 printf("node[%d][%d].Q=%-8.12f\t",Ilayer,Iny,node[Ilayer][Inx].Q);
                 fprintf(fp2,"%-8.12f\t",node[Ilayer][Inx].Q);
