@@ -111,6 +111,15 @@ void BackNN_train()
             }
 
             /*..... compute delta .....*/
+                for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
+                        node[Ilayer-1].[Iny].delta=
+
+
+            for (Ilayer=Nlayer-1;Ilayer>-1;Ilayer--)
+
+
+
+
                         /// editing up to here
             for (Iy=0; Iy<Nout; Iy++)
                 delta_y[Iy]=Y[Iy]*(1-Y[Iy])*(T[Iy]-Y[Iy]);
