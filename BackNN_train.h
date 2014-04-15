@@ -114,70 +114,38 @@ void BackNN_train()
             for (Iny=0; (unsigned)Iny<node[Ilayer-1].size(); Iny++)
                 node[Nlayer-1].[Iny].delta=node[Nlayer-1].[Iny].Output*(1-node[Nlayer-1].[Iny].Output)*(T[Iny]-node[Nlayer-1].[Iny].Output);
 
-
             for (Ilayer=Nlayer-2; Ilayer>0; Ilayer--)
-
                 for (Inx=0; (unsigned)Inx<node[Nlayer-1].size(); Inx++)
                 {
                     sum=0.0;
-
                     for (Iny=0; (unsigned)Iny<node[Nlayer].size(); Iny++)
                         sum+=node[Ilayer+1][Iny].W[Inx]*node[Ilayer+1].[Iny].delta;
-                        node[Ilayer].[Inx].delta=node[Ilayer][Inx].Output*(1-node[Ilayer][Inx].Output)*sum;
-                }
-
-
-            /// editing up to here
-            for (Iy=0; Iy<Nout; Iy++)
-                delta_y[Iy]=Y[Iy]*(1-Y[Iy])*(T[Iy]-Y[Iy]);
-
-            for (Ihx=0; Ihx<Nhid; Ihx++)
-            {
-                sum=0.0;
-                for (Iy=0; Iy<Nout; Iy++)
-                    sum+=W_hy[Ihx][Iy]*delta_y[Iy];
-                delta_h[Nhl-1][Ihx]=H[Ihx]*(1-H[Ihx])*sum;
-            }
-            for (Ihl=Nhl-1; Ihl>-1; Ihl--)
-                for (Ihx=0; Ihx<Nhid; Ihx++)
-                {
-                    sum=0.0;
-                    for (Ihy=0; Ihy<Nhid; Ihy++)
-                        sum+=W_hh[Ihx][Ihy]*delta_y[Iy];//
-                    delta_h[Ihx]=H[Ihx]*(1-H[Ihx])*sum;
+                    node[Ilayer].[Inx].delta=node[Ilayer][Inx].Output*(1-node[Ilayer][Inx].Output)*sum;
                 }
 
             /*..... compute dW,dQ .....*/
-            for (Iy=0; Iy<Nout; Iy++)
-                for (Ihid=0; Ihid<Nhid; Ihid++)
-                    dW_hy[Ihid][Iy]=eta*delta_y[Iy]*H[Ihid]+alpha*dW_hy[Ihid][Iy];
+            for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
+                for (Iny=0; Iny<node[Ilayer].size(); Iny++)
+                    i        for (Inx=0; Inx<node[Ilayer-1].size(); Inx++)
+                        node[Ilayer][Iny].dW[Inx]=eta*node[Ilayer][Iny].delta*node[Ilayer][Iny].Output+alpha*node[Ilayer][Iny].dW[Inx];
 
-            for (Iy=0; Iy<Nout; Iy++)
-                dQ_y[Iy]=-eta*delta_y[Iy]+alpha*dQ_y[Iy];
-
-            for (Ihid=0; Ihid<Nhid; Ihid++)
-                for (Ix=0; Ix<Ninp; Ix++)
-                    dW_xh[Ix][Ihid]=eta*delta_h[Ihid]*X[Ix]+alpha*dW_xh[Ix][Ihid];
-
-            for (Ihid=0; Ihid<Nhid; Ihid++)
-                dQ_h[Ihid]=-eta*delta_h[Ihid]+alpha*dQ_h[Ihid];
+            for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
+                for (Iny=0; Iny<node[Ilayer].size(); Iny++)
+                    node[Ilayer][Iny].dQ=-eta*node[Ilayer][Iny].delta+alpha*node[Ilayer][Iny].dQ;
 
             /*..... compute new W,Q .....*/
-            for (Iy=0; Iy<Nout; Iy++)
-                for (Ihid=0; Ihid<Nhid; Ihid++)
-                    W_hy[Ihid][Iy]+=dW_hy[Ihid][Iy];
 
-            for (Iy=0; Iy<Nout; Iy++)
-                Q_y[Iy]+=dQ_y[Iy];
+            for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
+                for (Iny=0; Iny<node[Ilayer].size(); Iny++)
+                    for (Inx=0; Inx<node[Ilayer-1].size(); Inx++)
+                        node[Ilayer][Iny].W[Inx]+=node[Ilayer][Iny].dW[Inx];
 
-            for (Ihid=0; Ihid<Nhid; Ihid++)
-                for (Ix=0; Ix<Ninp; Ix++)
-                    W_xh[Ix][Ihid]+=dW_xh[Ix][Ihid];
-
-            for (Ihid=0; Ihid<Nhid; Ihid++)
-                Q_h[Ihid]+=dQ_h[Ihid];
+            for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
+                for (Iny=0; Iny<node[Ilayer].size(); Iny++)
+                    node[Ilayer][Iny].Q+=node[Ilayer][Iny].dQ;
 
             /*... compute the mean_square_error ...*/
+            /// editing up to here
             for (Iy=0; Iy<Nout; Iy++)
                 mse+=(T[Iy]-Y[Iy])*(T[Iy]-Y[Iy]);
 
