@@ -64,7 +64,7 @@ void BackNN_train()
 
     /*----- initialize vector node[] e.g. weight, Q ----*/
     srand(time(&now)%1000);
-    for (Ilayer=0; Ilayer<Nlayer; Ilayer++)
+    for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
     {
         for (Iny=0; Iny<Lsize(Ilayer); Iny++)
         {
@@ -72,12 +72,11 @@ void BackNN_train()
             nodetype dnode;
             dnode.W.clear();
             dnode.dW.clear();
-            if (Ilayer!=0)
-                for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
-                {
-                    dnode.W.push_back(random_value());
-                    dnode.dW.push_back(0);
-                }
+            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            {
+                dnode.W.push_back(random_value());
+                dnode.dW.push_back(0);
+            }
             dnode.Q=0.0;          //??//random for the last one?
             dnode.dQ=0.0;
             dnode.delta=0.0;
@@ -126,7 +125,7 @@ void BackNN_train()
             /*..... compute dW,dQ .....*/
             for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
                 for (Iny=0; Iny<node[Ilayer].size(); Iny++)
-                    i        for (Inx=0; Inx<node[Ilayer-1].size(); Inx++)
+                    for (Inx=0; Inx<node[Ilayer-1].size(); Inx++)
                         node[Ilayer][Iny].dW[Inx]=eta*node[Ilayer][Iny].delta*node[Ilayer][Iny].Output+alpha*node[Ilayer][Iny].dW[Inx];
 
             for (Ilayer=Nlayer-1; Ilayer>0; Ilayer++)
@@ -144,11 +143,8 @@ void BackNN_train()
                     node[Ilayer][Iny].Q+=node[Ilayer][Iny].dQ;
 
             /*... compute the mean_square_error ...*/
-
             for (Iny=0; Iny<node[Nlayer-1].size(); Iny++)
                 mse+=(T[Iy]-node[Nlayer-1][Iny].Output)*(T[Iy]-node[Nlayer-1][Iny].Output);
-            /// editing up to here
-
         }   /* end of 1 learning cycle */
 
         /*... write the mse_value to mse_file ...*/
@@ -163,44 +159,41 @@ void BackNN_train()
 
     /*---- Write the weights to weight_file -----*/
     printf("\n");
-    for (Ihid=0; Ihid<Nhid; Ihid++)
+
+    for (Ilayer=1; Ilayer<Nlayer; Ilayer++)    
     {
-        for (Ix=0; Ix<Ninp; Ix++)
+        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
         {
-            printf("W_xh[%2d][%2d]=%-8.12f\t",i,h,W_xh[Ix][Ihid]);
-            fprintf(fp2,"%-8.12f\t",W_xh[Ix][Ihid]);
+            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            {
+                printf("node[%d][%d].W[%d]=%-8.12f\t",Ilayer,Iny,Inx,node[Ilayer][Iny].W[Inx]);
+                fprintf(fp2,"%-8.12f\t",node[Ilayer][Iny].W[Inx]);
+            }
+            printf("\n");
+            fprintf(fp2,"\n");
         }
         printf("\n");
         fprintf(fp2,"\n");
     }
-    printf("\n");
-    fprintf(fp2,"\n");
-    for (Iy=0; Iy<Nout; Iy++)
+
+    printf("\nn");
+    fprintf(fp2,"\nn");
+
+    for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
     {
-        for (Ihid=0; Ihid<Nhid; Ihid++)
+        for (Iny=0; Iny<Lsize(Ilayer); Iny++)
         {
-            printf("W_hy[%2d][%2d]=%-8.12f\t",h,Iy,W_hy[Ihid][Iy]);
-            fprintf(fp2,"%-8.12f\t",W_hy[Ihid][Iy]);
+            for (Inx=0; Inx<Lsize(Ilayer-1); Inx++)
+            {
+                printf("node[%d][%d].Q=%-8.12f\t",Ilayer,Iny,node[Ilayer][Inx].Q);
+                fprintf(fp2,"%-8.12f\t",node[Ilayer][Inx].Q);
+            }
+            printf("\n");
+            fprintf(fp2,"\n");
         }
         printf("\n");
         fprintf(fp2,"\n");
     }
-    printf("\n");
-    fprintf(fp2,"\n");
-    for (Ihid=0; Ihid<Nhid; Ihid++)
-    {
-        printf("Q_h[%2d]=%-8.12f\t",h,Q_h[Ihid]);
-        fprintf(fp2,"%-8.12f\t",Q_h[Ihid]);
-    }
-    printf("\n\n");
-    fprintf(fp2,"\n\n");
-    for (Iy=0; Iy<Nout; Iy++)
-    {
-        printf("Q_y[%2d]=%-8.12f\t",Iy,Q_y[Iy]);
-        fprintf(fp2,"%-8.12f\t",Q_y[Iy]);
-    }
-    printf("\n\n");
-    fprintf(fp2,"\n\n");
 
     fclose(fp1);
     fclose(fp2);
