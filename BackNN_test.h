@@ -25,6 +25,23 @@ struct testnodetype
     float Q,Output;
 };
 
+int Lsize_test(int i)
+{
+    int size;
+    switch (i)
+    {
+    case 0:
+        size=Ninp;
+        break;
+    case (Nlayer-1):
+        size=Nout;
+        break;
+    default:
+        size=Nhid;
+    }
+    return size;
+}
+
 void BackNN_test()
 {
     FILE    *fp1,*fp2,*fp3;
@@ -53,12 +70,12 @@ void BackNN_test()
     for (Ilayer=1; Ilayer<Nlayer; Ilayer++)
     {
         float W,Q;
-        for (Iny=0; Iny<Lsize(Ilayer,Ninp,Nout); Iny++)
+        for (Iny=0; Iny<Lsize_test(Ilayer); Iny++)
         {
             node[Ilayer].clear();
             testnodetype dnode;
             dnode.W.clear();
-            for (Inx=0; Inx<Lsize(Ilayer-1,Ninp,Nout); Inx++)
+            for (Inx=0; Inx<Lsize_test(Ilayer-1); Inx++)
             {
                 fscanf(fp1,"%f",&W);
                 dnode.W.push_back(W);
@@ -75,7 +92,7 @@ void BackNN_test()
     {        
         /*..... input one testing example ....*/
         for (Inx=0; Inx<Ninp; Inx++)
-            fscanf(fp2,"%f",&node[0].[Inx].Output);
+            fscanf(fp2,"%f",&node[0][Inx].Output);
 
         for (Iny=0; Iny<Nout; Iny++)
             fscanf(fp2,"%f",&T[Iny]);
@@ -95,7 +112,7 @@ void BackNN_test()
         /*..... compute the mean_square_error ....*/
         mse=0.0;
         for (Iny=0; Iny<Nout; Iny++)
-            mse+=(T[j]-node[Nlayer-1][Iny].Output)*(T[j]-node[Nlayer-1][Iny].Output);
+            mse+=(T[Iny]-node[Nlayer-1][Iny].Output)*(T[Iny]-node[Nlayer-1][Iny].Output);
 
         ///
         /*---- Write the results to recall_file -----*/
@@ -103,8 +120,8 @@ void BackNN_test()
         fprintf(fp3,"T[%d]= ",Itest);
         for (Iny=0; Iny<Nout; Iny++)
         {
-            printf("%-8.2f\t",T[j]);
-            fprintf(fp3,"%-8.2f\t",T[j]);
+            printf("%-8.2f\t",T[Iny]);
+            fprintf(fp3,"%-8.2f\t",T[Iny]);
         }
         printf("Y[%d]= ",Itest);
         fprintf(fp3,"Y[%d]= ",Itest);
