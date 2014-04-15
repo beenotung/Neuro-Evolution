@@ -8,20 +8,16 @@
 
 using namespace std;
 
-void BackNN_train(){
-
-}
-
-void BackNN_test(){
-
-}
+void BackNN_train();
+void BackNN_test();
 
 int main()
 {
     cout << "Back-progapation Neural Network\nPlease select a action:\n1. Train\n2. Test" << endl;
     int choose;
     cin>>choose;
-    switch (choose) {
+    switch (choose)
+    {
     case 1:
         BackNN_train();
         break;

@@ -3,6 +3,7 @@
 #include <vector>
 #include <math.h>
 using namespace std;
+#include "utility.h"
 
 #define Ncycle  1000                //number of Learning Iteration
 #define Ntrain  10                  //number of training example
@@ -17,13 +18,14 @@ using namespace std;
 #define weight_file "test.wei"
 #define mse_file    "test.mse"
 
-float random_value(void);
-
+//float random_value(void);
+/*
 struct nodetype
 {
     vector<float> W,dW;
     float Q,dQ,delta,Output;
 };
+
 
 int Lsize(int i)
 {
@@ -41,6 +43,7 @@ int Lsize(int i)
     }
     return size;
 }
+*/
 
 void BackNN_train()
 {
@@ -200,9 +203,3 @@ void BackNN_train()
     fclose(fp3);
 
 }   /* end of the program */
-
-float random_value(void)
-{
-    //return(((double)rand()/52767.0-0.1));
-    return(((double)rand()/RAND_MAX));
-}

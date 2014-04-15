@@ -1,17 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 #include <math.h>
+using namespace std;
+#include "utility.h"
 
 #define Ntest   10                  //number of tesing data
 #define Ninp    2                   //number of input node
 #define Nout    1                   //number of output node
 #define Nhid    (Ninp+Nout+1)/2+1   //number of node in each hidden layer
-#define NhidL   2                   //number of hidden layer
+#define Nhl     1                   //number of hidden layer
+#define Nlayer  1+Nhl+1             //number of layer
 #define eta     0.5                 //intense to learn from new data
 #define alpha   0.5                 //inertia (similar to swarm algorithm)
 #define weight_file "test.wei"
 #define test_file   "test.tra"
 #define recall_file "test.rec"
+
+//float random_value(void);
 
 void BackNN_test()
 {
@@ -110,4 +116,3 @@ void BackNN_test()
     fclose(fp3);
 
 }   /* end of the program */
-
