@@ -5,7 +5,7 @@
 using namespace std;
 #include "utility.h"
 
-#define Ntest   10                  //number of tesing data
+#define Ntest   4                  //number of tesing data
 #define Ninp    2                   //number of input node
 #define Nout    1                   //number of output node
 #define Nhid    (Ninp+Nout+1)/2+1   //number of node in each hidden layer
@@ -27,19 +27,21 @@ struct testnodetype
 
 int Lsize_test(int i)
 {
-    int size;
-    switch (i)
+    if (i==0)
     {
-    case 0:
-        size=Ninp;
-        break;
-    case (Nlayer-1):
-        size=Nout;
-        break;
-    default:
-        size=Nhid;
+        return Ninp;
     }
-    return size;
+    else
+    {
+        if (i==Nlayer-1)
+        {
+            return Nout;
+        }
+        else
+        {
+            return Nhid;
+        }
+    }
 }
 
 void BackNN_test()
@@ -86,10 +88,10 @@ void BackNN_test()
         }
     }
 
-    /*---------- Start Testing ---------*/    
+    /*---------- Start Testing ---------*/
     fseek(fp2,0,0);
     for (Itest=0; Itest<Ntest; Itest++)
-    {        
+    {
         /*..... input one testing example ....*/
         for (Inx=0; Inx<Ninp; Inx++)
             fscanf(fp2,"%f",&node[0][Inx].Output);
