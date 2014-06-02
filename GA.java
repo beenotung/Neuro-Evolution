@@ -26,16 +26,16 @@ public class GA {
 	public static final String fileformat = "UTF-8";
 
 	/* Genetic Algorithm variable */
-	public long POPSIZE;
-	public long MAXGENS;
-	public long NSIG;
+	public BigDecimal POPSIZE;
+	public BigDecimal MAXGENS;
+	public BigDecimal NSIG;
 	public double PXOVER;
 	public double PMUTATION;
 	public double CUTOFF;
 	public Gen[] population;
 
 	/* problem specific */
-	public int NVARS = 2;// number of characteristic(s)
+	public BigDecimal NVARS = two();// number of characteristic(s)
 	public BigDecimal PRECISION;
 	public BigDecimal Target;
 
@@ -49,10 +49,10 @@ public class GA {
 		public BigDecimal fitness;
 		public boolean Survivor;
 
-		public Gen(int NVARS, long NSIG) {
-			this.code = new BigDecimal[NVARS];
-			for (int i = 0; i < NVARS; i++) {
-				this.code[i] = random(NSIG);
+		public Gen(BigDecimal NVARS, BigDecimal NSIG) {
+			this.code = new BigDecimal[NVARS.intValue()];
+			for (BigDecimal i = zero(); !i.equals(NVARS); i.add(one)) {
+				this.code[i.intValue()] = random(NSIG);
 			}
 		}
 
@@ -86,15 +86,15 @@ public class GA {
 			String s = m.group(1);
 			// s now contains " <value of parameter>"
 			if (sfromfile.matches("Population Size ?:.*")) {
-				POPSIZE = Integer.parseInt(s.trim());
+				POPSIZE = new BigDecimal(s.trim());
 				System.out.println("Population Size : " + POPSIZE);
 			}
 			if (sfromfile.matches("Generation Limit ?.* ?:.*")) {
-				MAXGENS = Integer.parseInt(s.trim());
+				MAXGENS = new BigDecimal(s.trim());
 				System.out.println("Generation Limit : " + MAXGENS);
 			}
 			if (sfromfile.matches("Length of each chromosome ?.* ?:.*")) {
-				NSIG = Integer.parseInt(s.trim());
+				NSIG = new BigDecimal(s.trim());
 				System.out.println("Length of each chromosome : " + NSIG);
 			}
 			if (sfromfile.matches("Probability of Crossover ?.* ?:.*")) {
@@ -110,7 +110,7 @@ public class GA {
 				System.out.println("Cutoff : " + CUTOFF);
 			}
 			if (sfromfile.matches("NVARS ?:.*")) {
-				NVARS = Integer.parseInt(s.trim());
+				NVARS = new BigDecimal(s.trim());
 				System.out.println("NVARS : " + NVARS);
 			}
 			if (sfromfile.matches("Target ?:.*")) {
@@ -123,19 +123,18 @@ public class GA {
 	public void initialize() {
 		/* initialize */
 		this.population = new Gen[this.POPSIZE];
-		console.printf("Generating Gens...1/"+POPSIZE);
+		console.printf("Generating Gens...1/" + POPSIZE);
 		for (int i = 0; i < this.POPSIZE; i++) {
-			String s = (i)+"/"+POPSIZE;
-			int l=s.length();
-			s="";
-			for (int j=0;j<l;j++)
-			{
-				s+="\u0008";
+			String s = (i) + "/" + POPSIZE;
+			int l = s.length();
+			s = "";
+			for (int j = 0; j < l; j++) {
+				s += "\u0008";
 			}
 			console.printf("%s", s);
-			System.out.print((i+1)+"/"+POPSIZE);
+			System.out.print((i + 1) + "/" + POPSIZE);
 			this.population[i] = new Gen(this.NVARS, this.NSIG);
-			//sleep(150);
+			// sleep(150);
 		}
 		System.out.println("\tFinished");
 	}
@@ -153,7 +152,7 @@ public class GA {
 		if (NVARS > 1) {
 			msg += "s";
 		}
-		System.out.println(msg+": " + NVARS);
+		System.out.println(msg + ": " + NVARS);
 		// print or not? public static BigDecimal PRECISION = new
 		// BigDecimal("10").pow(NSIG).pow(NVARS);
 	}
@@ -194,10 +193,9 @@ public class GA {
 		return new BigDecimal("10");
 	}
 
-	public static BigDecimal random(int length) {
+	public static BigDecimal random(BigDecimal NSIG) {
 		BigDecimal result = new BigDecimal("0.0");
-
-		for (int i = 0; i < length; i++) {
+		for (BigDecimal i = zero(); !i.equals(NSIG); i.add(one)) {
 			result = result.multiply(ten()).add(new BigDecimal(random.nextInt(10)));
 		}
 		return result;
@@ -279,7 +277,7 @@ public class GA {
 		ga.initialize();
 
 		/* breeding */
-		for (int IGENS = 0; IGENS < ga.MAXGENS; IGENS++) {
+		for (long IGENS = 0; IGENS < ga.MAXGENS; IGENS++) {
 			for (int i = 0; i < ga.POPSIZE; i++) {
 				ga.population[i].evaluate();
 				ga.population[i].report();
@@ -287,7 +285,7 @@ public class GA {
 			}
 		}
 
-		//ga.showsettings();
+		// ga.showsettings();
 
 		System.out.println("End.");
 	}
