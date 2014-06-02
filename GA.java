@@ -1,39 +1,54 @@
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+// math
 import java.math.BigDecimal;
 
-import NN_BP_v0_3.Network;
+// string regex
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
-public class GA {
+// io utility
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
+// general utility
+import java.util.Random;
+
+public  class GA {
+
+	public GA(){
+
+	}
+
 
 	/* Genetic Algorithm constant */
 	public static final String version = "Genetic Algorithm V1.0\t --by Beeno Tung";
 	public static final String inifilepath = "GA.ini";
+	public static final String demoinifilepath = "DEMO.ini";
 	public static final String fileformat = "UTF-8";
 
-	public static int POPSIZE = 50;// population size
-	public static int MAXGENS = 1000; // generation limit (iteration steps)
-	public static int NVARS = 2;// number of characteristic(s)
-	public static int NSIG = 20; // length of each chromosome (detail level)
-	// index list for the top 25% gens
-	public static double PXOVER = 0.2; // Probability of crossover
-	// default 0.2
-	public static double PMUTATION = 0.02; // Proportion of mutated variables
-	// default 0.05
-	public static int[] BestList = new int[(int) (POPSIZE * 0.25)];
-	public static BigDecimal PRECISION = new BigDecimal("10").pow(NVARS);
+	/* Genetic Algorithm variable */
+	public static int POPSIZE;
+	public static int MAXGENS;
+	public static int NSIG;
+	public static double PXOVER;
+	public static double PMUTATION;
+	public static double CUTOFF;
+	public static int[] BestList = new int[(int) (POPSIZE * CUTOFF) + 1];
 
 	/* problem specific */
+	public static int NVARS = 2;// number of characteristic(s)
+	public static BigDecimal PRECISION = new BigDecimal("10").pow(NSIG).pow(NVARS);
+	public static BigDecimal Target;
 
 	/*
 	 * Gen code Class container of chromosome(s)
 	 */
 	public static class Gen {
 
+		/* each gen's element */
 		public BigDecimal[] code;
 		public BigDecimal fitness;
 		public boolean Survivor;
@@ -45,7 +60,7 @@ public class GA {
 			}
 		}
 
-		// find fractional expression of PI in this example
+		// find fractional expression of target, PI in this example
 		public void evaluate() {
 			this.fitness = this.code[0].divide(this.code[1], PRECISION.intValue(), BigDecimal.ROUND_HALF_UP);
 		}
@@ -63,7 +78,7 @@ public class GA {
 
 		// print gen info, for debug only
 		public void report() {
-			System.out.println(this.fitness);
+			// System.out.println(this.fitness);
 		}
 	} /* end of class Gen */
 
@@ -73,21 +88,9 @@ public class GA {
 		while (m.find()) {
 			String s = m.group(1);
 			// s now contains " <Num>"
-			if (sfromfile.matches("Number of input Node ?:.*")) {
-				network.Ninput = new BigDecimal(s.trim());
-				System.out.println("Number of input Node : " + network.Ninput.toString());
-			}
-			if (sfromfile.matches("Number of output Node ?:.*")) {
-				network.Noutput = new BigDecimal(s.trim());
-				System.out.println("Number of output Node : " + network.Noutput.toString());
-			}
-			if (sfromfile.matches("Number of Hidden Layer ?:.*")) {
-				network.NhiddenLayer = new BigDecimal(s.trim());
-				System.out.println("Number of Hidden Layer : " + network.NhiddenLayer.toString());
-			}
-			if (sfromfile.matches("Number of Node per Hidden Layer ?:.*")) {
-				network.NnodeperhiddenLayer = new BigDecimal(s.trim());
-				System.out.println("Number of Node per Hidden Layer : " + network.NnodeperhiddenLayer.toString());
+			if (sfromfile.matches("Target ?:.*")) {
+				Target = new BigDecimal(s.trim());
+				System.out.println("Target : " + Target);
 			}
 		}
 	}
@@ -136,15 +139,38 @@ public class GA {
 		return result;
 	}
 
-	public static void ReadFromINI(String filepath) {
+	public static void CreateDemo(String filepath, String coding) {
+		System.out.print("Creating " + filepath + " ...");
+		PrintWriter writer;
+		try {
+			writer = new PrintWriter(filepath, coding);
+			writer.println("Number of input Node: 2");
+			writer.println("Number of output Node: 1");
+			writer.println("Number of Hidden Layer: 3");
+			writer.println("Number of Node per Hidden Layer: 2");
+			writer.close();
+			System.out.println("\tFinished");
+		} catch (FileNotFoundException e) {
+			System.out.println();
+			System.out.println(filepath + " does not exist");
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			System.out.println();
+			System.out.println(coding + " is not supported");
+			e.printStackTrace();
+		}
+	} /* end of CreateDemo() */
+
+	public static void ReadFromINI(String filepath, GA target) {
 		System.out.println("Reading from " + filepath + " ...");
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader(filepath));
 			String sCurrentLine;
 			while ((sCurrentLine = br.readLine()) != null) {
-				SetVar(sCurrentLine, network);
+				SetVar(sCurrentLine);
 			}
+			target.PRECISION = new BigDecimal("10").pow(NSIG).pow(NVARS);
 		} catch (IOException e) {
 			System.out.println();
 			System.out.println(filepath + " does not exist");
@@ -161,6 +187,19 @@ public class GA {
 				ex.printStackTrace();
 			}
 		}
+	} /* end of ReadFromINI(string) */
+
+	public static void showsettings() {
+		System.out.println("Population Size: " + POPSIZE);
+		System.out.println("Generation Limit (Iteration Steps): " + MAXGENS);
+		System.out.println("Length of each chromosome (detail level): " + NSIG);
+		System.out.println("Probability of crossover: " + PXOVER);
+		System.out.println("Probability of mutations: " + PMUTATION);
+		System.out.println("Cutoff: " + CUTOFF);
+
+		/* problem specific */
+		public static int NVARS;// number of characteristic(s)
+		public static BigDecimal PRECISION = new BigDecimal("10").pow(NSIG).pow(NVARS);
 	}
 
 	/*
@@ -172,16 +211,20 @@ public class GA {
 		System.out.println(version);
 		System.out.println();
 
-		ReadFromINI(inifilepath);
+		CreateDemo(demoinifilepath, fileformat);
+
+		Gen[] population = new Gen[POPSIZE];
+
+		ReadFromINI(inifilepath, population);
+		System.out.println();
 
 		/* initialize */
-		Gen[] population = new Gen[POPSIZE];
 		for (int i = 0; i < POPSIZE; i++) {
 			population[i] = new Gen();
 		}
 
 		/* breeding */
-		for (int Iround = 0; Iround < MAXGENS; Iround++) {
+		for (int IGENS = 0; IGENS < MAXGENS; IGENS++) {
 			for (int i = 0; i < POPSIZE; i++) {
 				population[i].evaluate();
 				population[i].report();
