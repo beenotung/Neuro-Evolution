@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 // io utility
-import java.io.Console;
+//import java.io.Console;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.BufferedReader;
@@ -51,7 +51,7 @@ public class GA {
 
 		public Gen(BigDecimal NVARS, BigDecimal NSIG) {
 			this.code = new BigDecimal[NVARS.intValue()];
-			for (BigDecimal i = zero(); !i.equals(NVARS); i=i.add(one)) {
+			for (BigDecimal i = zero(); !i.equals(NVARS); i = i.add(one)) {
 				this.code[i.intValue()] = random();
 			}
 		}
@@ -122,17 +122,18 @@ public class GA {
 
 	public void initialize() {
 		/* initialize */
-		String amoung = this.POPSIZE.toString();
+		String amoung = "" + this.POPSIZE;
 		this.population = new Gen[this.POPSIZE.intValue()];
-		console.printf("%s%s", "Generating Gens...1/", amoung);
-		for (BigDecimal i = zero(); !i.equals(this.POPSIZE); i=i.add(one)) {
+		System.out.print("Generating Gens...1/" + amoung);
+		for (BigDecimal i = zero(); !i.equals(this.POPSIZE); i = i.add(one)) {
 			String s = (i) + "/" + this.POPSIZE;
 			int l = s.length();
 			s = "";
 			for (int j = 0; j < l; j++) {
 				s += "\u0008";
 			}
-			console.printf("%s", s+i.add(one)+"/"+amoung);
+			// console.printf("%s", s + i.add(one) + "/" + amoung);
+			System.out.print(s + i.add(one) + "/" + amoung);
 			this.population[i.intValue()] = new Gen(this.NVARS, this.NSIG);
 			// sleep(150);
 		}
@@ -158,7 +159,7 @@ public class GA {
 	}
 
 	/* utility variables */
-	public static Console console = System.console();
+	// public static Console console = System.console();
 	public static final BigDecimal zero = new BigDecimal("0");
 	public static final BigDecimal one = new BigDecimal("1");
 	public static final BigDecimal two = new BigDecimal("2");
@@ -195,7 +196,7 @@ public class GA {
 
 	public BigDecimal random() {
 		BigDecimal result = new BigDecimal("0.0");
-		for (BigDecimal i = zero(); !i.equals(this.NSIG); i=i.add(one)) {
+		for (BigDecimal i = zero(); !i.equals(this.NSIG); i = i.add(one)) {
 			result = result.multiply(ten()).add(new BigDecimal(random.nextInt(10)));
 		}
 		return result;
@@ -277,8 +278,8 @@ public class GA {
 		ga.initialize();
 
 		/* breeding */
-		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS=IGENS.add(one)) {
-			for (BigDecimal i = zero(); !i.equals(ga.POPSIZE); i=i.add(one)) {
+		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one)) {
+			for (BigDecimal i = zero(); !i.equals(ga.POPSIZE); i = i.add(one)) {
 				ga.population[i.intValue()].evaluate();
 				ga.population[i.intValue()].report();
 			}
