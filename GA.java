@@ -51,8 +51,8 @@ public class GA {
 
 		public Gen(BigDecimal NVARS, BigDecimal NSIG) {
 			this.code = new BigDecimal[NVARS.intValue()];
-			for (BigDecimal i = zero(); !i.equals(NVARS); i.add(one)) {
-				this.code[i.intValue()] = random(NSIG);
+			for (BigDecimal i = zero(); !i.equals(NVARS); i=i.add(one)) {
+				this.code[i.intValue()] = random();
 			}
 		}
 
@@ -86,28 +86,28 @@ public class GA {
 			String s = m.group(1);
 			// s now contains " <value of parameter>"
 			if (sfromfile.matches("Population Size ?:.*")) {
-				POPSIZE = new BigDecimal(s.trim());
-				System.out.println("Population Size : " + POPSIZE);
+				this.POPSIZE = new BigDecimal(s.trim());
+				System.out.println("Population Size : " + this.POPSIZE);
 			}
 			if (sfromfile.matches("Generation Limit ?.* ?:.*")) {
-				MAXGENS = new BigDecimal(s.trim());
-				System.out.println("Generation Limit : " + MAXGENS);
+				this.MAXGENS = new BigDecimal(s.trim());
+				System.out.println("Generation Limit : " + this.MAXGENS);
 			}
 			if (sfromfile.matches("Length of each chromosome ?.* ?:.*")) {
-				NSIG = new BigDecimal(s.trim());
-				System.out.println("Length of each chromosome : " + NSIG);
+				this.NSIG = new BigDecimal(s.trim());
+				System.out.println("Length of each chromosome : " + this.NSIG);
 			}
 			if (sfromfile.matches("Probability of Crossover ?.* ?:.*")) {
-				PXOVER = Double.parseDouble(s.trim());
-				System.out.println("Probability of Crossover : " + PXOVER);
+				this.PXOVER = Double.parseDouble(s.trim());
+				System.out.println("Probability of Crossover : " + this.PXOVER);
 			}
 			if (sfromfile.matches("Probability of Mutation ?.* ?:.*")) {
-				PMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Probability of Mutation : " + PMUTATION);
+				this.PMUTATION = Double.parseDouble(s.trim());
+				System.out.println("Probability of Mutation : " + this.PMUTATION);
 			}
-			if (sfromfile.matches("Cutoff ?.* ?:.*")) {
-				CUTOFF = Double.parseDouble(s.trim());
-				System.out.println("Cutoff : " + CUTOFF);
+			if (sfromfile.matches("this.CUTOFF ?.* ?:.*")) {
+				this.CUTOFF = Double.parseDouble(s.trim());
+				System.out.println("this.CUTOFF : " + this.CUTOFF);
 			}
 			if (sfromfile.matches("NVARS ?:.*")) {
 				NVARS = new BigDecimal(s.trim());
@@ -122,39 +122,39 @@ public class GA {
 
 	public void initialize() {
 		/* initialize */
-		this.population = new Gen[this.POPSIZE];
-		console.printf("Generating Gens...1/" + POPSIZE);
-		for (int i = 0; i < this.POPSIZE; i++) {
-			String s = (i) + "/" + POPSIZE;
+		String amoung = this.POPSIZE.toString();
+		this.population = new Gen[this.POPSIZE.intValue()];
+		console.printf("%s%s", "Generating Gens...1/", amoung);
+		for (BigDecimal i = zero(); !i.equals(this.POPSIZE); i=i.add(one)) {
+			String s = (i) + "/" + this.POPSIZE;
 			int l = s.length();
 			s = "";
 			for (int j = 0; j < l; j++) {
 				s += "\u0008";
 			}
-			console.printf("%s", s);
-			System.out.print((i + 1) + "/" + POPSIZE);
-			this.population[i] = new Gen(this.NVARS, this.NSIG);
+			console.printf("%s", s+i.add(one)+"/"+amoung);
+			this.population[i.intValue()] = new Gen(this.NVARS, this.NSIG);
 			// sleep(150);
 		}
 		System.out.println("\tFinished");
 	}
 
 	public void showsettings() {
-		System.out.println("Population Size: " + POPSIZE);
-		System.out.println("Generation Limit (Iteration Steps): " + MAXGENS);
-		System.out.println("Length of each chromosome (detail level): " + NSIG);
-		System.out.println("Probability of crossover: " + PXOVER);
-		System.out.println("Probability of mutations: " + PMUTATION);
-		System.out.println("Cutoff: " + CUTOFF);
+		System.out.println("Population Size: " + this.POPSIZE);
+		System.out.println("Generation Limit (Iteration Steps): " + this.MAXGENS);
+		System.out.println("Length of each chromosome (detail level): " + this.NSIG);
+		System.out.println("Probability of crossover: " + this.PXOVER);
+		System.out.println("Probability of mutations: " + this.PMUTATION);
+		System.out.println("CUTOFF: " + this.CUTOFF);
 
 		// problem specific
 		String msg = "number of characteristic";
-		if (NVARS > 1) {
+		if (!NVARS.equals(one)) {
 			msg += "s";
 		}
 		System.out.println(msg + ": " + NVARS);
 		// print or not? public static BigDecimal PRECISION = new
-		// BigDecimal("10").pow(NSIG).pow(NVARS);
+		// BigDecimal("10").pow(this.NSIG).pow(NVARS);
 	}
 
 	/* utility variables */
@@ -193,9 +193,9 @@ public class GA {
 		return new BigDecimal("10");
 	}
 
-	public static BigDecimal random(BigDecimal NSIG) {
+	public BigDecimal random() {
 		BigDecimal result = new BigDecimal("0.0");
-		for (BigDecimal i = zero(); !i.equals(NSIG); i.add(one)) {
+		for (BigDecimal i = zero(); !i.equals(this.NSIG); i=i.add(one)) {
 			result = result.multiply(ten()).add(new BigDecimal(random.nextInt(10)));
 		}
 		return result;
@@ -212,7 +212,7 @@ public class GA {
 			writer.println("Length of each chromosome (detail level) : 20");
 			writer.println("Probability of Crossover : 0.2");
 			writer.println("Probability of Mutation : 0.02");
-			writer.println("Cutoff : 0.25");
+			writer.println("this.CUTOFF : 0.25");
 			writer.println("");
 			writer.println("/* problem specific */");
 			writer.println("NVARS ： 2");
@@ -239,7 +239,7 @@ public class GA {
 			while ((sCurrentLine = br.readLine()) != null) {
 				target.SetVar(sCurrentLine);
 			}
-			target.PRECISION = new BigDecimal("10").pow(target.NSIG).pow(target.NVARS);
+			target.PRECISION = new BigDecimal("10").pow(target.NSIG.intValue()).pow(target.NVARS.intValue());
 		} catch (IOException e) {
 			System.out.println();
 			System.out.println(filepath + " does not exist");
@@ -277,11 +277,10 @@ public class GA {
 		ga.initialize();
 
 		/* breeding */
-		for (long IGENS = 0; IGENS < ga.MAXGENS; IGENS++) {
-			for (int i = 0; i < ga.POPSIZE; i++) {
-				ga.population[i].evaluate();
-				ga.population[i].report();
-
+		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS=IGENS.add(one)) {
+			for (BigDecimal i = zero(); !i.equals(ga.POPSIZE); i=i.add(one)) {
+				ga.population[i.intValue()].evaluate();
+				ga.population[i.intValue()].report();
 			}
 		}
 
