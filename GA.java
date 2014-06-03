@@ -16,6 +16,7 @@ import java.io.UnsupportedEncodingException;
 
 // general utility
 import java.util.Random;
+import java.util.Arrays;
 
 public class GA {
 
@@ -38,21 +39,22 @@ public class GA {
 	public BigDecimal NVARS = two();// number of characteristic(s)
 	public BigDecimal PRECISION;
 	public BigDecimal Target;
+	public BigDecimal SUM;
 
 	/*
 	 * Gen code Class container of chromosome(s)
 	 */
-	public class Gen {
+	public class Gen implements Comparable<Gen> {
 
 		/* each gen's element */
 		public BigDecimal[] code;
 		public BigDecimal fitness;
 		public boolean Survivor;
 
-		public Gen(BigDecimal NVARS, BigDecimal NSIG) {
-			this.code = new BigDecimal[NVARS.intValue()];
-			for (BigDecimal i = zero(); !i.equals(NVARS); i = i.add(one)) {
-				this.code[i.intValue()] = random();
+		public Gen(int Ncode) {
+			this.code = new BigDecimal[Ncode];
+			for (BigDecimal i : this.code) {
+				i = random();
 			}
 		}
 
@@ -64,8 +66,7 @@ public class GA {
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			//this.fitness = this.code[0].divide(this.code[1], PRECISION.intValue(), BigDecimal.ROUND_HALF_UP);
-			this.fitness = this.code[0].divide(this.code[1], Math.min(this.code[0].precision()+this.code[1].precision(),Integer.MAX_VALUE), BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
+			this.fitness = this.code[0].divide(this.code[1], Math.min(this.code[0].precision() + this.code[1].precision(), Integer.MAX_VALUE), BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
 		}
 
 		// uniform mutation
@@ -81,9 +82,17 @@ public class GA {
 
 		// print gen info, for debug only
 		public void report() {
-
 			System.out.println(this.fitness);
+		}
 
+		@Override
+		public int compareTo(Gen target) {
+			int result = this.fitness.compareTo(target.fitness);
+			return result;
+			// ascending order
+			// return this.quantity - compareQuantity;
+			// descending order
+			// return compareQuantity - this.quantity;
 		}
 
 	} /* end of class Gen */
@@ -143,28 +152,104 @@ public class GA {
 			}
 			// console.printf("%s", s + i.add(one) + "/" + amoung);
 			System.out.print(s + i.add(one) + "/" + amoung);
-			this.population[i.intValue()] = new Gen(this.NVARS, this.NSIG);
+			this.population[i.intValue()] = new Gen(this.NVARS.intValue());
 			// sleep(150);
 		}
 		System.out.println("\tFinished");
 	}
 
-	public void showsettings() {
-		System.out.println("Population Size: " + this.POPSIZE);
-		System.out.println("Generation Limit (Iteration Steps): " + this.MAXGENS);
-		System.out.println("Length of each chromosome (detail level): " + this.NSIG);
-		System.out.println("Probability of crossover: " + this.PXOVER);
-		System.out.println("Probability of mutations: " + this.PMUTATION);
-		System.out.println("CUTOFF: " + this.CUTOFF);
+	public void nextGeneration() {
+		this.check();
+		this.evaluate();
+		this.Rfitness();
+		this.select(); // for crossover
+		this.crossover();
+		this.mutation();
 
-		// problem specific
-		String msg = "number of characteristic";
-		if (!NVARS.equals(one)) {
-			msg += "s";
+	}
+
+	public void report() {
+		for (Gen i : this.population) {
+			System.out.println(i.fitness);
 		}
-		System.out.println(msg + ": " + NVARS);
-		// print or not? public static BigDecimal PRECISION = new
-		// BigDecimal("10").pow(this.NSIG).pow(NVARS);
+	}
+
+	public void check() {
+		for (Gen i : this.population) {
+			i.check();
+		}
+	}
+
+	public void evaluate() {
+		this.SUM = zero();
+		for (Gen i : this.population) {
+			i.evaluate();
+			this.SUM = this.SUM.add(i.fitness);
+		}
+	}
+
+	public void Rfitness() {
+		for (Gen i : this.population) {
+			i.fitness = i.fitness.divide(this.SUM, Math.min(i.fitness.precision() + this.SUM.precision(), Integer.MAX_VALUE), BigDecimal.ROUND_HALF_UP);
+		}
+	}
+
+	public void select() {
+		Arrays.sort(this.population);
+		for (Gen i : this.population) {
+			i.Survivor = i.fitness.doubleValue() <= this.PXOVER;
+		}
+	}
+
+	private void crossover() {
+		for (Gen i : this.population) {
+			if (!i.Survivor) {
+				int a, b;
+				do {
+					a = random.nextInt(this.POPSIZE.intValue());
+				} while (!this.population[a].Survivor);
+				do {
+					b = random.nextInt(this.POPSIZE.intValue());
+				} while (!this.population[b].Survivor);
+				i = crossover(this.population[a], this.population[b]);
+			}
+		}
+
+	}
+
+	public Gen crossover(Gen a, Gen b) {
+		Gen result = new Gen(a.code.length);
+		for (int i = 0; i < result.code.length; i++) {
+			result.code[i] = crossover(a.code[i], a.code[i]);
+		}
+		return result;
+	}
+	public BigDecimal crossover(BigDecimal a, BigDecimal b) {
+		String as=a.toString();
+		String bs=b.toString();
+		String c="";
+		while (as.length()<bs.length()){
+			as="0"+as;
+		}
+		while (bs.length()<as.length()){
+			bs="0"+bs;
+		}
+		int l=as.length();
+		while (c.length()<l)
+		{
+			if(random.nextInt(2)==0){
+				c+=as[c.length()];
+			}
+			else{
+				c+=bs[c.length()];
+			}
+		}
+
+		return new BigDecimal(c);
+	}
+
+	private void mutation() {
+
 	}
 
 	/* utility variables */
@@ -289,16 +374,12 @@ public class GA {
 
 		/* breeding */
 		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one)) {
-			for (BigDecimal i = zero(); !i.equals(ga.POPSIZE); i = i.add(one)) {
-				ga.population[i.intValue()].check();
-				ga.population[i.intValue()].evaluate();
-				ga.population[i.intValue()].report();
-			}
+			ga.nextGeneration();
 		}
+		// ga.report();
 
 		// ga.showsettings();
 
 		System.out.println("End.");
 	}
-
 }
