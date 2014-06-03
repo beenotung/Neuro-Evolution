@@ -56,9 +56,16 @@ public class GA {
 			}
 		}
 
+		public void check() {
+			while (this.code[1].equals(zero)) {
+				code[1] = random();
+			}
+		}
+
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			this.fitness = this.code[0].divide(this.code[1], PRECISION.intValue(), BigDecimal.ROUND_HALF_UP);
+			//this.fitness = this.code[0].divide(this.code[1], PRECISION.intValue(), BigDecimal.ROUND_HALF_UP);
+			this.fitness = this.code[0].divide(this.code[1], Math.min(this.code[0].precision()+this.code[1].precision(),Integer.MAX_VALUE), BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
 		}
 
 		// uniform mutation
@@ -74,7 +81,9 @@ public class GA {
 
 		// print gen info, for debug only
 		public void report() {
-			// System.out.println(this.fitness);
+
+			System.out.println(this.fitness);
+
 		}
 
 	} /* end of class Gen */
@@ -240,7 +249,8 @@ public class GA {
 			while ((sCurrentLine = br.readLine()) != null) {
 				target.SetVar(sCurrentLine);
 			}
-			target.PRECISION = new BigDecimal("10").pow(target.NSIG.intValue()).pow(target.NVARS.intValue());
+			target.PRECISION = target.NSIG.multiply(target.NVARS);
+			System.out.println("Precision: " + target.PRECISION);
 		} catch (IOException e) {
 			System.out.println();
 			System.out.println(filepath + " does not exist");
@@ -280,6 +290,7 @@ public class GA {
 		/* breeding */
 		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one)) {
 			for (BigDecimal i = zero(); !i.equals(ga.POPSIZE); i = i.add(one)) {
+				ga.population[i.intValue()].check();
 				ga.population[i.intValue()].evaluate();
 				ga.population[i.intValue()].report();
 			}
