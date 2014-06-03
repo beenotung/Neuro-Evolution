@@ -51,16 +51,18 @@ public class GA {
 		public BigDecimal fitness;
 		public boolean Survivor;
 
+
 		public Gen(int Ncode) {
 			this.code = new BigDecimal[Ncode];
-			for (BigDecimal i : this.code) {
-				i = random();
+			for (int i=0;i<Ncode;i++)
+			{
+				this.code[i]=random();
 			}
 		}
 
 		public void check() {
 			while (this.code[1].equals(zero)) {
-				code[1] = random();
+				this.code[1] = random();
 			}
 		}
 
@@ -143,7 +145,7 @@ public class GA {
 		String amoung = "" + this.POPSIZE;
 		this.population = new Gen[this.POPSIZE.intValue()];
 		System.out.print("Generating Gens...1/" + amoung);
-		for (BigDecimal i = zero(); !i.equals(this.POPSIZE); i = i.add(one)) {
+		for (int i=0;i<this.POPSIZE.intValue();i++){
 			String s = (i) + "/" + this.POPSIZE;
 			int l = s.length();
 			s = "";
@@ -151,8 +153,8 @@ public class GA {
 				s += "\u0008";
 			}
 			// console.printf("%s", s + i.add(one) + "/" + amoung);
-			System.out.print(s + i.add(one) + "/" + amoung);
-			this.population[i.intValue()] = new Gen(this.NVARS.intValue());
+			System.out.print(s + (i+1) + "/" + amoung);
+			this.population[i] = new Gen(this.NVARS.intValue());
 			// sleep(150);
 		}
 		System.out.println("\tFinished");
@@ -164,13 +166,17 @@ public class GA {
 		this.Rfitness();
 		this.select(); // for crossover
 		this.crossover();
+		//this.report();
 		this.mutation();
 
 	}
 
 	public void report() {
 		for (Gen i : this.population) {
-			System.out.println(i.fitness);
+			//System.out.println(i.fitness);
+			System.out.println();
+			System.out.println(i.code[0]);
+			System.out.println(i.code[1]);
 		}
 	}
 
@@ -224,24 +230,23 @@ public class GA {
 		}
 		return result;
 	}
+
 	public BigDecimal crossover(BigDecimal a, BigDecimal b) {
-		String as=a.toString();
-		String bs=b.toString();
-		String c="";
-		while (as.length()<bs.length()){
-			as="0"+as;
+		String as = a.toString();
+		String bs = b.toString();
+		String c = "";
+		while (as.length() < bs.length()) {
+			as = "0" + as;
 		}
-		while (bs.length()<as.length()){
-			bs="0"+bs;
+		while (bs.length() < as.length()) {
+			bs = "0" + bs;
 		}
-		int l=as.length();
-		while (c.length()<l)
-		{
-			if(random.nextInt(2)==0){
-				c+=as[c.length()];
-			}
-			else{
-				c+=bs[c.length()];
+		int l = as.length();
+		while (c.length() < l) {
+			if (random.nextInt(2) == 0) {
+				c += as.charAt(c.length());
+			} else {
+				c += bs.charAt(c.length());
 			}
 		}
 
