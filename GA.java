@@ -157,13 +157,13 @@ public class GA {
 	}
 
 	public void report() {
-		//System.out.println(this.population[0].fitness);
+		// System.out.println(this.population[0].fitness);
 		// System.out.println(this.population[0].code[0]);
 		// System.out.println(this.population[0].code[1]);
 		// System.out.println(this.population[1].fitness);
-		 //System.out.println();
+		// System.out.println();
 		for (Gen i : this.population) {
-			//System.out.println(i.fitness);
+			// System.out.println(i.fitness);
 		}
 	}
 
@@ -179,11 +179,16 @@ public class GA {
 	}
 
 	public void select_X() {
+		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		Arrays.sort(this.population);
 		for (int i = 0; i < this.population.length; i++) {
 			this.population[i].Survivor = ((double) i / this.population.length) <= this.CUTOFF;
+			System.out.println("pop ["+i+"].code[0]   :"+this.population[i].code[0]);
+			System.out.println("pop ["+i+"].code[1]   :"+this.population[i].code[1]);
+			System.out.println();
 		}
 		this.population[0].Survivor = true;
+		System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
 	}
 
 	public void crossover() {
@@ -196,6 +201,13 @@ public class GA {
 				do {
 					b = random.nextInt(this.POPSIZE.intValue());
 				} while ((!this.population[b].Survivor) || (a == b));
+				System.out.println("-----------------------------------");
+				System.out.println("gen a  :"+a);
+				System.out.println("gen b  :"+b);
+				System.out.println("pop a  :"+this.population[a].code);
+				System.out.println("pop b  :"+this.population[b].code);
+				System.out.println("pop a [0]   :"+this.population[a].code[0]);
+				System.out.println("pop b [0]   :"+this.population[b].code[0]);
 				this.population[i] = crossover(this.population[a],
 						this.population[b]);
 			}
@@ -204,14 +216,15 @@ public class GA {
 
 	public Gen crossover(Gen a, Gen b) {
 		Gen result = new Gen(a.code.length);
-		System.out.println("\\\\\\");
-		System.out.println(a);
-		System.out.println(b);
-		System.out.println(result);
-		System.out.println("///////");
-
 		for (int i = 0; i < result.code.length; i++) {
 			result.code[i] = crossover(a.code[i], b.code[i]);
+			System.out.println("\\\\\\");
+			System.out.println("gen2 a   :"+a.code);
+			System.out.println("gen2 b   :"+b.code);
+			System.out.println("a.code[i]   :"+a.code[i]);
+			System.out.println("b.code[i]   :"+b.code[i]);
+			System.out.println(result.code[i]);
+			System.out.println("///////");
 		}
 		return result;
 	}
@@ -235,9 +248,9 @@ public class GA {
 			}
 		}
 		System.out.println("---------");
-		System.out.println(a);
-		System.out.println(b);
-		System.out.println(new BigDecimal(c));
+		System.out.println("as  :"+as);
+		System.out.println("bs  :"+bs);
+		System.out.println("cs  :"+new BigDecimal(c));
 		return new BigDecimal(c);
 	}
 
