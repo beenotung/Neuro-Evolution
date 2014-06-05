@@ -1,5 +1,6 @@
 // math
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 // string regex
 import java.util.regex.Pattern;
@@ -50,10 +51,10 @@ public class GA {
 		public BigDecimal fitness;
 		public boolean Survivor;
 
-		public Gen(int Ncode,BigDecimal NSIG) {
+		public Gen(int Ncode, BigDecimal NSIG) {
 			this.code = new BigDecimal[Ncode];
 			for (int i = 0; i < Ncode; i++) {
-				//this.code[i] = random_no_decimal_place(NSIG);
+				// this.code[i] = random_no_decimal_place(NSIG);
 				this.code[i] = random_with_decimal_place(NSIG);
 			}
 		}
@@ -64,8 +65,10 @@ public class GA {
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			this.fitness=this.code[0].pow(2).add(this.code[0]).add(one).abs();
-			//this.fitness = this.code[0].divide(this.code[1],Math.min(this.code[0].precision()+ this.code[1].precision(),Integer.MAX_VALUE),BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
+			this.fitness = this.code[0].pow(2).add(this.code[0]).add(one).abs();
+			// this.fitness =
+			// this.code[0].divide(this.code[1],Math.min(this.code[0].precision()+
+			// this.code[1].precision(),Integer.MAX_VALUE),BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
 		}
 
 		@Override
@@ -144,7 +147,7 @@ public class GA {
 			}
 			// console.printf("%s", s + i.add(one) + "/" + amoung);
 			System.out.print(s + (i + 1) + "/" + amoung);
-			this.population[i] = new Gen(this.NVARS.intValue(),this.NSIG);
+			this.population[i] = new Gen(this.NVARS.intValue(), this.NSIG);
 			// sleep(150);
 		}
 		System.out.println("\tFinished");
@@ -156,7 +159,7 @@ public class GA {
 		// this.Rfitness();
 		this.select_X(); // for crossover
 		this.crossover_keepParent();
-		//this.crossover_killParent();
+		// this.crossover_killParent();
 		this.mutation();
 	}
 
@@ -165,10 +168,11 @@ public class GA {
 		// this.population[0].code[1], 238, BigDecimal.ROUND_HALF_UP));
 		gotorc(1, 1);
 		for (int i = 0; i < this.population.length; i++) {
-			//System.out.println(this.population[i].code[0].divide(this.population[i].code[1], this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
-			System.out.println(this.population[i].code[0]+"     ");
+			// System.out.println(this.population[i].code[0].divide(this.population[i].code[1],
+			// this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
+			System.out.println(this.population[i].code[0] + "     ");
 		}
-		//sleep(150);
+		// sleep(150);
 
 		/*
 		 * for (Gen i : this.population) { System.out.println(i.fitness); }
@@ -181,10 +185,24 @@ public class GA {
 	}
 
 	public String fix(String ori) {
-		char [] c=new char[ori.length()];
-		for (int i = 0; i < this.population.length; i++)
-			this.population[i].check();
-		return c;
+		char[] c = new char[ori.length()];
+		int[] list = new int[c.length];
+		int li;
+		do {
+			li = -1;
+			for (int i = 0; i < c.length; i++) {
+
+				if (c[i] == '.') {
+					list[++li] = i;
+				}
+			}
+			if (li > 0) {
+				c[list[random.nextInt(li + 1)]] = (char) (random.nextInt(10) + 48);
+			} else {
+				break;
+			}
+		} while (true);
+		return String.valueOf(c);
 	}
 
 	public void evaluate() {
@@ -243,7 +261,7 @@ public class GA {
 	}
 
 	public Gen crossover(Gen a, Gen b) {
-		Gen result = new Gen(a.code.length,this.NSIG);
+		Gen result = new Gen(a.code.length, this.NSIG);
 		for (int i = 0; i < result.code.length; i++) {
 			result.code[i] = crossover(a.code[i], b.code[i]);
 		}
@@ -251,6 +269,12 @@ public class GA {
 	}
 
 	public BigDecimal crossover(BigDecimal a, BigDecimal b) {
+		BigInteger a1=a.toBigInteger();
+		BigInteger a2=a.subtract(new BigDecimal(a1)).scaleByPowerOfTen(a.scale()).toBigInteger();
+
+		BigInteger b1=b.toBigInteger();
+		BigInteger b2=b.subtract(new BigDecimal(b1)).scaleByPowerOfTen(b.scale()).toBigInteger();
+re
 		String as = a.toString();
 		String bs = b.toString();
 		String c = "";
@@ -270,6 +294,30 @@ public class GA {
 		}
 		System.out.println(fix(c));
 		return new BigDecimal(fix(c));
+	}
+
+	public BigInteger crossover(BigInteger a, BigInteger b) {
+		String as = a.toString();
+		String bs = b.toString();
+		String cs = "";
+		while ((cs.length() < as.length()) && (cs.length() < bs.length()))
+		{
+			if (random.nextBoolean()){
+				cs+=as.charAt(cs.length());
+			}
+			else{
+				cs+=bs.charAt(cs.length());
+			}
+		}
+		while (cs.length()<as.length())
+		{
+			cs+=as.charAt(cs.length());
+		}
+		while (cs.length()<bs.length())
+		{
+			cs+=bs.charAt(cs.length());
+		}
+		return new BigInteger(fix(String.valueOf(cs)));
 	}
 
 	public void mutation() {
@@ -344,6 +392,7 @@ public class GA {
 		}
 		return result;
 	}
+
 	public static BigDecimal random_with_decimal_place(BigDecimal l) {
 		int[] s = new int[l.intValue()];
 		for (int i = 0; i < l.intValue(); i++) {
@@ -455,13 +504,15 @@ public class GA {
 
 		/* breeding */
 		System.out.print("\nBreeding...");
-		//System.out.print("\nBest value of Generation ");
-		//String s = "";
-		//int l;
+		// System.out.print("\nBest value of Generation ");
+		// String s = "";
+		// int l;
 		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS
 				.add(one)) {
-			//l = s.length();
-			//s = IGENS.toString()+ ":  "+ ga.population[0].code[0].divide(ga.population[0].code[1],40, BigDecimal.ROUND_HALF_UP);
+			// l = s.length();
+			// s = IGENS.toString()+ ":  "+
+			// ga.population[0].code[0].divide(ga.population[0].code[1],40,
+			// BigDecimal.ROUND_HALF_UP);
 			// System.out.print(BackSpace(l) + s);
 			ga.nextGeneration();
 			ga.report();
