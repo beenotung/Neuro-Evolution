@@ -76,12 +76,11 @@ public class GA {
 
 		@Override
 		public int compareTo(Gen target) {
-			int result = this.fitness.compareTo(target.fitness);
-			return result;
-			// ascending order
-			// return this.quantity - compareQuantity;
-			// descending order
-			// return compareQuantity - this.quantity;
+			/* ascending order */
+			return this.fitness.compareTo(target.fitness);
+
+			/* descending order */
+			// return -this.fitness.compareTo(target.fitness);
 		}
 	} /* end of class Gen */
 
@@ -127,6 +126,16 @@ public class GA {
 		}
 	}
 
+	public GA() {
+		super();
+	}
+
+	public GA(BigDecimal POPSIZE, BigDecimal NVARS) {
+		this.POPSIZE = POPSIZE;
+		this.NVARS = NVARS;
+		this.initialize();
+	}
+
 	public void initialize() {
 		/* initialize */
 		String amoung = "" + this.POPSIZE;
@@ -152,19 +161,24 @@ public class GA {
 		this.evaluate();
 		// this.Rfitness();
 		this.select_X(); // for crossover
-		this.crossover();
+		// this.crossover_keepParent();
+		this.crossover_killParent();
 		this.mutation();
 	}
 
 	public void report() {
-		// System.out.println(this.population[0].fitness);
-		// System.out.println(this.population[0].code[0]);
-		// System.out.println(this.population[0].code[1]);
-		// System.out.println(this.population[1].fitness);
-		// System.out.println();
-		for (Gen i : this.population) {
-			// System.out.println(i.fitness);
+		// System.out.println(this.population[0].code[0].divide(
+		// this.population[0].code[1], 238, BigDecimal.ROUND_HALF_UP));
+		gotorc(1, 1);
+		for (int i = 0; i < this.population.length; i++) {
+			System.out.println(this.population[i].code[0].divide(
+					this.population[i].code[1], this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
 		}
+		//sleep(150);
+
+		/*
+		 * for (Gen i : this.population) { System.out.println(i.fitness); }
+		 */
 	}
 
 	public void check() {
@@ -173,25 +187,28 @@ public class GA {
 	}
 
 	public void evaluate() {
+		// int amoung = this.population.length;
+		// System.out.print("Evaluating Gens...");
+		// String s = "";
+		// int l;
 		for (int i = 0; i < this.population.length; i++) {
+			// l = s.length();
+			// s = (i + 1) + "/" + amoung;
+			// System.out.print(BackSpace(l) + s);
 			this.population[i].evaluate();
 		}
+		// System.out.print(BackSpace(("Evaluating Gens..." + s).length()));
 	}
 
 	public void select_X() {
-		System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 		Arrays.sort(this.population);
 		for (int i = 0; i < this.population.length; i++) {
 			this.population[i].Survivor = ((double) i / this.population.length) <= this.CUTOFF;
-			System.out.println("pop ["+i+"].code[0]   :"+this.population[i].code[0]);
-			System.out.println("pop ["+i+"].code[1]   :"+this.population[i].code[1]);
-			System.out.println();
 		}
 		this.population[0].Survivor = true;
-		System.out.println("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV");
 	}
 
-	public void crossover() {
+	public void crossover_keepParent() {
 		for (int i = 0; i < this.population.length; i++) {
 			if (!this.population[i].Survivor) {
 				int a, b;
@@ -201,13 +218,23 @@ public class GA {
 				do {
 					b = random.nextInt(this.POPSIZE.intValue());
 				} while ((!this.population[b].Survivor) || (a == b));
-				System.out.println("-----------------------------------");
-				System.out.println("gen a  :"+a);
-				System.out.println("gen b  :"+b);
-				System.out.println("pop a  :"+this.population[a].code);
-				System.out.println("pop b  :"+this.population[b].code);
-				System.out.println("pop a [0]   :"+this.population[a].code[0]);
-				System.out.println("pop b [0]   :"+this.population[b].code[0]);
+				this.population[i] = crossover(this.population[a],
+						this.population[b]);
+			}
+		}
+	}
+
+	public void crossover_killParent() {
+		GA ga_new = new GA();
+		for (int i = 0; i < this.population.length; i++) {
+			if (!this.population[i].Survivor) {
+				int a, b;
+				do {
+					a = random.nextInt(this.POPSIZE.intValue());
+				} while (!this.population[a].Survivor);
+				do {
+					b = random.nextInt(this.POPSIZE.intValue());
+				} while ((!this.population[b].Survivor) || (a == b));
 				this.population[i] = crossover(this.population[a],
 						this.population[b]);
 			}
@@ -218,13 +245,6 @@ public class GA {
 		Gen result = new Gen(a.code.length);
 		for (int i = 0; i < result.code.length; i++) {
 			result.code[i] = crossover(a.code[i], b.code[i]);
-			System.out.println("\\\\\\");
-			System.out.println("gen2 a   :"+a.code);
-			System.out.println("gen2 b   :"+b.code);
-			System.out.println("a.code[i]   :"+a.code[i]);
-			System.out.println("b.code[i]   :"+b.code[i]);
-			System.out.println(result.code[i]);
-			System.out.println("///////");
 		}
 		return result;
 	}
@@ -247,15 +267,11 @@ public class GA {
 				c += bs.charAt(c.length());
 			}
 		}
-		System.out.println("---------");
-		System.out.println("as  :"+as);
-		System.out.println("bs  :"+bs);
-		System.out.println("cs  :"+new BigDecimal(c));
 		return new BigDecimal(c);
 	}
 
 	public void mutation() {
-		for (int i = 0; i < this.population.length; i++) {
+		for (int i = 1; i < this.population.length; i++) {
 			if (random.nextDouble() <= this.PMUTATION) {
 				for (int j = 0; j < this.population[i].code.length; j++) {
 					char[] s = this.population[i].code[j].toString()
@@ -264,6 +280,7 @@ public class GA {
 						if (random.nextDouble() <= this.AMUTATION)
 							s[k] = (char) (random.nextInt(10) + 48);
 					}
+					this.population[i].code[j] = new BigDecimal(s);
 				}
 			}
 		}
@@ -287,6 +304,18 @@ public class GA {
 		} catch (InterruptedException ex) {
 			Thread.currentThread().interrupt();
 		}
+	}
+
+	public static String BackSpace(int l) {
+		String s = "";
+		for (int i = 0; i < l; i++) {
+			s += "\u0008";
+		}
+		return s;
+	}
+
+	public final static void gotorc(int x, int y) {
+		System.out.print((char) 27 + "[" + x + ";" + y + "H");
 	}
 
 	public static BigDecimal zero() {
@@ -323,13 +352,12 @@ public class GA {
 			writer.println("Population Size : 50");
 			writer.println("Generation Limit (Iteration Steps) : 1000");
 			writer.println("Length of each chromosome (detail level) : 20");
-			writer.println("Probability of Crossover : 0.2");
 			writer.println("Probability of Mutation : 0.02");
-			writer.println("Amount of Mutation : 0.02");
-			writer.println("this.CUTOFF : 0.25");
+			writer.println("Amount of Mutation : 0.1");
+			writer.println("Cutoff : 0.25");
 			writer.println("");
 			writer.println("/* problem specific */");
-			writer.println("NVARS ： 2");
+			writer.println("NVARS : 2");
 			writer.println("Target : 3.14");
 			writer.close();
 			System.out.println("\tFinished");
@@ -393,14 +421,21 @@ public class GA {
 		ga.initialize();
 
 		/* breeding */
+		System.out.print("\nBreeding...");
+		//System.out.print("\nBest value of Generation ");
+		String s = "";
+		int l;
 		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS
 				.add(one)) {
+			l = s.length();
+			s = IGENS.toString()
+					+ ":  "
+					+ ga.population[0].code[0].divide(ga.population[0].code[1],
+							40, BigDecimal.ROUND_HALF_UP);
+			// System.out.print(BackSpace(l) + s);
 			ga.nextGeneration();
 			ga.report();
 		}
-		// ga.report();
-
-		// ga.showsettings();
 
 		System.out.println("End.");
 	}
