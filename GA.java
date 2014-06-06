@@ -65,7 +65,7 @@ public class GA {
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			this.fitness = this.code[0].pow(2).add(this.code[0]).add(one).abs();
+			this.fitness = this.code[0].pow(2).add(this.code[0]).subtract(one).abs();
 			// this.fitness =
 			// this.code[0].divide(this.code[1],Math.min(this.code[0].precision()+
 			// this.code[1].precision(),Integer.MAX_VALUE),BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
@@ -170,8 +170,11 @@ public class GA {
 		for (int i = 0; i < this.population.length; i++) {
 			// System.out.println(this.population[i].code[0].divide(this.population[i].code[1],
 			// this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
-			System.out.println(this.population[i].code[0] + "     ");
+			System.out.println(this.population[i].code[0].setScale(150, BigDecimal.ROUND_HALF_UP) + "        ");
+			//System.out.println(this.population[i].code[0]);// + "        ");
+			//System.out.println(this.population[i].fitness + "           ");
 		}
+		System.out.println(Space(168));
 		// sleep(150);
 
 		/*
@@ -269,40 +272,38 @@ public class GA {
 	}
 
 	public BigDecimal crossover(BigDecimal a, BigDecimal b) {
-		BigInteger a1=a.toBigInteger();
-		BigInteger a2=a.subtract(new BigDecimal(a1)).scaleByPowerOfTen(a.scale()).toBigInteger();
+		BigInteger a1 = a.toBigInteger();
+		BigInteger a2 = a.subtract(new BigDecimal(a1))
+				.scaleByPowerOfTen(a.scale()).toBigInteger();
 
-		BigInteger b1=b.toBigInteger();
-		BigInteger b2=b.subtract(new BigDecimal(b1)).scaleByPowerOfTen(b.scale()).toBigInteger();
+		BigInteger b1 = b.toBigInteger();
+		BigInteger b2 = b.subtract(new BigDecimal(b1))
+				.scaleByPowerOfTen(b.scale()).toBigInteger();
 
-		BigInteger c1=crossover(a1,b1);
-		BigInteger c2=crossover(a2,b2);
+		BigDecimal c1 = new BigDecimal(crossover(a1, b1));
+		BigDecimal c2 = new BigDecimal(crossover(a2, b2));
 
-		BigDecimal c=BigDecimal
+		BigDecimal c = c1.add(c2.movePointLeft(c2.precision()));
 
-		return new BigDecimal(c);
+		return c;
 	}
 
 	public BigInteger crossover(BigInteger a, BigInteger b) {
 		String as = a.toString();
 		String bs = b.toString();
 		String cs = "";
-		while ((cs.length() < as.length()) && (cs.length() < bs.length()))
-		{
-			if (random.nextBoolean()){
-				cs+=as.charAt(cs.length());
-			}
-			else{
-				cs+=bs.charAt(cs.length());
+		while ((cs.length() < as.length()) && (cs.length() < bs.length())) {
+			if (random.nextBoolean()) {
+				cs += as.charAt(cs.length());
+			} else {
+				cs += bs.charAt(cs.length());
 			}
 		}
-		while (cs.length()<as.length())
-		{
-			cs+=as.charAt(cs.length());
+		while (cs.length() < as.length()) {
+			cs += as.charAt(cs.length());
 		}
-		while (cs.length()<bs.length())
-		{
-			cs+=bs.charAt(cs.length());
+		while (cs.length() < bs.length()) {
+			cs += bs.charAt(cs.length());
 		}
 		return new BigInteger(String.valueOf(cs));
 	}
@@ -344,9 +345,17 @@ public class GA {
 	}
 
 	public static String BackSpace(int l) {
+		return man_char('\u0008',l);
+	}
+
+	public static String Space(int l) {
+		return man_char(' ',l);
+	}
+
+	public static String man_char(char c, int l){
 		String s = "";
 		for (int i = 0; i < l; i++) {
-			s += "\u0008";
+			s += c;
 		}
 		return s;
 	}
