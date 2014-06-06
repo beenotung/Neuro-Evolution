@@ -274,26 +274,13 @@ public class GA {
 
 		BigInteger b1=b.toBigInteger();
 		BigInteger b2=b.subtract(new BigDecimal(b1)).scaleByPowerOfTen(b.scale()).toBigInteger();
-re
-		String as = a.toString();
-		String bs = b.toString();
-		String c = "";
-		while (as.length() < bs.length()) {
-			as = "0" + as;
-		}
-		while (bs.length() < as.length()) {
-			bs = "0" + bs;
-		}
-		int l = as.length();
-		while (c.length() < l) {
-			if (random.nextInt(2) == 0) {
-				c += as.charAt(c.length());
-			} else {
-				c += bs.charAt(c.length());
-			}
-		}
-		System.out.println(fix(c));
-		return new BigDecimal(fix(c));
+
+		BigInteger c1=crossover(a1,b1);
+		BigInteger c2=crossover(a2,b2);
+
+		BigDecimal c=BigDecimal
+
+		return new BigDecimal(c);
 	}
 
 	public BigInteger crossover(BigInteger a, BigInteger b) {
@@ -317,7 +304,7 @@ re
 		{
 			cs+=bs.charAt(cs.length());
 		}
-		return new BigInteger(fix(String.valueOf(cs)));
+		return new BigInteger(String.valueOf(cs));
 	}
 
 	public void mutation() {
