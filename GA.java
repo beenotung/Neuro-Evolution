@@ -65,7 +65,8 @@ public class GA {
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			this.fitness = this.code[0].pow(2).add(this.code[0]).subtract(one).abs();
+			this.fitness = this.code[0].pow(2).add(this.code[0]).subtract(one)
+					.abs();
 			// this.fitness =
 			// this.code[0].divide(this.code[1],Math.min(this.code[0].precision()+
 			// this.code[1].precision(),Integer.MAX_VALUE),BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
@@ -158,8 +159,8 @@ public class GA {
 		this.evaluate();
 		// this.Rfitness();
 		this.select_X(); // for crossover
-		this.crossover_keepParent();
-		// this.crossover_killParent();
+		//this.crossover_keepParent();
+		this.crossover_killParent();
 		this.mutation();
 	}
 
@@ -170,11 +171,11 @@ public class GA {
 		for (int i = 0; i < this.population.length; i++) {
 			// System.out.println(this.population[i].code[0].divide(this.population[i].code[1],
 			// this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
-			System.out.println(this.population[i].code[0].setScale(150, BigDecimal.ROUND_HALF_UP) + "        ");
-			//System.out.println(this.population[i].code[0]);// + "        ");
-			//System.out.println(this.population[i].fitness + "           ");
+			System.out.println(this.population[i].code[0] + Space(5));
+			// System.out.println(this.population[i].code[0]);// + "        ");
+			// System.out.println(this.population[i].fitness + "           ");
 		}
-		System.out.println(Space(168));
+		System.out.println(Space(50));
 		// sleep(150);
 
 		/*
@@ -247,20 +248,15 @@ public class GA {
 	}
 
 	public void crossover_killParent() {
-		GA ga_new = new GA();
+		Gen[] pop_new = new Gen[this.population.length];
 		for (int i = 0; i < this.population.length; i++) {
-			if (!this.population[i].Survivor) {
-				int a, b;
-				do {
-					a = random.nextInt(this.POPSIZE.intValue());
-				} while (!this.population[a].Survivor);
-				do {
-					b = random.nextInt(this.POPSIZE.intValue());
-				} while ((!this.population[b].Survivor) || (a == b));
-				this.population[i] = crossover(this.population[a],
-						this.population[b]);
-			}
+			int a;
+			do {
+				a = random.nextInt(this.POPSIZE.intValue());
+			} while ((!this.population[a].Survivor) || (a == i));
+			pop_new[i] = crossover(this.population[a], this.population[i]);
 		}
+		this.population = pop_new;
 	}
 
 	public Gen crossover(Gen a, Gen b) {
@@ -280,15 +276,48 @@ public class GA {
 		BigInteger b2 = b.subtract(new BigDecimal(b1))
 				.scaleByPowerOfTen(b.scale()).toBigInteger();
 
-		BigDecimal c1 = new BigDecimal(crossover(a1, b1));
-		BigDecimal c2 = new BigDecimal(crossover(a2, b2));
+		BigDecimal c1 = new BigDecimal(crossover_keepsame(a1, b1));
+		BigDecimal c2 = new BigDecimal(crossover_keepmore(a2, b2));
 
 		BigDecimal c = c1.add(c2.movePointLeft(c2.precision()));
 
 		return c;
 	}
 
-	public BigInteger crossover(BigInteger a, BigInteger b) {
+	public BigInteger crossover_keepsame(BigInteger a, BigInteger b) {
+		String as = a.toString();
+		String bs = b.toString();
+		String cs = "";
+		int al = random.nextInt(as.length() + 1);
+		int bl = random.nextInt(bs.length() + 1);
+		// /
+		// System.out.println();
+		// System.out.println("as="+as);
+		// System.out.println("bs="+bs);
+		// /
+		if (random.nextBoolean()) {
+			while (cs.length() < al)
+				cs += as.charAt(cs.length());
+			// System.out.println("al="+al);
+			// System.out.println("cs="+cs);
+			// System.out.println("bl="+bl);
+			while (bl < bs.length())
+				cs += bs.charAt(bl++);
+			// System.out.println("cs="+cs);
+		} else {
+			while (cs.length() < bl)
+				cs += bs.charAt(cs.length());
+			// System.out.println("bl="+bl);
+			// System.out.println("cs="+cs);
+			// System.out.println("al="+al);
+			while (al < as.length())
+				cs += as.charAt(al++);
+			// System.out.println("cs="+cs);
+		}
+		return new BigInteger(String.valueOf("0" + cs));
+	}
+
+	public BigInteger crossover_keepmore(BigInteger a, BigInteger b) {
 		String as = a.toString();
 		String bs = b.toString();
 		String cs = "";
@@ -305,11 +334,15 @@ public class GA {
 		while (cs.length() < bs.length()) {
 			cs += bs.charAt(cs.length());
 		}
+		//System.out.println();
+		//System.out.println(as);
+		//System.out.println(bs);
+		//System.out.println(cs);
 		return new BigInteger(String.valueOf(cs));
 	}
 
 	public void mutation() {
-		for (int i = 1; i < this.population.length; i++) {
+		for (int i = 0; i < this.population.length; i++) {
 			if (random.nextDouble() <= this.PMUTATION) {
 				for (int j = 0; j < this.population[i].code.length; j++) {
 					char[] s = this.population[i].code[j].toString()
@@ -345,14 +378,14 @@ public class GA {
 	}
 
 	public static String BackSpace(int l) {
-		return man_char('\u0008',l);
+		return man_char('\u0008', l);
 	}
 
 	public static String Space(int l) {
-		return man_char(' ',l);
+		return man_char(' ', l);
 	}
 
-	public static String man_char(char c, int l){
+	public static String man_char(char c, int l) {
 		String s = "";
 		for (int i = 0; i < l; i++) {
 			s += c;
