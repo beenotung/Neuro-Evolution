@@ -167,8 +167,9 @@ public class GA {
 	public void report() {
 		// System.out.println(this.population[0].code[0].divide(
 		// this.population[0].code[1], 238, BigDecimal.ROUND_HALF_UP));
-		gotorc(1, 1);
-		for (int i = 0; i < this.population.length; i++) {
+		//gotorc(1, 1);
+		//for (int i = 0; i < this.population.length; i++) {
+		for (int i = 0; i < 60; i++) {
 			// System.out.println(this.population[i].code[0].divide(this.population[i].code[1],
 			// this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
 			System.out.println(this.population[i].code[0] + Space(5));
@@ -544,6 +545,8 @@ public class GA {
 			// BigDecimal.ROUND_HALF_UP);
 			// System.out.print(BackSpace(l) + s);
 			ga.nextGeneration();
+		  gotorc(1, 1);
+      System.out.println(IGENS+"     ");
 			ga.report();
 		}
 
