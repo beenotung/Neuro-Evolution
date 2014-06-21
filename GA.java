@@ -15,30 +15,32 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
+import java.util.BitSet;
 // general utility
 import java.util.Random;
 import java.util.Arrays;
+import java.util.Vector;
 
 public class GA {
 
 	/* Genetic Algorithm constant */
-	public static final String version = "Genetic Algorithm V1.0\t --by Beeno Tung";
+	public static final String version = "Genetic Algorithm V3.0\t --by Beeno Tung";
 	public static final String inifilepath = "GA.ini";
 	public static final String demoinifilepath = "DEMO.ini";
 	public static final String fileformat = "UTF-8";
 
 	/* Genetic Algorithm variable */
-	public BigDecimal POPSIZE;
-	public BigDecimal MAXGENS;
-	public BigDecimal NSIG;
+	public BigInteger POPSIZE;
+	public BigInteger MAXGENS;
+	public BigInteger NSIG;
 	public double PMUTATION;
 	public double AMUTATION;
 	public double CUTOFF;
 	public Gen[] population;
 
 	/* problem specific */
-	public BigDecimal NVARS = two();// number of characteristic(s)
-	public BigDecimal PRECISION;
+	public BigInteger NVAR;// number of characteristic(s)
+	public BigInteger PRECISION;
 	public BigDecimal Target;
 
 	/*
@@ -47,15 +49,20 @@ public class GA {
 	public class Gen implements Comparable<Gen> {
 
 		/* each gen's element */
-		public BigDecimal[] code;
+		// public BigDecimal[] code;
+		public BigInteger NSIG;
+		public BitSet[] code;
 		public BigDecimal fitness;
 		public boolean Survivor;
 
-		public Gen(int Ncode, BigDecimal NSIG) {
-			this.code = new BigDecimal[Ncode];
-			for (int i = 0; i < Ncode; i++) {
+		public Gen(int NVAR, BigInteger NSIG) {
+			// this.code = new BigDecimal[NVAR];
+			this.NSIG = NSIG;
+			this.code = new BitSet[NVAR];
+			for (int i = 0; i < NVAR; i++) {
 				// this.code[i] = random_no_decimal_place(NSIG);
-				this.code[i] = random_with_decimal_place(NSIG);
+				// this.code[i] = random_with_decimal_place(NSIG);
+				this.code[i] = random_bitset(NSIG);
 			}
 		}
 
@@ -65,8 +72,7 @@ public class GA {
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			this.fitness = this.code[0].pow(2).add(this.code[0]).subtract(one)
-					.abs();
+			this.fitness = this.code[0].pow(2).add(this.code[0]).subtract(one).abs();
 			// this.fitness =
 			// this.code[0].divide(this.code[1],Math.min(this.code[0].precision()+
 			// this.code[1].precision(),Integer.MAX_VALUE),BigDecimal.ROUND_HALF_UP).subtract(Target).abs();
@@ -102,8 +108,7 @@ public class GA {
 			}
 			if (sfromfile.matches("Probability of Mutation ?.* ?:.*")) {
 				this.PMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Probability of Mutation : "
-						+ this.PMUTATION);
+				System.out.println("Probability of Mutation : " + this.PMUTATION);
 			}
 			if (sfromfile.matches("Amount of Mutation ?.* ?:.*")) {
 				this.AMUTATION = Double.parseDouble(s.trim());
@@ -114,8 +119,8 @@ public class GA {
 				System.out.println("CUTOFF : " + this.CUTOFF);
 			}
 			if (sfromfile.matches("NVARS ?:.*")) {
-				NVARS = new BigDecimal(s.trim());
-				System.out.println("NVARS : " + NVARS);
+				NVAR = new BigDecimal(s.trim());
+				System.out.println("NVARS : " + NVAR);
 			}
 			if (sfromfile.matches("Target ?:.*")) {
 				Target = new BigDecimal(s.trim());
@@ -130,7 +135,7 @@ public class GA {
 
 	public GA(BigDecimal POPSIZE, BigDecimal NVARS) {
 		this.POPSIZE = POPSIZE;
-		this.NVARS = NVARS;
+		this.NVAR = NVARS;
 		this.initialize();
 	}
 
@@ -148,7 +153,7 @@ public class GA {
 			}
 			// console.printf("%s", s + i.add(one) + "/" + amoung);
 			System.out.print(s + (i + 1) + "/" + amoung);
-			this.population[i] = new Gen(this.NVARS.intValue(), this.NSIG);
+			this.population[i] = new Gen(this.NVAR.intValue(), this.NSIG);
 			// sleep(150);
 		}
 		System.out.println("\tFinished");
@@ -159,7 +164,7 @@ public class GA {
 		this.evaluate();
 		// this.Rfitness();
 		this.select_X(); // for crossover
-		//this.crossover_keepParent();
+		// this.crossover_keepParent();
 		this.crossover_killParent();
 		this.mutation();
 	}
@@ -167,8 +172,8 @@ public class GA {
 	public void report() {
 		// System.out.println(this.population[0].code[0].divide(
 		// this.population[0].code[1], 238, BigDecimal.ROUND_HALF_UP));
-		//gotorc(1, 1);
-		//for (int i = 0; i < this.population.length; i++) {
+		// gotorc(1, 1);
+		// for (int i = 0; i < this.population.length; i++) {
 		for (int i = 0; i < 60; i++) {
 			// System.out.println(this.population[i].code[0].divide(this.population[i].code[1],
 			// this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
@@ -242,8 +247,7 @@ public class GA {
 				do {
 					b = random.nextInt(this.POPSIZE.intValue());
 				} while ((!this.population[b].Survivor) || (a == b));
-				this.population[i] = crossover(this.population[a],
-						this.population[b]);
+				this.population[i] = crossover(this.population[a], this.population[b]);
 			}
 		}
 	}
@@ -270,12 +274,10 @@ public class GA {
 
 	public BigDecimal crossover(BigDecimal a, BigDecimal b) {
 		BigInteger a1 = a.toBigInteger();
-		BigInteger a2 = a.subtract(new BigDecimal(a1))
-				.scaleByPowerOfTen(a.scale()).toBigInteger();
+		BigInteger a2 = a.subtract(new BigDecimal(a1)).scaleByPowerOfTen(a.scale()).toBigInteger();
 
 		BigInteger b1 = b.toBigInteger();
-		BigInteger b2 = b.subtract(new BigDecimal(b1))
-				.scaleByPowerOfTen(b.scale()).toBigInteger();
+		BigInteger b2 = b.subtract(new BigDecimal(b1)).scaleByPowerOfTen(b.scale()).toBigInteger();
 
 		BigDecimal c1 = new BigDecimal(crossover_keepsame(a1, b1));
 		BigDecimal c2 = new BigDecimal(crossover_keepmore(a2, b2));
@@ -335,10 +337,10 @@ public class GA {
 		while (cs.length() < bs.length()) {
 			cs += bs.charAt(cs.length());
 		}
-		//System.out.println();
-		//System.out.println(as);
-		//System.out.println(bs);
-		//System.out.println(cs);
+		// System.out.println();
+		// System.out.println(as);
+		// System.out.println(bs);
+		// System.out.println(cs);
 		return new BigInteger(String.valueOf(cs));
 	}
 
@@ -346,8 +348,7 @@ public class GA {
 		for (int i = 0; i < this.population.length; i++) {
 			if (random.nextDouble() <= this.PMUTATION) {
 				for (int j = 0; j < this.population[i].code.length; j++) {
-					char[] s = this.population[i].code[j].toString()
-							.toCharArray();
+					char[] s = this.population[i].code[j].toString().toCharArray();
 					for (int k = 0; k < s.length; k++) {
 						if (random.nextDouble() <= this.AMUTATION)
 							s[k] = (char) (random.nextInt(10) + 48);
@@ -365,6 +366,7 @@ public class GA {
 	public static final BigDecimal two = new BigDecimal("2");
 	public static final BigDecimal ten = new BigDecimal("10");
 	public static BigDecimal idCount = zero();
+	public static int GB = (int) Math.pow(2, 30);
 
 	public static Random random = new Random(System.currentTimeMillis());
 
@@ -414,46 +416,32 @@ public class GA {
 		return new BigDecimal("10");
 	}
 
-	public BigDecimal random_no_decimal_place(BigDecimal l) {
-		BigDecimal result = new BigDecimal("0.0");
-		for (BigDecimal i = zero(); !i.equals(l); i = i.add(one)) {
-			result = result.multiply(ten()).add(
-					new BigDecimal(random.nextInt(10)));
+	public static BitSet random_bitset(int l) {
+		BitSet result = new BitSet();
+		for (int i = 0; i < l; i++) {
+			if (random.nextBoolean())
+				result.set(i, true);
 		}
 		return result;
 	}
 
-	public static BigDecimal random_with_decimal_place(BigDecimal l) {
-		int[] s = new int[l.intValue()];
-		for (int i = 0; i < l.intValue(); i++) {
-			s[i] = 10;
-		}
-		int li;
-		do {
-			int[] list = new int[32767];
-			li = -1;
-			for (int i = 0; i < l.intValue(); i++) {
-				if (s[i] == 10) {
-					list[++li] = i;
-				}
-			}
-			if (li > 0) {
-				s[list[random.nextInt(li + 1)]] = random.nextInt(10);
-			} else {
-				break;
-			}
-		} while (true);
-		String str = "";
-
-		for (int i = 0; i < l.intValue(); i++) {
-			if (s[i] != 10) {
-				str += Integer.toString(s[i]);
-			} else {
-				str += '.';
-			}
-		}
-		return new BigDecimal(str);
-	}
+	/*
+	 * public BigDecimal random_no_decimal_place(BigDecimal l) { BigDecimal
+	 * result = new BigDecimal("0.0"); for (BigDecimal i = zero(); !i.equals(l);
+	 * i = i.add(one)) { result = result.multiply(ten()).add(new
+	 * BigDecimal(random.nextInt(10))); } return result; }
+	 *
+	 * public static BigDecimal random_with_decimal_place(BigDecimal l) { int[]
+	 * s = new int[l.intValue()]; for (int i = 0; i < l.intValue(); i++) { s[i]
+	 * = 10; } int li; do { int[] list = new int[32767]; li = -1; for (int i =
+	 * 0; i < l.intValue(); i++) { if (s[i] == 10) { list[++li] = i; } } if (li
+	 * > 0) { s[list[random.nextInt(li + 1)]] = random.nextInt(10); } else {
+	 * break; } } while (true); String str = "";
+	 *
+	 * for (int i = 0; i < l.intValue(); i++) { if (s[i] != 10) { str +=
+	 * Integer.toString(s[i]); } else { str += '.'; } } return new
+	 * BigDecimal(str); }
+	 */
 
 	public static void CreateDemo(String filepath, String coding) {
 		System.out.print("Creating " + filepath + " ...");
@@ -463,7 +451,7 @@ public class GA {
 			writer.println("/* Genetic Algorithm constant */");
 			writer.println("Population Size : 50");
 			writer.println("Generation Limit (Iteration Steps) : 1000");
-			writer.println("Length of each chromosome (detail level) : 20");
+			writer.println("Length of each chromosome (num of bits) : 64");
 			writer.println("Probability of Mutation : 0.02");
 			writer.println("Amount of Mutation : 0.1");
 			writer.println("Cutoff : 0.25");
@@ -493,7 +481,7 @@ public class GA {
 			while ((sCurrentLine = br.readLine()) != null) {
 				target.SetVar(sCurrentLine);
 			}
-			target.PRECISION = target.NSIG.multiply(target.NVARS);
+			target.PRECISION = target.NSIG.multiply(target.NVAR);
 			System.out.println("Precision: " + target.PRECISION);
 		} catch (IOException e) {
 			System.out.println();
@@ -502,8 +490,7 @@ public class GA {
 		} finally {
 			try {
 				if (br != null) {
-					System.out.print("Closing FileReader on " + filepath
-							+ " ...");
+					System.out.print("Closing FileReader on " + filepath + " ...");
 					br.close();
 					System.out.println("\tFinished");
 				}
@@ -537,16 +524,15 @@ public class GA {
 		// System.out.print("\nBest value of Generation ");
 		// String s = "";
 		// int l;
-		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS
-				.add(one)) {
+		for (BigDecimal IGENS = zero(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one)) {
 			// l = s.length();
 			// s = IGENS.toString()+ ":  "+
 			// ga.population[0].code[0].divide(ga.population[0].code[1],40,
 			// BigDecimal.ROUND_HALF_UP);
 			// System.out.print(BackSpace(l) + s);
 			ga.nextGeneration();
-		  gotorc(1, 1);
-      System.out.println(IGENS+"     ");
+			gotorc(1, 1);
+			System.out.println(IGENS + "     ");
 			ga.report();
 		}
 
