@@ -75,11 +75,11 @@ public class GA {
 		}
 
 		public BigDecimal getvalue() {
-			BigDecimal value=zero();
+			BigDecimal value = zero();
 			BigDecimal rate = one();
 			for (int i = 0; i < this.NSIGB.intValue(); i++) {
 				if (this.code[0][0].get(i))
-					value= value.add(rate);
+					value = value.add(rate);
 				rate = rate.multiply(two);
 			}
 			rate = one.divide(two);
@@ -91,6 +91,17 @@ public class GA {
 			return value;
 		}
 
+		public String getcode() {
+			String result = "";
+			for (int i = 0; i < this.NSIGB.intValue(); i++) {
+				result += (this.code[0][0].get(i)) ? "1" : 0;
+			}
+			result += ".";
+			for (int i = 0; i < this.NSIGA.intValue(); i++) {
+				result += (this.code[0][1].get(i)) ? "1" : 0;
+			}
+			return result;
+		}
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
@@ -179,50 +190,39 @@ public class GA {
 			this.population[i] = new Gen(this.NVAR, this.NSIGB, this.NSIGA);
 			// sleep(150);
 		}
+		this.check();
 		System.out.println("\tFinished");
 	}
 
 	public void nextGeneration() {
+		// this.Rfitness();
+		// this.crossover_keepParent();
+		this.crossover_killParent(); // come with mutation
+		// this.mutation();
 		this.check();
 		this.evaluate();
-		// this.Rfitness();
-		this.select_X(); // for crossover
-		// this.crossover_keepParent();
-		this.crossover_killParent();
-		this.mutation();
+		this.select_X(); // sort for crossover
 	}
 
 	public void report(BigInteger I) {
-		// System.out.println(this.population[0].code[0].divide(
-		// this.population[0].code[1], 238, BigDecimal.ROUND_HALF_UP));
 		gotorc(1, 1);
-		System.out.println("Generation " + I + Space(5));
-		// for (int i = 0; i < this.population.length; i++) {
-		for (int i = 0; i < 0; i++) {
-			System.out.println("...........................................");
-			System.out.println(Space(5)+this.population[i]+Space(5));
-			System.out.println(Space(5)+this.population[i].Survivor+Space(5));
-			System.out.println(Space(5)+this.population[i].NSIGB+Space(5));
-			System.out.println(Space(5)+this.population[i].NSIGA+Space(5));
-			// System.out.println(this.population[i].fitness);
+		int n = 4;
+		System.out.println("Generation " + I + Space(5) + "|");
+		// for (int i = 0; i < 1 * this.POPSIZE.intValue(); i++) {
+		for (int i = 0; i < 0*50; i++) {
+			System.out.print(i);
+			if (i < 10)
+				System.out.print(" ");
+			// System.out.println(Space(n) + this.population[i].getcode() +
+			// Space(n) +
+			// this.population[i].getvalue()+Space(n)+this.population[i].fitness.doubleValue()+Space(n));
+			System.out.println(Space(n) + this.population[i].getcode() + Space(n)
+					+ this.population[i].fitness.doubleValue() + Space(n));
 		}
-		for (int i = 0; i <this.POPSIZE.intValue(); i++) {
-			if (this.population[i].Survivor){
-				System.out.println("*");
-			}
-			// System.out.println(this.population[i].fitness);
-			// for(int j=0;j<this)
-			// System.out.println(this.population[i].code[0].divide(this.population[i].code[1],
-			// this.NSIG.intValue(), BigDecimal.ROUND_HALF_UP)+"     ");
-			// System.out.println(this.population[i].code[0] + Space(5));
-			// System.out.println(this.population[i].code[0]);// + "        ");
-			// System.out.println(this.population[i].fitness + "           ");
-		}
-		// sleep(150);
-
 		/*
 		 * for (Gen i : this.population) { System.out.println(i.fitness); }
 		 */
+		// sleep(150);
 	}
 
 	public void check() {
@@ -252,27 +252,18 @@ public class GA {
 	}
 
 	public void evaluate() {
-		// int amoung = this.population.length;
-		// System.out.print("Evaluating Gens...");
-		// String s = "";
-		// int l;
 		for (int i = 0; i < this.population.length; i++) {
-			// l = s.length();
-			// s = (i + 1) + "/" + amoung;
-			// System.out.print(BackSpace(l) + s);
 			this.population[i].evaluate();
 		}
-		// System.out.print(BackSpace(("Evaluating Gens..." + s).length()));
 	}
 
 	public void select_X() {
 		Arrays.sort(this.population);
 		for (int i = 0; i < this.population.length; i++) {
 			this.population[i].Survivor = ((double) i / this.population.length) <= this.CUTOFF;
-			System.out.print(i+Space(5)+this.population[i].Survivor+Space(5));
-			System.out.println(this.population[i].fitness+Space(5));
 		}
 		this.population[0].Survivor = true;
+		this.population[1].Survivor = true;
 	}
 
 	public void crossover_keepParent() {
@@ -298,6 +289,9 @@ public class GA {
 				a = random.nextInt(this.POPSIZE.intValue());
 			} while ((!this.population[a].Survivor) || (a == i));
 			pop_new[i] = crossover(this.population[a], this.population[i]);
+			System.out.println(i+"*****");
+			if (random.nextDouble() < this.PMUTATION)
+				pop_new[i] = mutation(pop_new[i]);
 		}
 		this.population = pop_new;
 	}
@@ -331,63 +325,26 @@ public class GA {
 		return result;
 	}
 
-	/*
-	 * public BigDecimal crossover(BigDecimal a, BigDecimal b) { BigInteger a1 =
-	 * a.toBigInteger(); BigInteger a2 = a.subtract(new
-	 * BigDecimal(a1)).scaleByPowerOfTen(a.scale()).toBigInteger();
-	 *
-	 * BigInteger b1 = b.toBigInteger(); BigInteger b2 = b.subtract(new
-	 * BigDecimal(b1)).scaleByPowerOfTen(b.scale()).toBigInteger();
-	 *
-	 * BigDecimal c1 = new BigDecimal(crossover_keepsame(a1, b1)); BigDecimal c2
-	 * = new BigDecimal(crossover_keepmore(a2, b2));
-	 *
-	 * BigDecimal c = c1.add(c2.movePointLeft(c2.precision()));
-	 *
-	 * return c; }
-	 */
-
-	/*
-	 * public BigInteger crossover_keepsame(BigInteger a, BigInteger b) { String
-	 * as = a.toString(); String bs = b.toString(); String cs = ""; int al =
-	 * random.nextInt(as.length() + 1); int bl = random.nextInt(bs.length() +
-	 * 1); // / // System.out.println(); // System.out.println("as="+as); //
-	 * System.out.println("bs="+bs); // / if (random.nextBoolean()) { while
-	 * (cs.length() < al) cs += as.charAt(cs.length()); //
-	 * System.out.println("al="+al); // System.out.println("cs="+cs); //
-	 * System.out.println("bl="+bl); while (bl < bs.length()) cs +=
-	 * bs.charAt(bl++); // System.out.println("cs="+cs); } else { while
-	 * (cs.length() < bl) cs += bs.charAt(cs.length()); //
-	 * System.out.println("bl="+bl); // System.out.println("cs="+cs); //
-	 * System.out.println("al="+al); while (al < as.length()) cs +=
-	 * as.charAt(al++); // System.out.println("cs="+cs); } return new
-	 * BigInteger(String.valueOf("0" + cs)); }
-	 *
-	 * public BigInteger crossover_keepmore(BigInteger a, BigInteger b) { String
-	 * as = a.toString(); String bs = b.toString(); String cs = ""; while
-	 * ((cs.length() < as.length()) && (cs.length() < bs.length())) { if
-	 * (random.nextBoolean()) { cs += as.charAt(cs.length()); } else { cs +=
-	 * bs.charAt(cs.length()); } } while (cs.length() < as.length()) { cs +=
-	 * as.charAt(cs.length()); } while (cs.length() < bs.length()) { cs +=
-	 * bs.charAt(cs.length()); } // System.out.println(); //
-	 * System.out.println(as); // System.out.println(bs); //
-	 * System.out.println(cs); return new BigInteger(String.valueOf(cs)); }
-	 */
-
 	public void mutation() {
-		int len;
+
 		for (int i = 0; i < this.population.length; i++)
 			if (random.nextDouble() <= this.PMUTATION)
-				for (int j = 0; j < this.NVAR.intValue(); j++)
-					for (int k = 0; k < 2; k++) {
-						if (k == 0)
-							len = this.NSIGB.intValue();
-						else
-							len = this.NSIGA.intValue();
-						for (int l = 0; l < len; l++)
-							if (random.nextDouble() <= this.AMUTATION)
-								this.population[i].code[j][k].set(l, !this.population[i].code[j][k].get(l));
-					}
+				this.population[i] = mutation(this.population[i]);
+	}
+
+	public Gen mutation(Gen pop) {
+		int len;
+		for (int j = 0; j < this.NVAR.intValue(); j++)
+			for (int k = 0; k < 2; k++) {
+				if (k == 0)
+					len = this.NSIGB.intValue();
+				else
+					len = this.NSIGA.intValue();
+				for (int l = 0; l < len; l++)
+					if (random.nextDouble() <= this.AMUTATION)
+						pop.code[j][k].set(l, !pop.code[j][k].get(l));
+			}
+		return pop;
 	}
 
 	/* utility variables */
@@ -455,24 +412,6 @@ public class GA {
 		}
 		return result;
 	}
-
-	/*
-	 * public BigDecimal random_no_decimal_place(BigDecimal l) { BigDecimal
-	 * result = new BigDecimal("0.0"); for (BigDecimal i = zero(); !i.equals(l);
-	 * i = i.add(one)) { result = result.multiply(ten()).add(new
-	 * BigDecimal(random.nextInt(10))); } return result; }
-	 *
-	 * public static BigDecimal random_with_decimal_place(BigDecimal l) { int[]
-	 * s = new int[l.intValue()]; for (int i = 0; i < l.intValue(); i++) { s[i]
-	 * = 10; } int li; do { int[] list = new int[32767]; li = -1; for (int i =
-	 * 0; i < l.intValue(); i++) { if (s[i] == 10) { list[++li] = i; } } if (li
-	 * > 0) { s[list[random.nextInt(li + 1)]] = random.nextInt(10); } else {
-	 * break; } } while (true); String str = "";
-	 *
-	 * for (int i = 0; i < l.intValue(); i++) { if (s[i] != 10) { str +=
-	 * Integer.toString(s[i]); } else { str += '.'; } } return new
-	 * BigDecimal(str); }
-	 */
 
 	public static void CreateDemo(String filepath, String coding) {
 		System.out.print("Creating " + filepath + " ...");
@@ -553,20 +492,15 @@ public class GA {
 
 		/* breeding */
 		System.out.print("\nBreeding...");
-		// System.out.print("\nBest value of Generation ");
-		// String s = "";
-		// int l;
+		ga.evaluate();
+		ga.select_X();
 		for (BigInteger IGENS = zero.toBigInteger(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one.toBigInteger())) {
-			// l = s.length();
-			// s = IGENS.toString()+ ":  "+
-			// ga.population[0].code[0].divide(ga.population[0].code[1],40,
-			// BigDecimal.ROUND_HALF_UP);
-			// System.out.print(BackSpace(l) + s);
 			ga.nextGeneration();
 			ga.report(IGENS.add(one.toBigInteger()));
 		}
 
+		/* end */
 		System.out.println(Space(50));
-		System.out.println("End.");
+		System.out.println(Space(5) + "End." + Space(5));
 	}
 }
