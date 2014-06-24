@@ -19,7 +19,6 @@ import java.util.BitSet;
 // general utility
 import java.util.Random;
 import java.util.Arrays;
-import java.util.Vector;
 
 public class GA {
 
@@ -38,6 +37,10 @@ public class GA {
 	public double AMUTATION;
 	public double CUTOFF;
 	public Gen[] population;
+
+	/* Genetic Algorithm option */
+	public String Mode_Crossover;
+	public String Mode_Mutation;
 
 	/* problem specific */
 	public BigInteger NVAR;// number of characteristic(s)
@@ -105,8 +108,11 @@ public class GA {
 
 		// find fractional expression of target, PI in this example
 		public void evaluate() {
-			//this.fitness = Target.subtract(this.getvalue()).abs();
-			this.fitness = this.getvalue();
+			// this.fitness = Target.subtract(this.getvalue()).abs();
+			// BigDecimal x=this.getvalue();
+			// this.fitness
+			// =x.multiply(x).add(x).subtract(one).subtract(Target).abs();
+			this.fitness = this.getvalue().subtract(Target).abs();
 		}
 
 		@Override
@@ -120,6 +126,7 @@ public class GA {
 	} /* end of class Gen */
 
 	public void SetVar(String sfromfile) {
+		int n=32;
 		Pattern MY_PATTERN = Pattern.compile(":(.*)");
 		Matcher m = MY_PATTERN.matcher(sfromfile);
 		while (m.find()) {
@@ -127,39 +134,47 @@ public class GA {
 			// s now contains " <value of parameter>"
 			if (sfromfile.matches("Population Size ?:.*")) {
 				this.POPSIZE = new BigInteger(s.trim());
-				System.out.println("Population Size : " + this.POPSIZE);
+				System.out.println("Population Size : " + this.POPSIZE+Space(n));
 			}
 			if (sfromfile.matches("Generation Limit ?.* ?:.*")) {
 				this.MAXGENS = new BigInteger(s.trim());
-				System.out.println("Generation Limit : " + this.MAXGENS);
+				System.out.println("Generation Limit : " + this.MAXGENS+Space(n));
 			}
 			if (sfromfile.matches("Bit length of each chromosome before decimal place ?.* ?:.*")) {
 				this.NSIGB = new BigInteger(s.trim());
-				System.out.println("Length of each chromosome : " + this.NSIGB);
+				System.out.println("Length of each chromosome : " + this.NSIGB+Space(n));
 			}
 			if (sfromfile.matches("Bit length of each chromosome after decimal place ?.* ?:.*")) {
 				this.NSIGA = new BigInteger(s.trim());
-				System.out.println("Length of each chromosome : " + this.NSIGA);
+				System.out.println("Length of each chromosome : " + this.NSIGA+Space(n));
 			}
 			if (sfromfile.matches("Probability of Mutation ?.* ?:.*")) {
 				this.PMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Probability of Mutation : " + this.PMUTATION);
+				System.out.println("Probability of Mutation : " + this.PMUTATION+Space(n));
 			}
 			if (sfromfile.matches("Amount of Mutation ?.* ?:.*")) {
 				this.AMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Amount of Mutation : " + this.AMUTATION);
+				System.out.println("Amount of Mutation : " + this.AMUTATION+Space(n));
 			}
 			if (sfromfile.matches("Cutoff ?.* ?:.*")) {
 				this.CUTOFF = Double.parseDouble(s.trim());
-				System.out.println("CUTOFF : " + this.CUTOFF);
+				System.out.println("CUTOFF : " + this.CUTOFF+Space(n));
+			}
+			if (sfromfile.matches("Crossover ?.* ?:.*")) {
+				Mode_Crossover = s.trim();
+				System.out.println("Crossover (parent kill/keep) : " + Mode_Crossover+Space(n));
+			}
+			if (sfromfile.matches("Mutation ?.* ?:.*")) {
+				Mode_Mutation = s.trim();
+				System.out.println("Mutation (all or new_only) : " + Mode_Mutation+Space(n));
 			}
 			if (sfromfile.matches("NVARS ?:.*")) {
 				NVAR = new BigInteger(s.trim());
-				System.out.println("NVARS : " + NVAR);
+				System.out.println("NVARS : " + NVAR+Space(n));
 			}
 			if (sfromfile.matches("Target ?:.*")) {
 				Target = new BigDecimal(s.trim());
-				System.out.println("Target : " + Target);
+				System.out.println("Target : " + Target+Space(n));
 			}
 		}
 	}
@@ -197,10 +212,22 @@ public class GA {
 
 	public void nextGeneration() {
 		// this.Rfitness();
-		//this.crossover_killParent();
-		 this.crossover_keepParent();
-		// this.mutation();
-		 this.mutation_newonly();
+		switch (Mode_Crossover) {
+		case "kill":
+			this.crossover_killParent();
+			break;
+		case "keep":
+			this.crossover_keepParent();
+			break;
+		}
+		switch (Mode_Mutation) {
+		case "all":
+			this.mutation_all();
+			break;
+		case "new_only":
+			this.mutation_newonly();
+			break;
+		}
 		// this.check();
 		this.evaluate();
 		this.select_X(); // sort for crossover
@@ -209,7 +236,7 @@ public class GA {
 	public void report(BigInteger I) {
 		String s;
 		int n = 4;
-		//if (random.nextFloat()>0.01) return;
+		// if (random.nextFloat()>0.01) return;
 		gotorc(1, 1);
 		System.out.println("Generation " + I + Space(5));
 		// for (int i = 0; i < 1 * this.POPSIZE.intValue(); i++) {
@@ -224,6 +251,8 @@ public class GA {
 			s += this.population[i].getcode();
 			s += Space(n);
 			s += this.population[i].Survivor ? "T" : "F";
+			s += Space(n);
+			s += this.population[i].getvalue().doubleValue();
 			s += Space(n);
 			s += this.population[i].fitness.doubleValue();
 			s += Space(n);
@@ -314,8 +343,8 @@ public class GA {
 	}
 
 	public BitSet crossover(BitSet a_ori, BitSet b_ori) {
-		BitSet a =(BitSet) a_ori.clone();
-		BitSet b =(BitSet) b_ori.clone();
+		BitSet a = (BitSet) a_ori.clone();
+		BitSet b = (BitSet) b_ori.clone();
 		BitSet result = new BitSet();
 		if (a.length() < b.length()) {
 			a.set(b.length() - 1, true);
@@ -333,7 +362,7 @@ public class GA {
 		return result;
 	}
 
-	public void mutation() {
+	public void mutation_all() {
 		for (int i = 0; i < this.population.length; i++)
 			if (random.nextDouble() <= this.PMUTATION)
 				this.population[i] = mutation(this.population[i]);
