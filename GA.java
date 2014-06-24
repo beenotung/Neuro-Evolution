@@ -186,22 +186,23 @@ public class GA {
 				switch (s.trim()) {
 				case "code":
 					this.Report_code = true;
-					System.out.println("Report Item : "+s.trim());
+					System.out.println("Report Item : " + s.trim());
 					break;
 				case "value":
 					this.Report_value = true;
-					System.out.println("Report Item : "+s.trim());
+					System.out.println("Report Item : " + s.trim());
 					break;
 				case "fitness":
 					this.Report_fitness = true;
-					System.out.println("Report Item : "+s.trim());
+					System.out.println("Report Item : " + s.trim());
 					break;
 				default:
 					String ss = s.trim();
 					if (ss.matches("survivor.*")) {
 						this.Report_survivor[0] = ss.charAt(ss.length() - 1);
 						this.Report_survivor[1] = ss.charAt(ss.length() - 2);
-						System.out.println("Report survivor : " + this.Report_survivor[0]+this.Report_survivor[1]+Space(n));
+						System.out.println("Report survivor : " + this.Report_survivor[0] + this.Report_survivor[1]
+								+ Space(n));
 					}
 					break;
 				}
@@ -413,29 +414,30 @@ public class GA {
 
 	public void mutation_all() {
 		for (int i = 0; i < this.population.length; i++)
-			if (random.nextDouble() <= this.PMUTATION)
-				this.population[i] = mutation(this.population[i]);
+			for (int j = 0; j < this.NVAR.intValue(); j++)
+				if (random.nextDouble() <= this.PMUTATION)
+					mutation(this.population[i].code[j]);
 	}
 
 	public void mutation_newonly() {
 		for (int i = 0; i < this.population.length; i++)
-			if ((!this.population[i].Survivor) && (random.nextDouble() <= this.PMUTATION))
-				this.population[i] = mutation(this.population[i]);
+			if (!this.population[i].Survivor)
+				for (int j = 0; j < this.NVAR.intValue(); j++)
+					if (random.nextDouble() <= this.PMUTATION)
+						mutation(this.population[i].code[j]);
 	}
 
-	public Gen mutation(Gen pop) {
+	private void mutation(BitSet[] bs) {
 		int len;
-		for (int j = 0; j < this.NVAR.intValue(); j++)
-			for (int k = 0; k < 2; k++) {
-				if (k == 0)
-					len = this.NSIGB.intValue();
-				else
-					len = this.NSIGA.intValue();
-				for (int l = 0; l < len; l++)
-					if (random.nextDouble() <= this.AMUTATION)
-						pop.code[j][k].set(l, !pop.code[j][k].get(l));
-			}
-		return pop;
+		for (int k = 0; k < 2; k++) {
+			if (k == 0)
+				len = this.NSIGB.intValue();
+			else
+				len = this.NSIGA.intValue();
+			for (int l = 0; l < len; l++)
+				if (random.nextDouble() <= this.AMUTATION)
+					bs[k].set(l, !bs[k].get(l));
+		}
 	}
 
 	/* utility variables */
