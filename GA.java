@@ -50,9 +50,9 @@ public class GA {
 	public boolean Report_fitness = false;
 
 	/* problem specific */
-	public BigInteger NVAR;// number of characteristic(s)
-	// public BigInteger PRECISION;
-	public BigDecimal Target;
+	public BigInteger NVAR;// dimension of the problem
+	public BigDecimal[] Target = { new BigDecimal(40), new BigDecimal(190), new BigDecimal(418), new BigDecimal(1796) };
+	public BigDecimal[][] Example = { { new BigDecimal(1), new BigDecimal(2), new BigDecimal(3), new BigDecimal(4) }, { new BigDecimal(2), new BigDecimal(6), new BigDecimal(12), new BigDecimal(24) }, { new BigDecimal(12), new BigDecimal(72),new BigDecimal(17), new BigDecimal(22) }, { new BigDecimal(864), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4) } };
 
 	/*
 	 * Gen code Class container of chromosome(s)
@@ -84,17 +84,17 @@ public class GA {
 
 		}
 
-		public BigDecimal getvalue() {
+		public BigDecimal getvalue(int var) {
 			BigDecimal value = zero();
 			BigDecimal rate = one();
 			for (int i = this.NSIGB.intValue() - 1; i >= 0; i--) {
-				if (this.code[0][0].get(i))
+				if (this.code[var][0].get(i))
 					value = value.add(rate);
 				rate = rate.multiply(two);
 			}
 			rate = one.divide(two);
 			for (int i = 0; i < this.NSIGA.intValue(); i++) {
-				if (this.code[0][1].get(i))
+				if (this.code[var][1].get(i))
 					value = value.add(rate);
 				rate = rate.divide(two);
 			}
@@ -119,7 +119,17 @@ public class GA {
 			// BigDecimal x=this.getvalue();
 			// this.fitness
 			// =x.multiply(x).add(x).subtract(one).subtract(Target).abs();
-			this.fitness = this.getvalue().subtract(Target).abs();
+			//this.fitness = this.getvalue().subtract(Target).abs();
+			this.fitness=zero();
+			 BigDecimal temp;
+			for (int i=0;i<NVAR.intValue();i++){
+				temp=zero();
+				for (int j=0;j<NVAR.intValue();j++){
+					temp=temp.add(this.getvalue(j).multiply(Example[i][j]));
+				}
+				this.fitness=this.fitness.add()
+				
+			}
 		}
 
 		@Override
@@ -213,7 +223,7 @@ public class GA {
 				System.out.println("NVARS : " + NVAR + Space(n));
 			}
 			if (sfromfile.matches("Target ?:.*")) {
-				Target = new BigDecimal(s.trim());
+			//	Target = new BigDecimal(s.trim());
 				System.out.println("Target : " + Target + Space(n));
 			}
 		}
@@ -299,7 +309,8 @@ public class GA {
 			}
 			if (this.Report_value) {
 				s += Space(n);
-				s += this.population[i].getvalue().doubleValue();
+				for (int j=0;j<this.NVAR.intValue();j++)
+				s += this.population[i].getvalue(j).doubleValue();
 			}
 			if (this.Report_fitness) {
 				s += Space(n);
