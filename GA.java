@@ -42,6 +42,13 @@ public class GA {
 	public String Mode_Crossover;
 	public String Mode_Mutation;
 
+	/* Interface option */
+	public double Report_rate = 1;
+	public boolean Report_code = false;
+	public char[] Report_survivor = new char[] { ' ', ' ' };
+	public boolean Report_value = false;
+	public boolean Report_fitness = false;
+
 	/* problem specific */
 	public BigInteger NVAR;// number of characteristic(s)
 	// public BigInteger PRECISION;
@@ -126,55 +133,87 @@ public class GA {
 	} /* end of class Gen */
 
 	public void SetVar(String sfromfile) {
-		int n=32;
-		Pattern MY_PATTERN = Pattern.compile(":(.*)");
-		Matcher m = MY_PATTERN.matcher(sfromfile);
+		int n = 32;
+		Pattern Colon_Pattern = Pattern.compile(":(.*)");
+		Matcher m = Colon_Pattern.matcher(sfromfile);
 		while (m.find()) {
 			String s = m.group(1);
 			// s now contains " <value of parameter>"
+			/* Genetic Algorithm constant */
 			if (sfromfile.matches("Population Size ?:.*")) {
 				this.POPSIZE = new BigInteger(s.trim());
-				System.out.println("Population Size : " + this.POPSIZE+Space(n));
+				System.out.println("Population Size : " + this.POPSIZE + Space(n));
 			}
 			if (sfromfile.matches("Generation Limit ?.* ?:.*")) {
 				this.MAXGENS = new BigInteger(s.trim());
-				System.out.println("Generation Limit : " + this.MAXGENS+Space(n));
+				System.out.println("Generation Limit : " + this.MAXGENS + Space(n));
 			}
 			if (sfromfile.matches("Bit length of each chromosome before decimal place ?.* ?:.*")) {
 				this.NSIGB = new BigInteger(s.trim());
-				System.out.println("Length of each chromosome : " + this.NSIGB+Space(n));
+				System.out.println("Length of each chromosome : " + this.NSIGB + Space(n));
 			}
 			if (sfromfile.matches("Bit length of each chromosome after decimal place ?.* ?:.*")) {
 				this.NSIGA = new BigInteger(s.trim());
-				System.out.println("Length of each chromosome : " + this.NSIGA+Space(n));
+				System.out.println("Length of each chromosome : " + this.NSIGA + Space(n));
 			}
 			if (sfromfile.matches("Probability of Mutation ?.* ?:.*")) {
 				this.PMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Probability of Mutation : " + this.PMUTATION+Space(n));
+				System.out.println("Probability of Mutation : " + this.PMUTATION + Space(n));
 			}
 			if (sfromfile.matches("Amount of Mutation ?.* ?:.*")) {
 				this.AMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Amount of Mutation : " + this.AMUTATION+Space(n));
+				System.out.println("Amount of Mutation : " + this.AMUTATION + Space(n));
 			}
 			if (sfromfile.matches("Cutoff ?.* ?:.*")) {
 				this.CUTOFF = Double.parseDouble(s.trim());
-				System.out.println("CUTOFF : " + this.CUTOFF+Space(n));
+				System.out.println("CUTOFF : " + this.CUTOFF + Space(n));
 			}
+			/* Algorithm option */
 			if (sfromfile.matches("Crossover ?.* ?:.*")) {
 				Mode_Crossover = s.trim();
-				System.out.println("Crossover (parent kill/keep) : " + Mode_Crossover+Space(n));
+				System.out.println("Crossover (parent kill/keep) : " + Mode_Crossover + Space(n));
 			}
 			if (sfromfile.matches("Mutation ?.* ?:.*")) {
 				Mode_Mutation = s.trim();
-				System.out.println("Mutation (all or new_only) : " + Mode_Mutation+Space(n));
+				System.out.println("Mutation (all or new_only) : " + Mode_Mutation + Space(n));
 			}
+			/* Interface option */
+			if (sfromfile.matches("Report rate ?.* ?:.*")) {
+				this.Report_rate = Double.parseDouble(s.trim());
+				System.out.println("Report rate : " + this.Report_rate + Space(n));
+			}
+			if (sfromfile.matches("Report Item ?.* ?:.*")) {
+				switch (s.trim()) {
+				case "code":
+					this.Report_code = true;
+					System.out.println("Report Item : "+s.trim());
+					break;
+				case "value":
+					this.Report_value = true;
+					System.out.println("Report Item : "+s.trim());
+					break;
+				case "fitness":
+					this.Report_fitness = true;
+					System.out.println("Report Item : "+s.trim());
+					break;
+				default:
+					String ss = s.trim();
+					if (ss.matches("survivor.*")) {
+						this.Report_survivor[0] = ss.charAt(ss.length() - 1);
+						this.Report_survivor[1] = ss.charAt(ss.length() - 2);
+						System.out.println("Report survivor : " + this.Report_survivor[0]+this.Report_survivor[1]+Space(n));
+					}
+					break;
+				}
+			}
+			/* problem specific */
 			if (sfromfile.matches("NVARS ?:.*")) {
 				NVAR = new BigInteger(s.trim());
-				System.out.println("NVARS : " + NVAR+Space(n));
+				System.out.println("NVARS : " + NVAR + Space(n));
 			}
 			if (sfromfile.matches("Target ?:.*")) {
 				Target = new BigDecimal(s.trim());
-				System.out.println("Target : " + Target+Space(n));
+				System.out.println("Target : " + Target + Space(n));
 			}
 		}
 	}
@@ -236,25 +275,35 @@ public class GA {
 	public void report(BigInteger I) {
 		String s;
 		int n = 4;
-		// if (random.nextFloat()>0.01) return;
+		if (random.nextFloat() > this.Report_rate)
+			return;
 		gotorc(1, 1);
-		System.out.println("Generation " + I + Space(5));
+		System.out.println("Generation " + I + Space(n));
 		// for (int i = 0; i < 1 * this.POPSIZE.intValue(); i++) {
 		for (int i = 0; i < Math.min(32, this.POPSIZE.intValue()); i++) {
-			System.out.print(i);
 			if (i < 10)
 				System.out.print(" ");
+			System.out.print(i);
 			// System.out.println(Space(n) + this.population[i].getcode() +
 			// Space(n) +
 			// this.population[i].getvalue()+Space(n)+this.population[i].fitness.doubleValue()+Space(n));
-			s = Space(n);
-			s += this.population[i].getcode();
-			s += Space(n);
-			s += this.population[i].Survivor ? "T" : "F";
-			s += Space(n);
-			s += this.population[i].getvalue().doubleValue();
-			s += Space(n);
-			s += this.population[i].fitness.doubleValue();
+			s = "";
+			if (this.Report_code) {
+				s += Space(n);
+				s += this.population[i].getcode();
+			}
+			if (this.Report_survivor[0] != ' ') {
+				s += Space(n);
+				s += this.population[i].Survivor ? "T" : "F";
+			}
+			if (this.Report_value) {
+				s += Space(n);
+				s += this.population[i].getvalue().doubleValue();
+			}
+			if (this.Report_fitness) {
+				s += Space(n);
+				s += this.population[i].fitness.doubleValue();
+			}
 			s += Space(n);
 			System.out.println(s);
 		}
@@ -460,6 +509,7 @@ public class GA {
 		PrintWriter writer;
 		try {
 			writer = new PrintWriter(filepath, coding);
+			/* Genetic Algorithm constant */
 			writer.println("/* Genetic Algorithm constant */");
 			writer.println("Population Size : 50");
 			writer.println("Generation Limit (Iteration Steps) : 1000");
@@ -469,6 +519,21 @@ public class GA {
 			writer.println("Amount of Mutation : 0.1");
 			writer.println("Cutoff : 0.25");
 			writer.println("");
+			/* Algorithm option */
+			writer.println("/* Algorithm option */");
+			writer.println("Crossover (parent kill/keep) : keep");
+			writer.println("Mutation (all or new_only) : new_only");
+			writer.println("");
+			/* Interface option */
+			writer.println("/* Interface option */");
+			writer.println("Report rate (i.e. 0/1/0.01) : 0.01");
+			writer.println("Report Item (i.e. code, survivor(together with two char), value, fitness)");
+			writer.println("Report Item : code");
+			writer.println("Report Item : survivor TF");
+			writer.println("Report Item : value");
+			writer.println("Report Item : fitness");
+			writer.println("");
+			/* problem specific */
 			writer.println("/* problem specific */");
 			writer.println("NVARS : 1");
 			writer.println("Target : 3.14");
@@ -519,7 +584,8 @@ public class GA {
 	 */
 
 	public static void main(String[] args) {
-		System.out.println();
+		for (int i = 0; i < 256; i++)
+			System.out.println();
 		System.out.println(version);
 		System.out.println();
 
