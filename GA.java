@@ -52,7 +52,10 @@ public class GA {
 	/* problem specific */
 	public BigInteger NVAR;// dimension of the problem
 	public BigDecimal[] Target = { new BigDecimal(40), new BigDecimal(190), new BigDecimal(418), new BigDecimal(1796) };
-	public BigDecimal[][] Example = { { new BigDecimal(1), new BigDecimal(2), new BigDecimal(3), new BigDecimal(4) }, { new BigDecimal(2), new BigDecimal(6), new BigDecimal(12), new BigDecimal(24) }, { new BigDecimal(12), new BigDecimal(72),new BigDecimal(17), new BigDecimal(22) }, { new BigDecimal(864), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4) } };
+	public BigDecimal[][] Example = { { new BigDecimal(1), new BigDecimal(2), new BigDecimal(3), new BigDecimal(4) },
+			{ new BigDecimal(2), new BigDecimal(6), new BigDecimal(12), new BigDecimal(24) },
+			{ new BigDecimal(12), new BigDecimal(72), new BigDecimal(17), new BigDecimal(22) },
+			{ new BigDecimal(864), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4) } };
 
 	/*
 	 * Gen code Class container of chromosome(s)
@@ -101,14 +104,14 @@ public class GA {
 			return value;
 		}
 
-		public String getcode() {
+		public String getcode(int var) {
 			String result = "";
 			for (int i = 0; i < this.NSIGB.intValue(); i++) {
-				result += (this.code[0][0].get(i)) ? "1" : 0;
+				result += (this.code[var][0].get(i)) ? "1" : 0;
 			}
 			result += ".";
 			for (int i = 0; i < this.NSIGA.intValue(); i++) {
-				result += (this.code[0][1].get(i)) ? "1" : 0;
+				result += (this.code[var][1].get(i)) ? "1" : 0;
 			}
 			return result;
 		}
@@ -119,16 +122,15 @@ public class GA {
 			// BigDecimal x=this.getvalue();
 			// this.fitness
 			// =x.multiply(x).add(x).subtract(one).subtract(Target).abs();
-			//this.fitness = this.getvalue().subtract(Target).abs();
-			this.fitness=zero();
-			 BigDecimal temp;
-			for (int i=0;i<NVAR.intValue();i++){
-				temp=zero();
-				for (int j=0;j<NVAR.intValue();j++){
-					temp=temp.add(this.getvalue(j).multiply(Example[i][j]));
+			// this.fitness = this.getvalue().subtract(Target).abs();
+			this.fitness = zero();
+			BigDecimal temp;
+			for (int i = 0; i < NVAR.intValue(); i++) {
+				temp = zero();
+				for (int j = 0; j < NVAR.intValue(); j++) {
+					temp = temp.add(this.getvalue(j).multiply(Example[i][j]));
 				}
-				this.fitness=this.fitness.add()
-				
+				this.fitness = this.fitness.add(temp.subtract(Target[i]).abs());
 			}
 		}
 
@@ -223,7 +225,7 @@ public class GA {
 				System.out.println("NVARS : " + NVAR + Space(n));
 			}
 			if (sfromfile.matches("Target ?:.*")) {
-			//	Target = new BigDecimal(s.trim());
+				// Target = new BigDecimal(s.trim());
 				System.out.println("Target : " + Target + Space(n));
 			}
 		}
@@ -300,17 +302,20 @@ public class GA {
 			// this.population[i].getvalue()+Space(n)+this.population[i].fitness.doubleValue()+Space(n));
 			s = "";
 			if (this.Report_code) {
-				s += Space(n);
-				s += this.population[i].getcode();
+				for (int j = 0; j < this.NVAR.intValue(); j++) {
+					s += Space(n);
+					s += this.population[i].getcode(j);
+				}
+			}
+			if (this.Report_value) {
+				for (int j = 0; j < this.NVAR.intValue(); j++) {
+					s += Space(n);
+					s += this.population[i].getvalue(j).doubleValue();
+				}
 			}
 			if (this.Report_survivor[0] != ' ') {
 				s += Space(n);
 				s += this.population[i].Survivor ? "T" : "F";
-			}
-			if (this.Report_value) {
-				s += Space(n);
-				for (int j=0;j<this.NVAR.intValue();j++)
-				s += this.population[i].getvalue(j).doubleValue();
 			}
 			if (this.Report_fitness) {
 				s += Space(n);
@@ -613,9 +618,14 @@ public class GA {
 
 		/* breeding */
 		System.out.print("\nBreeding...");
-		ga.evaluate();
-		ga.select_X();
-		ga.report(zero.toBigInteger());
+		{
+			ga.evaluate();
+			ga.select_X();
+			double temp = ga.Report_rate;
+			ga.Report_rate = 1;
+			ga.report(zero.toBigInteger());
+			ga.Report_rate = temp;
+		}
 		for (BigInteger IGENS = zero.toBigInteger(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one.toBigInteger())) {
 			ga.nextGeneration();
 			ga.report(IGENS.add(one.toBigInteger()));
