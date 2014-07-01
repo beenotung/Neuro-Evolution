@@ -17,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.BitSet;
 // general utility
-import java.util.Random;
 import java.util.Arrays;
 
 public class GA {
@@ -37,6 +36,7 @@ public class GA {
 	public double AMUTATION;
 	public double CUTOFF;
 	public Gen[] population;
+	public BigInteger IGENS;
 
 	/* Genetic Algorithm option */
 	public String Mode_Crossover;
@@ -49,13 +49,27 @@ public class GA {
 	public boolean Report_value = false;
 	public boolean Report_fitness = false;
 
+	/* Threads interval */
+	public static final long GENERAL_INTERVAL=5;
+
 	/* problem specific */
 	public BigInteger NVAR;// dimension of the problem
-	public BigDecimal[] Target = { new BigDecimal(40), new BigDecimal(190), new BigDecimal(418), new BigDecimal(1796) };
-	public BigDecimal[][] Example = { { new BigDecimal(1), new BigDecimal(2), new BigDecimal(3), new BigDecimal(4) },
-			{ new BigDecimal(2), new BigDecimal(6), new BigDecimal(12), new BigDecimal(24) },
-			{ new BigDecimal(12), new BigDecimal(72), new BigDecimal(17), new BigDecimal(22) },
-			{ new BigDecimal(864), new BigDecimal(8), new BigDecimal(6), new BigDecimal(4) } };
+	public BigDecimal[] Target = { new BigDecimal(40), new BigDecimal(190),
+			new BigDecimal(418), new BigDecimal(1796) };
+	public BigDecimal[][] Example = {
+			{ new BigDecimal(1), new BigDecimal(2), new BigDecimal(3),
+					new BigDecimal(4) },
+			{ new BigDecimal(2), new BigDecimal(6), new BigDecimal(12),
+					new BigDecimal(24) },
+			{ new BigDecimal(12), new BigDecimal(72), new BigDecimal(17),
+					new BigDecimal(22) },
+			{ new BigDecimal(864), new BigDecimal(8), new BigDecimal(6),
+					new BigDecimal(4) } };
+
+	/*
+	 * Threads
+	 */
+	Report report;
 
 	/*
 	 * Gen code Class container of chromosome(s)
@@ -78,8 +92,8 @@ public class GA {
 			for (int i = 0; i < NVAR.intValue(); i++) {
 				// this.code[i] = random_no_decimal_place(NSIG);
 				// this.code[i] = random_with_decimal_place(NSIG);
-				this.code[i][0] = random_bitset(NSIGB.intValue());
-				this.code[i][1] = random_bitset(NSIGA.intValue());
+				this.code[i][0] = Utils.random_bitset(NSIGB.intValue());
+				this.code[i][1] = Utils.random_bitset(NSIGA.intValue());
 			}
 		}
 
@@ -88,18 +102,18 @@ public class GA {
 		}
 
 		public BigDecimal getvalue(int var) {
-			BigDecimal value = zero();
-			BigDecimal rate = one();
+			BigDecimal value = Utils.zero();
+			BigDecimal rate = Utils.one();
 			for (int i = this.NSIGB.intValue() - 1; i >= 0; i--) {
 				if (this.code[var][0].get(i))
 					value = value.add(rate);
-				rate = rate.multiply(two);
+				rate = rate.multiply(Utils.two);
 			}
-			rate = one.divide(two);
+			rate = Utils.one.divide(Utils.two);
 			for (int i = 0; i < this.NSIGA.intValue(); i++) {
 				if (this.code[var][1].get(i))
 					value = value.add(rate);
-				rate = rate.divide(two);
+				rate = rate.divide(Utils.two);
 			}
 			return value;
 		}
@@ -123,10 +137,10 @@ public class GA {
 			// this.fitness
 			// =x.multiply(x).add(x).subtract(one).subtract(Target).abs();
 			// this.fitness = this.getvalue().subtract(Target).abs();
-			this.fitness = zero();
+			this.fitness = Utils.zero();
 			BigDecimal temp;
 			for (int i = 0; i < NVAR.intValue(); i++) {
-				temp = zero();
+				temp = Utils.zero();
 				for (int j = 0; j < NVAR.intValue(); j++) {
 					temp = temp.add(this.getvalue(j).multiply(Example[i][j]));
 				}
@@ -154,45 +168,56 @@ public class GA {
 			/* Genetic Algorithm constant */
 			if (sfromfile.matches("Population Size ?:.*")) {
 				this.POPSIZE = new BigInteger(s.trim());
-				System.out.println("Population Size : " + this.POPSIZE + Space(n));
+				System.out.println("Population Size : " + this.POPSIZE
+						+ Utils.Space(n));
 			}
 			if (sfromfile.matches("Generation Limit ?.* ?:.*")) {
 				this.MAXGENS = new BigInteger(s.trim());
-				System.out.println("Generation Limit : " + this.MAXGENS + Space(n));
+				System.out.println("Generation Limit : " + this.MAXGENS
+						+ Utils.Space(n));
 			}
-			if (sfromfile.matches("Bit length of each chromosome before decimal place ?.* ?:.*")) {
+			if (sfromfile
+					.matches("Bit length of each chromosome before decimal place ?.* ?:.*")) {
 				this.NSIGB = new BigInteger(s.trim());
-				System.out.println("Length of each chromosome : " + this.NSIGB + Space(n));
+				System.out.println("Length of each chromosome : " + this.NSIGB
+						+ Utils.Space(n));
 			}
-			if (sfromfile.matches("Bit length of each chromosome after decimal place ?.* ?:.*")) {
+			if (sfromfile
+					.matches("Bit length of each chromosome after decimal place ?.* ?:.*")) {
 				this.NSIGA = new BigInteger(s.trim());
-				System.out.println("Length of each chromosome : " + this.NSIGA + Space(n));
+				System.out.println("Length of each chromosome : " + this.NSIGA
+						+ Utils.Space(n));
 			}
 			if (sfromfile.matches("Probability of Mutation ?.* ?:.*")) {
 				this.PMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Probability of Mutation : " + this.PMUTATION + Space(n));
+				System.out.println("Probability of Mutation : "
+						+ this.PMUTATION + Utils.Space(n));
 			}
 			if (sfromfile.matches("Amount of Mutation ?.* ?:.*")) {
 				this.AMUTATION = Double.parseDouble(s.trim());
-				System.out.println("Amount of Mutation : " + this.AMUTATION + Space(n));
+				System.out.println("Amount of Mutation : " + this.AMUTATION
+						+ Utils.Space(n));
 			}
 			if (sfromfile.matches("Cutoff ?.* ?:.*")) {
 				this.CUTOFF = Double.parseDouble(s.trim());
-				System.out.println("CUTOFF : " + this.CUTOFF + Space(n));
+				System.out.println("CUTOFF : " + this.CUTOFF + Utils.Space(n));
 			}
 			/* Algorithm option */
 			if (sfromfile.matches("Crossover ?.* ?:.*")) {
 				Mode_Crossover = s.trim();
-				System.out.println("Crossover (parent kill/keep) : " + Mode_Crossover + Space(n));
+				System.out.println("Crossover (parent kill/keep) : "
+						+ Mode_Crossover + Utils.Space(n));
 			}
 			if (sfromfile.matches("Mutation ?.* ?:.*")) {
 				Mode_Mutation = s.trim();
-				System.out.println("Mutation (all or new_only) : " + Mode_Mutation + Space(n));
+				System.out.println("Mutation (all or new_only) : "
+						+ Mode_Mutation + Utils.Space(n));
 			}
 			/* Interface option */
 			if (sfromfile.matches("Report rate ?.* ?:.*")) {
 				this.Report_rate = Double.parseDouble(s.trim());
-				System.out.println("Report rate : " + this.Report_rate + Space(n));
+				System.out.println("Report rate : " + this.Report_rate
+						+ Utils.Space(n));
 			}
 			if (sfromfile.matches("Report Item ?.* ?:.*")) {
 				switch (s.trim()) {
@@ -213,8 +238,9 @@ public class GA {
 					if (ss.matches("survivor.*")) {
 						this.Report_survivor[0] = ss.charAt(ss.length() - 1);
 						this.Report_survivor[1] = ss.charAt(ss.length() - 2);
-						System.out.println("Report survivor : " + this.Report_survivor[0] + this.Report_survivor[1]
-								+ Space(n));
+						System.out.println("Report survivor : "
+								+ this.Report_survivor[0]
+								+ this.Report_survivor[1] + Utils.Space(n));
 					}
 					break;
 				}
@@ -222,11 +248,11 @@ public class GA {
 			/* problem specific */
 			if (sfromfile.matches("NVARS ?:.*")) {
 				NVAR = new BigInteger(s.trim());
-				System.out.println("NVARS : " + NVAR + Space(n));
+				System.out.println("NVARS : " + NVAR + Utils.Space(n));
 			}
 			if (sfromfile.matches("Target ?:.*")) {
 				// Target = new BigDecimal(s.trim());
-				System.out.println("Target : " + Target + Space(n));
+				System.out.println("Target : " + Target + Utils.Space(n));
 			}
 		}
 	}
@@ -259,6 +285,9 @@ public class GA {
 			// sleep(150);
 		}
 		this.check();
+		this.IGENS = Utils.zero.toBigInteger();
+		GA[] gaIN = { this };
+		this.report = new Report(gaIN);
 		System.out.println("\tFinished");
 	}
 
@@ -285,49 +314,12 @@ public class GA {
 		this.select_X(); // sort for crossover
 	}
 
-	public void report(BigInteger I) {
-		String s;
-		int n = 4;
-		if (random.nextFloat() > this.Report_rate)
-			return;
-		gotorc(1, 1);
-		System.out.println("Generation " + I + Space(n));
-		// for (int i = 0; i < 1 * this.POPSIZE.intValue(); i++) {
-		for (int i = 0; i < Math.min(32, this.POPSIZE.intValue()); i++) {
-			if (i < 10)
-				System.out.print(" ");
-			System.out.print(i);
-			// System.out.println(Space(n) + this.population[i].getcode() +
-			// Space(n) +
-			// this.population[i].getvalue()+Space(n)+this.population[i].fitness.doubleValue()+Space(n));
-			s = "";
-			if (this.Report_code) {
-				for (int j = 0; j < this.NVAR.intValue(); j++) {
-					s += Space(n);
-					s += this.population[i].getcode(j);
-				}
-			}
-			if (this.Report_value) {
-				for (int j = 0; j < this.NVAR.intValue(); j++) {
-					s += Space(n);
-					s += this.population[i].getvalue(j).doubleValue();
-				}
-			}
-			if (this.Report_survivor[0] != ' ') {
-				s += Space(n);
-				s += this.population[i].Survivor ? "T" : "F";
-			}
-			if (this.Report_fitness) {
-				s += Space(n);
-				s += this.population[i].fitness.doubleValue();
-			}
-			s += Space(n);
-			System.out.println(s);
+	public void report() {
+		if (this.report == null) {
+			GA[] gaIN = { this };
+			this.report = new Report(gaIN);
 		}
-		/*
-		 * for (Gen i : this.population) { System.out.println(i.fitness); }
-		 */
-		// sleep(150);
+		this.report.show();
 	}
 
 	public void check() {
@@ -348,7 +340,8 @@ public class GA {
 				}
 			}
 			if (li > 0) {
-				c[list[random.nextInt(li + 1)]] = (char) (random.nextInt(10) + 48);
+				c[list[Utils.random.nextInt(li + 1)]] = (char) (Utils.random
+						.nextInt(10) + 48);
 			} else {
 				break;
 			}
@@ -376,7 +369,7 @@ public class GA {
 		Gen[] pop_new = new Gen[this.population.length];
 		for (int i = 0; i < this.population.length; i++) {
 			do {
-				a = random.nextInt(this.POPSIZE.intValue());
+				a = Utils.random.nextInt(this.POPSIZE.intValue());
 			} while ((!this.population[a].Survivor) || (a == i));
 			pop_new[i] = crossover(this.population[a], this.population[i]);
 		}
@@ -391,7 +384,7 @@ public class GA {
 				pop_new[i] = this.population[i];
 			} else {
 				do {
-					a = random.nextInt(this.POPSIZE.intValue());
+					a = Utils.random.nextInt(this.POPSIZE.intValue());
 				} while ((!this.population[a].Survivor) || (a == i));
 				pop_new[i] = crossover(this.population[a], this.population[i]);
 			}
@@ -419,7 +412,7 @@ public class GA {
 		}
 
 		for (int i = 0; i < a.length(); i++) {
-			if (random.nextBoolean()) {
+			if (Utils.random.nextBoolean()) {
 				result.set(i, a.get(i));
 			} else {
 				result.set(i, b.get(i));
@@ -431,7 +424,7 @@ public class GA {
 	public void mutation_all() {
 		for (int i = 0; i < this.population.length; i++)
 			for (int j = 0; j < this.NVAR.intValue(); j++)
-				if (random.nextDouble() <= this.PMUTATION)
+				if (Utils.random.nextDouble() <= this.PMUTATION)
 					mutation(this.population[i].code[j]);
 	}
 
@@ -439,7 +432,7 @@ public class GA {
 		for (int i = 0; i < this.population.length; i++)
 			if (!this.population[i].Survivor)
 				for (int j = 0; j < this.NVAR.intValue(); j++)
-					if (random.nextDouble() <= this.PMUTATION)
+					if (Utils.random.nextDouble() <= this.PMUTATION)
 						mutation(this.population[i].code[j]);
 	}
 
@@ -451,75 +444,9 @@ public class GA {
 			else
 				len = this.NSIGA.intValue();
 			for (int l = 0; l < len; l++)
-				if (random.nextDouble() <= this.AMUTATION)
+				if (Utils.random.nextDouble() <= this.AMUTATION)
 					bs[k].set(l, !bs[k].get(l));
 		}
-	}
-
-	/* utility variables */
-	// public static Console console = System.console();
-	public static final BigDecimal zero = new BigDecimal("0");
-	public static final BigDecimal one = new BigDecimal("1");
-	public static final BigDecimal two = new BigDecimal("2");
-	public static final BigDecimal ten = new BigDecimal("10");
-	public static BigDecimal idCount = zero();
-	public static int GB = (int) Math.pow(2, 30);
-
-	public static Random random = new Random(System.currentTimeMillis());
-
-	/* utility methods */
-
-	public static void sleep(long a) {
-		try {
-			Thread.sleep(a);
-		} catch (InterruptedException ex) {
-			Thread.currentThread().interrupt();
-		}
-	}
-
-	public static String BackSpace(int l) {
-		return man_char('\u0008', l);
-	}
-
-	public static String Space(int l) {
-		return man_char(' ', l);
-	}
-
-	public static String man_char(char c, int l) {
-		String s = "";
-		for (int i = 0; i < l; i++) {
-			s += c;
-		}
-		return s;
-	}
-
-	public final static void gotorc(int x, int y) {
-		System.out.print((char) 27 + "[" + x + ";" + y + "H");
-	}
-
-	public static BigDecimal zero() {
-		return new BigDecimal("0");
-	}
-
-	public static BigDecimal one() {
-		return new BigDecimal("1");
-	}
-
-	public static BigDecimal two() {
-		return new BigDecimal("2");
-	}
-
-	public static BigDecimal ten() {
-		return new BigDecimal("10");
-	}
-
-	public static BitSet random_bitset(int l) {
-		BitSet result = new BitSet();
-		for (int i = 0; i < l; i++) {
-			if (random.nextBoolean())
-				result.set(i, true);
-		}
-		return result;
 	}
 
 	public static void CreateDemo(String filepath, String coding) {
@@ -586,7 +513,8 @@ public class GA {
 		} finally {
 			try {
 				if (br != null) {
-					System.out.print("Closing FileReader on " + filepath + " ...");
+					System.out.print("Closing FileReader on " + filepath
+							+ " ...");
 					br.close();
 					System.out.println("\tFinished");
 				}
@@ -623,16 +551,22 @@ public class GA {
 			ga.select_X();
 			double temp = ga.Report_rate;
 			ga.Report_rate = 1;
-			ga.report(zero.toBigInteger());
+			// ga.report(Utils.zero.toBigInteger());
 			ga.Report_rate = temp;
 		}
-		for (BigInteger IGENS = zero.toBigInteger(); !IGENS.equals(ga.MAXGENS); IGENS = IGENS.add(one.toBigInteger())) {
+		ga.report.start();
+		for (ga.IGENS = Utils.zero.toBigInteger(); !ga.IGENS.equals(ga.MAXGENS); ga.IGENS = ga.IGENS
+				.add(Utils.one.toBigInteger())) {
 			ga.nextGeneration();
-			ga.report(IGENS.add(one.toBigInteger()));
+			// ga.report(ga.IGENS.add(Utils.one.toBigInteger()));
 		}
+		ga.report.stop();
 
 		/* end */
-		System.out.println(Space(50));
-		System.out.println(Space(5) + "End." + Space(5));
+		while (ga.report.isAlive()){
+			Utils.sleep();
+		}
+		System.out.println(Utils.Space(50));
+		System.out.println(Utils.Space(5) + "End." + Utils.Space(45));
 	}
 }
