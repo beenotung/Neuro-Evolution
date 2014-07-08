@@ -17,7 +17,7 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.BitSet;
 // general utility
-import java.util.Arrays;
+
 
 public class GA {
 
@@ -39,8 +39,8 @@ public class GA {
 	public BigInteger IGENS;
 
 	/* Genetic Algorithm option */
-	public String Mode_Crossover;
-	public String Mode_Mutation;
+	public String MODE_CROSSOVER;
+	public String MODE_MUTATION;
 
 	/* Interface option */
 	public double Report_rate = 1;
@@ -69,7 +69,9 @@ public class GA {
 	/*
 	 * Threads
 	 */
+	public static final int NThread=8;
 	Report report;
+	SelectX selectX;
 
 	/*
 	 * Gen code Class container of chromosome(s)
@@ -204,14 +206,14 @@ public class GA {
 			}
 			/* Algorithm option */
 			if (sfromfile.matches("Crossover ?.* ?:.*")) {
-				Mode_Crossover = s.trim();
+				MODE_CROSSOVER = s.trim();
 				System.out.println("Crossover (parent kill/keep) : "
-						+ Mode_Crossover + Utils.Space(n));
+						+ MODE_CROSSOVER + Utils.Space(n));
 			}
 			if (sfromfile.matches("Mutation ?.* ?:.*")) {
-				Mode_Mutation = s.trim();
+				MODE_MUTATION = s.trim();
 				System.out.println("Mutation (all or new_only) : "
-						+ Mode_Mutation + Utils.Space(n));
+						+ MODE_MUTATION + Utils.Space(n));
 			}
 			/* Interface option */
 			if (sfromfile.matches("Report rate ?.* ?:.*")) {
@@ -288,12 +290,13 @@ public class GA {
 		this.IGENS = Utils.zero.toBigInteger();
 		GA[] gaIN = { this };
 		this.report = new Report(gaIN);
+		this.selectX = new SelectX(gaIN);
 		System.out.println("\tFinished");
 	}
 
 	public void nextGeneration() {
 		// this.Rfitness();
-		switch (Mode_Crossover) {
+		switch (MODE_CROSSOVER) {
 		case "kill":
 			this.crossover_killParent();
 			break;
@@ -301,7 +304,7 @@ public class GA {
 			this.crossover_keepParent();
 			break;
 		}
-		switch (Mode_Mutation) {
+		switch (MODE_MUTATION) {
 		case "all":
 			this.mutation_all();
 			break;
@@ -311,7 +314,7 @@ public class GA {
 		}
 		// this.check();
 		this.evaluate();
-		this.select_X(); // sort for crossover
+		selectX.run();// sort and label for crossover
 	}
 
 	public void report() {
@@ -353,15 +356,6 @@ public class GA {
 		for (int i = 0; i < this.population.length; i++) {
 			this.population[i].evaluate();
 		}
-	}
-
-	public void select_X() {
-		Arrays.sort(this.population);
-		for (int i = 0; i < this.population.length; i++) {
-			this.population[i].Survivor = ((double) i / this.population.length) <= this.CUTOFF;
-		}
-		this.population[0].Survivor = true;
-		this.population[1].Survivor = true;
 	}
 
 	public void crossover_killParent() {
@@ -547,7 +541,7 @@ public class GA {
 		System.out.print("\nBreeding...");
 		{
 			ga.evaluate();
-			ga.select_X();
+			ga.selectX.run();
 			double temp = ga.Report_rate;
 			ga.Report_rate = 1;
 			// ga.report(Utils.zero.toBigInteger());

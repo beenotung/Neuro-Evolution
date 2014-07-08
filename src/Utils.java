@@ -75,8 +75,16 @@ public class Utils {
 		}
 		return result;
 	}
-	public static long rate2ms(double rate){
-		//return (long)((1.0-rate)*1000);
-		return (long)(rate*1000);
+
+	public static long rate2ms(double rate) {
+		// return (long)((1.0-rate)*1000);
+		return (long) (rate * 1000);
+	}
+
+	public static boolean someAlive(MyRunnable[] list) {
+		boolean alive = false;
+		for (int i = 0; i < GA.NThread; i++)
+			alive |= list[i].isAlive();
+		return alive;
 	}
 }
