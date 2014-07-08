@@ -22,7 +22,7 @@ import java.util.Arrays;
 public class GA {
 
 	/* Genetic Algorithm constant */
-	public static final String version = "Genetic Algorithm V3.0\t --by Beeno Tung";
+	public static final String version = "Genetic Algorithm V5.1.3\t --by Beeno Tung";
 	public static final String inifilepath = "resources/GA.ini";
 	public static final String demoinifilepath = "resources/DEMO.ini";
 	public static final String fileformat = "UTF-8";
@@ -50,7 +50,7 @@ public class GA {
 	public boolean Report_fitness = false;
 
 	/* Threads interval */
-	public static final long GENERAL_INTERVAL=5;
+	public static final long GENERAL_INTERVAL = 5;
 
 	/* problem specific */
 	public BigInteger NVAR;// dimension of the problem
@@ -471,7 +471,7 @@ public class GA {
 			writer.println("");
 			/* Interface option */
 			writer.println("/* Interface option */");
-			writer.println("Report rate (i.e. 0/1/0.01) : 0.01");
+			writer.println("Report rate (in sec, e.g. 0,0.5,1) : 0.25");
 			writer.println("Report Item (i.e. code, survivor(together with two char), value, fitness)");
 			writer.println("Report Item : code");
 			writer.println("Report Item : survivor TF");
@@ -528,17 +528,16 @@ public class GA {
 	/*
 	 * standard program entry point
 	 */
-
-	public static void main(String[] args) {
+	public void start(String[] args) {
 		for (int i = 0; i < 256; i++)
 			System.out.println();
-		System.out.println(version);
+		System.out.println(GA.version);
 		System.out.println();
 
-		CreateDemo(demoinifilepath, fileformat);
+		GA.CreateDemo(GA.demoinifilepath, GA.fileformat);
 
 		GA ga = new GA();
-		ReadFromINI(inifilepath, ga);
+		GA.ReadFromINI(GA.inifilepath, ga);
 		System.out.println();
 
 		/* initialize */
@@ -563,7 +562,7 @@ public class GA {
 		ga.report.stop();
 
 		/* end */
-		while (ga.report.isAlive()){
+		while (ga.report.isAlive()) {
 			Utils.sleep();
 		}
 		System.out.println(Utils.Space(50));

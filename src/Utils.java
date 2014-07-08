@@ -76,6 +76,7 @@ public class Utils {
 		return result;
 	}
 	public static long rate2ms(double rate){
-		return (long)((1.0-rate)*1000);
+		//return (long)((1.0-rate)*1000);
+		return (long)(rate*1000);
 	}
 }

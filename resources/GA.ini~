@@ -12,7 +12,7 @@ Crossover (parent kill/keep) : keep
 Mutation (all or new_only) : new_only
 
 /* Interface option */
-Report rate (in sec, e.g. 0,0.5,1) : 1.0
+Report rate (in sec, e.g. 0,0.5,1) : 0.4
 Report Item (i.e. code, survivor(together with two char), value, fitness)
 Report Item : c.ode
 Report Item : value
