@@ -23,8 +23,8 @@ public class GA {
 
 	/* Genetic Algorithm constant */
 	public static final String version = "Genetic Algorithm V3.0\t --by Beeno Tung";
-	public static final String inifilepath = "GA.ini";
-	public static final String demoinifilepath = "DEMO.ini";
+	public static final String inifilepath = "resources/GA.ini";
+	public static final String demoinifilepath = "resources/DEMO.ini";
 	public static final String fileformat = "UTF-8";
 
 	/* Genetic Algorithm variable */
