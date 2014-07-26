@@ -8,9 +8,18 @@ import myutils.SqlServerInfo;
 
 public class NeuralNetwork {
 	private SqlServerInfo sqlServerInfo;
+	private String mode;
+	private int[] layers;
 
-	public NeuralNetwork(SqlServerInfo sqlServerInfo) throws CloneNotSupportedException {
+	public NeuralNetwork(SqlServerInfo sqlServerInfo, String mode, int[] layers)
+			throws CloneNotSupportedException {
+		if (mode != "BackNN") {
+			System.out.println("[" + "mode" + "] Mode not supported");
+			System.exit(1);
+		}
 		this.sqlServerInfo = (SqlServerInfo) sqlServerInfo.clone();
+		this.mode = mode;
+		this.layers = layers.clone();
 	}
 
 	public void removeDatabase() {
@@ -30,7 +39,8 @@ public class NeuralNetwork {
 	public void createDatabase() {
 		ArrayList<String> sqls = new ArrayList<String>();
 		sqls.add("CREATE DATABASE IF NOT EXISTS " + sqlServerInfo.databaseName + ";");
-		sqls.add("CREATE TABLE cells (id int, incomeid int, outcomeid int);");
+		// sqls.add("CREATE TABLE cells (id int, incomeid int, outcomeid int);");
+		sqls.add("CREATE TABLE CELLS(layer int, PRIMARY KEY (layer));");
 		try {
 			// Mysql.sqlExecBatch(sqlServerInfo, sqls);
 			Mysql.sqlExec(sqlServerInfo.noDB(), sqls.get(0));
@@ -45,16 +55,27 @@ public class NeuralNetwork {
 		}
 	}
 
-	
-
 	public void setRandomly() {
 		// TODO Auto-generated method stub
-		
+		ArrayList<String> sqls = new ArrayList<String>();
+for(int iLayer=0;iLayer<layers.length;iLayer++)
+	for(int iCell=0;iCell<layers[iLayer];iCell++)
+		sqls.add(
+				CREATE TABLE cells
+				(
+				id int NOT NULL AUTO_INCREMENT,
+				incomeid varchar(255) NOT NULL,
+				outcomeid varchar(255),
+				Address varchar(255),
+				City varchar(255),
+				PRIMARY KEY (ID)
+				)
+				);
 	}
 
 	public void save() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
