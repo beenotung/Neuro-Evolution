@@ -39,11 +39,14 @@ public class NeuralNetwork {
 	public void createDatabase() {
 		ArrayList<String> sqls = new ArrayList<String>();
 		sqls.add("CREATE DATABASE IF NOT EXISTS " + sqlServerInfo.databaseName + ";");
-		// sqls.add("CREATE TABLE cells (id int, incomeid int, outcomeid int);");
-		sqls.add("CREATE TABLE CELLS(layer int, PRIMARY KEY (layer));");
+		sqls.add("CREATE TABLE cells (cellid INT, delta DOUBLE, layer INT, PRIMARY KEY (cellid));");
+		 sqls.add("CREATE TABLE connections (incomeid INT, outcomeid INT, weight DOUBLE, PRIMARY KEY (incomeid, outcomeid));");
+		//sqls.add("CREATE TABLE CELLS(layer int, PRIMARY KEY (layer));");
 		try {
 			// Mysql.sqlExecBatch(sqlServerInfo, sqls);
 			Mysql.sqlExec(sqlServerInfo.noDB(), sqls.get(0));
+			sqls.remove(0);
+			Mysql.sqlExecBatch(sqlServerInfo, sqls);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
