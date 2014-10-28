@@ -57,13 +57,17 @@ public class NeuralNetwork {
 			System.out.println("SQLException Message: " + e.getMessage());
 		}
 	}
-
-	public void setRandomly() {
+	
+    public void setRandomly() {
+        
+    }
+    
+	public void createCells() {
 		// TODO Auto-generated method stub
 		ArrayList<String> sqls = new ArrayList<String>();
-for(int iLayer=0;iLayer<layers.length;iLayer++)
-	for(int iCell=0;iCell<layers[iLayer];iCell++)
-		sqls.add(
+        for(int iLayer=0;iLayer<layers.length;iLayer++)
+	        for(int iCell=0;iCell<layers[iLayer];iCell++)
+		        sqls.add(
 				CREATE TABLE cells
 				(
 				id int NOT NULL AUTO_INCREMENT,
