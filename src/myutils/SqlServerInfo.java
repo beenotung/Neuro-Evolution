@@ -13,7 +13,8 @@ public class SqlServerInfo implements Cloneable {
 		this.password = password;
 	}
 
-	public SqlServerInfo(String sqlServerUrl, String databaseName, String user, String password) {
+	public SqlServerInfo(String sqlServerUrl, String databaseName, String user,
+			String password) {
 		this.sqlServerUrl = sqlServerUrl;
 		this.databaseName = databaseName;
 		this.user = user;
@@ -21,10 +22,16 @@ public class SqlServerInfo implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			SqlServerInfo info = new SqlServerInfo(sqlServerUrl, databaseName, user,
+					password);
+			return info;
+		}
 	}
-	
+
 	public SqlServerInfo noDB() {
 		return new SqlServerInfo(sqlServerUrl, user, password);
 	}

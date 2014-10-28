@@ -18,16 +18,9 @@ public class Main {
 		int [] layers={2,3,1};
 		// \\debug
 		NeuralNetwork neuralNetwork;
-		try {
-			neuralNetwork = new NeuralNetwork(sqlServerInfo,mode,layers);
-			neuralNetwork.removeDatabase();
-			neuralNetwork.createDatabase();
-			neuralNetwork.setRandomly();
-			neuralNetwork.save();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+					neuralNetwork = new NeuralNetwork(sqlServerInfo,mode,layers);
+			neuralNetwork.create();
+		
 		System.out.println("main end");
 	}
 
