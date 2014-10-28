@@ -158,9 +158,12 @@ public class NeuralNetwork {
 		for (Integer iCell : cells) {
 			PreparedStatement statement = (PreparedStatement) connection
 					.prepareStatement(sql);
+			// TODO debug
 			statement.setDouble(1, Utils.random.nextDouble());
-			statement.setInt(2, iCell);
-			sqls.add(statement.toString());
+			statement.setInt(2, iCell.intValue());
+			String tmp = statement.toString();
+			tmp = tmp.substring(tmp.indexOf(':') + 1);
+			sqls.add(tmp);
 		}
 		Mysql.removeConnection();
 		Mysql.sqlExecBatch(sqlServerInfo, sqls);
@@ -192,7 +195,9 @@ public class NeuralNetwork {
 					statement.setDouble(1, Utils.random.nextDouble());
 					statement.setInt(2, iCellFrom);
 					statement.setInt(3, iCellTo);
-					sqls.add(statement.toString());
+					String tmp = statement.toString();
+					tmp = tmp.substring(tmp.indexOf(':') + 1);
+					sqls.add(tmp);
 				}
 			}
 		}
