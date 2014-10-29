@@ -98,6 +98,7 @@ public class NeuralNetwork {
 	public String createCell(int cellid, int layer) {
 		String result = "INSERT INTO cells (cellid,layer) VALUES (" + cellid + ","
 				+ layer + ")";
+		System.out.println("create cell-" + cellid);
 		return result;
 	}
 
@@ -108,6 +109,12 @@ public class NeuralNetwork {
 			for (int iCell = 0; iCell < layers[iLayer]; iCell++)
 				sqls.add(createCell(newCellid++, iLayer));
 		Mysql.sqlExecBatch(sqlServerInfo, sqls);
+	}
+
+	private String createConnection(Integer iCellFrom, Integer iCellTo) {
+		System.out.println("create connection "+iCellFrom+"-"+iCellTo);
+		return "INSERT INTO connections (incomeid, outcomeid) VALUES ("
+				+ iCellFrom.intValue() + "," + iCellTo.intValue() + ")";
 	}
 
 	public void createConnections() throws SQLException {
@@ -131,9 +138,7 @@ public class NeuralNetwork {
 			}
 			for (Integer iCellFrom : cellFrom) {
 				for (Integer iCellTo : cellTo) {
-					sqlQuery = "INSERT INTO connections (incomeid, outcomeid) VALUES ("
-							+ iCellFrom.intValue() + "," + iCellTo.intValue() + ")";
-					sqls.add(sqlQuery);
+					sqls.add(createConnection(iCellFrom, iCellTo));
 				}
 			}
 		}

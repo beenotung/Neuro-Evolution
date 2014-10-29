@@ -87,8 +87,10 @@ public class Mysql {
 		Statement statement = connection.createStatement();
 		for (String sqlQuery : sqls) {
 			statement.addBatch(sqlQuery);
+			System.out.println(sqlQuery);
 		}
 		updateCount = statement.executeBatch();
+		System.out.println("finished batch");
 
 		return updateCount;
 	}
