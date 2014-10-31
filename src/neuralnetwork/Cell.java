@@ -12,6 +12,7 @@ public class Cell {
 	public int layerid;
 	public Vector<Connection> connections;
 	public double delta;
+	public double deltaDelta;
 	public double value;
 
 	/** Static methods **/

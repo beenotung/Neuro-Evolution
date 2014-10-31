@@ -6,6 +6,7 @@ public class Connection {
 	public Cell src;
 	public Cell dest;
 	public double weight;
+	public double deltaWeight;
 
 	public Connection(Cell src, Cell dest) {
 		this.src = src;

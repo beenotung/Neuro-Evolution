@@ -68,8 +68,35 @@ public class NeuralNetwork {
 	}
 
 	private void learn(Example example) {
-		example.checkInput(layers.get(0).cells.size());
 		example.checkOutput(layers.get(layers.size()).cells.size());
+		Vector<Double> results = run(example.input);
+		Vector<Double> deltaValues = new Vector<Double>();
+		for (int i = 0; i < results.size(); i++)
+			deltaValues.add(example.output.get(i) - results.get(i));
 	}
 
+	public Vector<Double> run(Vector<Double> inputs) {
+		Vector<Double> outputs = new Vector<Double>();
+		/** clean **/
+		for (Layer layer : layers)
+			for (Cell cell : layer.cells) {
+				cell.value = 0;
+				cell.delta = 0;
+			}
+		/** input **/
+		while (inputs.size() < layers.get(0).cells.size())
+			inputs.add(0d);
+		for (int i = 0; i < layers.get(0).cells.size(); i++)
+			layers.get(0).cells.get(i).value = inputs.get(i);
+		/** calc **/
+		for (Layer layer : layers)
+			for (Cell cell : layer.cells)
+				for (Connection connection : cell.connections)
+					connection.dest.value += (connection.src.value - connection.src.delta)
+							* connection.weight;
+		/** output **/
+		for (Cell cell : layers.get(layers.size()).cells)
+			outputs.add(cell.value);
+		return outputs;
+	}
 }
