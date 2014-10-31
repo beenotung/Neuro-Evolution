@@ -26,6 +26,7 @@ public class Launcher {
 		NeuralNetwork neuralNetwork;
 		neuralNetwork = new NeuralNetwork(sqlServerInfo, mode, layers);
 		neuralNetwork.create();
+		//neuralNetwork.save();
 
 		System.out.println("main end");
 	}
