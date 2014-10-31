@@ -1,9 +1,9 @@
-package test;
+package launcher;
 
+import neuralnetwork.NeuralNetwork;
 import myutils.SqlServerInfo;
-import core.NeuralNetwork;
 
-public class Main {
+public class Launcher {
 
 	public static void main(String[] args) {
 		System.out.println("main start");

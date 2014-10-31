@@ -1,4 +1,4 @@
-package core;
+package neuralnetwork;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
 import com.mysql.jdbc.PreparedStatement;
 
