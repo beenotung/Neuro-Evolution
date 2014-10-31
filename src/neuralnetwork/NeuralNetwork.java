@@ -1,11 +1,14 @@
 package neuralnetwork;
 
+import java.util.Vector;
+
 import myutils.SqlServerInfo;
 
 public class NeuralNetwork {
 	private SqlServerInfo sqlServerInfo;
 	private String mode;
 	private int[] layers;
+	private Vector<Cell> cells;
 
 	public NeuralNetwork(SqlServerInfo sqlServerInfo, String mode, int[] layers) {
 		if (mode != "BackNN") {
