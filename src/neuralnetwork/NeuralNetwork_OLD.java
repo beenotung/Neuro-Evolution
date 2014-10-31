@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
+
 import com.mysql.jdbc.PreparedStatement;
 
 import myutils.Mysql;
@@ -29,13 +31,17 @@ public class NeuralNetwork_OLD {
 		this.layers = layers.clone();
 	}
 
-	/**java staff**/
 	public void create() {
-		createCells();
-		createConnections();
+		try {
+			removeDatabase();
+			createDatabase();
+			initCells();
+			save();
+		} catch (SQLException e) {
+			Mysql.printSQLException(e);
+		}
 	}
 
-	/**sql staff**/
 	public void removeDatabase() {
 		try {
 			Mysql.sqlExecUpdate(sqlServerInfo.noDB(), "DROP DATABASE IF EXISTS "
@@ -63,7 +69,14 @@ public class NeuralNetwork_OLD {
 		}
 	}
 
-	
+	public void initCells() throws SQLException {
+		System.out.println("create cells");
+		createCells();
+		System.out.println("createConnections");
+		createConnections();
+		System.out.println("csetRandomly");
+		setRandomly();
+	}
 
 	public int getLastID() {
 		String sqlQuery = "SELECT cellid FROM cells ORDER BY cellid DESC LIMIT 1;";
@@ -82,7 +95,50 @@ public class NeuralNetwork_OLD {
 		return getLastID() + 1;
 	}
 
-	
+	public String createCell(int cellid, int layer) {
+		String result = "INSERT INTO cells (cellid,layer) VALUES (" + cellid + ","
+				+ layer + ")";
+		return result;
+	}
+
+	public void createCells() throws SQLException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		int newCellid = getNewID();
+		for (int iLayer = 0; iLayer < layers.length; iLayer++)
+			for (int iCell = 0; iCell < layers[iLayer]; iCell++)
+				sqls.add(createCell(newCellid++, iLayer));
+		Mysql.sqlExecBatch(sqlServerInfo, sqls);
+	}
+
+	public void createConnections() throws SQLException {
+		ArrayList<String> sqls = new ArrayList<String>();
+		Vector<Integer> cellFrom = new Vector<Integer>();
+		Vector<Integer> cellTo = new Vector<Integer>();
+		String sqlQuery;
+		ResultSet resultSet;
+		for (int iLayer = 0; iLayer < (layers.length - 1); iLayer++) {
+			sqlQuery = "SELECT cellid FROM cells WHERE layer=" + iLayer + ";";
+			resultSet = Mysql.sqlExecQuery(sqlServerInfo, sqlQuery);
+			cellFrom.removeAllElements();
+			while (resultSet.next()) {
+				cellFrom.add(resultSet.getInt("cellid"));
+			}
+			sqlQuery = "SELECT cellid FROM cells WHERE layer=" + (iLayer + 1) + ";";
+			resultSet = Mysql.sqlExecQuery(sqlServerInfo, sqlQuery);
+			cellTo.removeAllElements();
+			while (resultSet.next()) {
+				cellTo.add(resultSet.getInt("cellid"));
+			}
+			for (Integer iCellFrom : cellFrom) {
+				for (Integer iCellTo : cellTo) {
+					sqlQuery = "INSERT INTO connections (incomeid, outcomeid) VALUES ("
+							+ iCellFrom.intValue() + "," + iCellTo.intValue() + ")";
+					sqls.add(sqlQuery);
+				}
+			}
+		}
+		Mysql.sqlExecBatch(sqlServerInfo, sqls);
+	}
 
 	public void setRandomly() throws SQLException {
 		setCellsRandomly();
@@ -150,65 +206,7 @@ public class NeuralNetwork_OLD {
 	}
 
 	public void save() {
-		try {
-			removeDatabase();
-			createDatabase();
-			saveCells();
-			saveConnections();
-					} catch (SQLException e) {
-			Mysql.printSQLException(e);
-		}
-	}
-
-
-	public String createCell(int cellid, int layer) {
-		String result = "INSERT INTO cells (cellid,layer) VALUES (" + cellid + ","
-				+ layer + ")";
-		System.out.println("create cell-" + cellid);
-		return result;
-	}
-
-	public void saveCells() throws SQLException {
-		ArrayList<String> sqls = new ArrayList<String>();
-		int newCellid = getNewID();
-		for (int iLayer = 0; iLayer < layers.length; iLayer++)
-			for (int iCell = 0; iCell < layers[iLayer]; iCell++)
-				sqls.add(createCell(newCellid++, iLayer));
-		Mysql.sqlExecBatch(sqlServerInfo, sqls);
-	}
-
-	private String createConnection(Integer iCellFrom, Integer iCellTo) {
-		System.out.println("create connection "+iCellFrom+"-"+iCellTo);
-		return "INSERT INTO connections (incomeid, outcomeid) VALUES ("
-				+ iCellFrom.intValue() + "," + iCellTo.intValue() + ")";
-	}
-
-	public void saveConnections() throws SQLException {
-		ArrayList<String> sqls = new ArrayList<String>();
-		Vector<Integer> cellFrom = new Vector<Integer>();
-		Vector<Integer> cellTo = new Vector<Integer>();
-		String sqlQuery;
-		ResultSet resultSet;
-		for (int iLayer = 0; iLayer < (layers.length - 1); iLayer++) {
-			sqlQuery = "SELECT cellid FROM cells WHERE layer=" + iLayer + ";";
-			resultSet = Mysql.sqlExecQuery(sqlServerInfo, sqlQuery);
-			cellFrom.removeAllElements();
-			while (resultSet.next()) {
-				cellFrom.add(resultSet.getInt("cellid"));
-			}
-			sqlQuery = "SELECT cellid FROM cells WHERE layer=" + (iLayer + 1) + ";";
-			resultSet = Mysql.sqlExecQuery(sqlServerInfo, sqlQuery);
-			cellTo.removeAllElements();
-			while (resultSet.next()) {
-				cellTo.add(resultSet.getInt("cellid"));
-			}
-			for (Integer iCellFrom : cellFrom) {
-				for (Integer iCellTo : cellTo) {
-					sqls.add(createConnection(iCellFrom, iCellTo));
-				}
-			}
-		}
-		Mysql.sqlExecBatch(sqlServerInfo, sqls);
+		// dummy
 	}
 
 	public void close(Closeable c) {
