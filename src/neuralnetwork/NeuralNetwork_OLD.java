@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
-
 import com.mysql.jdbc.PreparedStatement;
 
 import myutils.Mysql;

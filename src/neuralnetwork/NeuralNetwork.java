@@ -42,48 +42,27 @@ public class NeuralNetwork {
 	}
 
 	/** neural network staff **/
-	public class Example {
-		public Vector<Double> input;
-		public Vector<Double> output;
-
-		public Example(Vector<Double> input, Vector<Double> output) {
-			this.input = input;
-			this.output = output;
-		}
-
-		public void checkInput(int n) {
-			while (input.size() < n)
-				input.add(0d);
-		}
-
-		public void checkOutput(int n) {
-			while (output.size() < n)
-				output.add(0d);
-		}
-	}
-
 	public void learn(Vector<Example> examples) {
 		for (Example example : examples)
 			learn(example);
 	}
 
 	private void learn(Example example) {
-		example.checkOutput(layers.get(layers.size()).cells.size());
-		Vector<Double> results = run(example.input);
-		Vector<Double> deltaValues = new Vector<Double>();
-		for (int i = 0; i < results.size(); i++)
-			deltaValues.add(example.output.get(i) - results.get(i));
+		example.checkOutput(layers.get(layers.size() - 1).cells.size());
+		run(example.input);
+		for (int i = 0; i < layers.get(layers.size() - 1).cells.size(); i++)
+
+			for (int i = 0; i < results.size(); i++)
+				deltaValues.add(example.output.get(i) - results.get(i));
 	}
 
 	public Vector<Double> run(Vector<Double> inputs) {
 		Vector<Double> outputs = new Vector<Double>();
-		/** clean **/
+		/** init cell activation **/
 		for (Layer layer : layers)
-			for (Cell cell : layer.cells) {
+			for (Cell cell : layer.cells)
 				cell.value = 0;
-				cell.delta = 0;
-			}
-		/** input **/
+		/** set input layer **/
 		while (inputs.size() < layers.get(0).cells.size())
 			inputs.add(0d);
 		for (int i = 0; i < layers.get(0).cells.size(); i++)
@@ -94,8 +73,8 @@ public class NeuralNetwork {
 				for (Connection connection : cell.connections)
 					connection.dest.value += (connection.src.value - connection.src.delta)
 							* connection.weight;
-		/** output **/
-		for (Cell cell : layers.get(layers.size()).cells)
+		/** export output layer **/
+		for (Cell cell : layers.get(layers.size() - 1).cells)
 			outputs.add(cell.value);
 		return outputs;
 	}

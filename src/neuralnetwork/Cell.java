@@ -2,8 +2,6 @@ package neuralnetwork;
 
 import java.util.Vector;
 
-import com.mysql.jdbc.Util;
-
 import myutils.Utils;
 
 public class Cell {
