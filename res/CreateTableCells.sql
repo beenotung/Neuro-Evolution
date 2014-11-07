@@ -1,4 +1,4 @@
-CREATE TABLE `cells` (
+CREATE TABLE IF NOT EXISTS `nndb`.`cells` (
   `cell_id` int(11) NOT NULL AUTO_INCREMENT,
   `layer_id` int(11) DEFAULT NULL,
   `bias` double DEFAULT '0',

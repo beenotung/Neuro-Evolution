@@ -11,8 +11,8 @@ public class MySqlServerInfo {
 	private String password;
 	private String databasename;
 
-	public MySqlServerInfo(String protocol, String host, int port,
-			String databasename, String username, String password) {
+	public MySqlServerInfo(String protocol, String host, int port, String databasename,
+			String username, String password) {
 		this.protocol = protocol;
 		this.host = host;
 		this.port = port;
@@ -35,6 +35,10 @@ public class MySqlServerInfo {
 
 	public String getMysqlpassword() {
 		return password;
+	}
+
+	public String getDatabasename() {
+		return databasename;
 	}
 
 }

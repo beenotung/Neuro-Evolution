@@ -52,6 +52,7 @@ public class MyDatabaseConnector {
 	}
 
 	public void commit() throws SQLException {
+		checkConnection();
 		connection.commit();
 	}
 
@@ -70,6 +71,7 @@ public class MyDatabaseConnector {
 
 	public static PreparedStatement getPreparedStatementFromSQLFile(String filename)
 			throws IOException, SQLException {
+		checkConnection();
 		return connection.prepareStatement(Utils.readFileAsString(filename));
 	}
 
@@ -105,6 +107,7 @@ public class MyDatabaseConnector {
 
 	public static boolean executeSQLFile(String filename) throws IOException,
 			SQLException {
+		checkConnection();
 		String sqlQuery = Utils.readFileAsString(filename);
 		return execute(sqlQuery);
 	}
@@ -165,5 +168,14 @@ public class MyDatabaseConnector {
 		for (PreparedStatement preparedStatement : preparedStatements)
 			resultSets.add(executeQuery(preparedStatement));
 		return resultSets;
+	}
+
+	/** debug method **/
+	public static void printSQLException(SQLException e) {
+		System.out.println();
+		System.out.println("SQLException ErrorCode: " + e.getErrorCode());
+		System.out.println("SQLException SQLState: " + e.getSQLState());
+		System.out.println("SQLException Message: " + e.getMessage());
+		e.printStackTrace();
 	}
 }
