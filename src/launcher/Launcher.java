@@ -1,6 +1,7 @@
 package launcher;
 
 import neuralnetwork.NeuralNetwork;
+import neuralnetwork.NeuralNetworkDatabaseConnector;
 import myutils.SqlServerInfo;
 
 public class Launcher {
@@ -23,10 +24,12 @@ public class Launcher {
 		int NMiddle3 = (NMiddle2 + NOutput) / 2;
 		int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
 		// \\debug
-		NeuralNetwork neuralNetwork;
-		neuralNetwork = new NeuralNetwork(sqlServerInfo, mode, layers);
+		NeuralNetworkDatabaseConnector databaseConnector = new NeuralNetworkDatabaseConnector(
+				sqlServerInfo, mode);
+		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, databaseConnector);
 		neuralNetwork.create();
-		//neuralNetwork.save();
+		
+		// neuralNetwork.save();
 
 		System.out.println("main end");
 	}

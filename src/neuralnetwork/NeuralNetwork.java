@@ -5,10 +5,10 @@ import java.util.Vector;
 import myutils.SqlServerInfo;
 
 public class NeuralNetwork {
-	private SqlServerInfo sqlServerInfo;
 	private String mode;
 	private int[] layers_ints;
-	private Vector<Cell> cells;
+	private NeuralNetworkDatabaseConnector databaseConnector;
+
 	private Vector<Layer> layers;
 
 	/** parameter **/
@@ -20,15 +20,16 @@ public class NeuralNetwork {
 	}
 
 	/** constructor **/
-	public NeuralNetwork(SqlServerInfo sqlServerInfo, String mode, int[] layers_ints) {
+	public NeuralNetwork(String mode, int[] layers_ints,
+			NeuralNetworkDatabaseConnector databaseConnector) {
 		this();
 		if (mode != "BackNN") {
 			System.out.println("[" + "mode" + "] Mode not supported");
 			System.exit(1);
 		}
-		this.sqlServerInfo = (SqlServerInfo) sqlServerInfo.clone();
 		this.mode = mode;
 		this.layers_ints = layers_ints.clone();
+		this.databaseConnector = databaseConnector;
 	}
 
 	/** static staff **/
@@ -106,11 +107,9 @@ public class NeuralNetwork {
 			}
 		// mse
 		Layer layer = layers.get(layers.size() - 1);
-		for (int iCell = 0; iCell < example.output.size(); iCell++) {
-			Cell cell = layers.get(layers.size() - 1).cells.get(iCell);
+		for (int iCell = 0; iCell < example.output.size(); iCell++)
 			mse += Math.pow(
 					example.output.get(iCell) - layer.cells.get(iCell).activation, 2);
-		}
 		System.out.println(mse);
 	}
 
