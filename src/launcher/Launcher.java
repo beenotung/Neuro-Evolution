@@ -28,7 +28,7 @@ public class Launcher {
 				sqlServerInfo, mode);
 		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, databaseConnector);
 		neuralNetwork.create();
-		
+		neuralNetwork.learnFromDatabase(1);
 		// neuralNetwork.save();
 
 		System.out.println("main end");

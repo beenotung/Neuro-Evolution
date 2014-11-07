@@ -2,7 +2,7 @@ package neuralnetwork;
 
 import java.util.Vector;
 
-import myutils.SqlServerInfo;
+import neuralnetwork.databaseconnection.NeuralNetworkDatabaseConnector;
 
 public class NeuralNetwork {
 	private String mode;
@@ -49,22 +49,32 @@ public class NeuralNetwork {
 	}
 
 	/** sql staff **/
-	private void saveToDB() {
-		// TODO saveToDB()
-	}
-
 	private void loadFromDB() {
 		// TODO loadFromDB()
 	}
 
+	private void saveToDB() {
+		// TODO saveToDB()
+	}
+
+	public void learnFromDatabase(int NCycle) {
+		// TODO getexample
+		Vector<Example> examples = databaseConnector.getExamples();
+		for (int iCycle = 0; iCycle < NCycle; iCycle++) {
+			learn(examples);
+		}
+	}
+
 	/** neural network staff **/
 	public void learn(Vector<Example> examples) {
+		// init training variables
 		for (Layer layer : layers)
 			for (Cell cell : layer.cells) {
 				cell.deltaBias = 0;
 				for (Connection connection : cell.connections)
 					connection.deltaWeight = 0;
 			}
+		// Train
 		for (Example example : examples)
 			learn(example);
 	}
