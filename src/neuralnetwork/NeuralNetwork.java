@@ -58,11 +58,19 @@ public class NeuralNetwork {
 
 	/** neural network staff **/
 	public void learn(Vector<Example> examples) {
+		for (Layer layer : layers)
+			for (Cell cell : layer.cells) {
+				cell.deltaBias = 0;
+				for (Connection connection : cell.connections)
+					connection.deltaWeight = 0;
+			}
 		for (Example example : examples)
 			learn(example);
 	}
 
 	private void learn(Example example) {
+		// mse
+		double mse = 0;
 		// check example
 		example.checkOutput(layers.get(layers.size() - 1).cells.size());
 		// run example
@@ -81,8 +89,29 @@ public class NeuralNetwork {
 				cell.deltaError *= derivative(cell.activation);
 			}
 		}
-		// compute delta weight
-		// compute delta bias
+		// compute delta weight, delta bias
+		for (Layer layer : layers)
+			for (Cell cell : layer.cells) {
+				cell.deltaBias = alpha * cell.deltaBias - eta * cell.deltaError;
+				for (Connection connection : cell.connections)
+					connection.deltaWeight = alpha * connection.deltaWeight + eta
+							* cell.activation * connection.dest.deltaError;
+			}
+		// update weight, bias
+		for (Layer layer : layers)
+			for (Cell cell : layer.cells) {
+				cell.bias += cell.deltaBias;
+				for (Connection connection : cell.connections)
+					connection.weight += connection.deltaWeight;
+			}
+		// mse
+		Layer layer = layers.get(layers.size() - 1);
+		for (int iCell = 0; iCell < example.output.size(); iCell++) {
+			Cell cell = layers.get(layers.size() - 1).cells.get(iCell);
+			mse += Math.pow(
+					example.output.get(iCell) - layer.cells.get(iCell).activation, 2);
+		}
+		System.out.println(mse);
 	}
 
 	public Vector<Double> run(Vector<Double> inputs) {
