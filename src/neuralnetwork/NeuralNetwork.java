@@ -10,12 +10,13 @@ public class NeuralNetwork {
 	private NeuralNetworkDatabaseConnector databaseConnector;
 
 	private Vector<Layer> layers;
+	private double mse;
 
 	/** parameter **/
 	public final double eta, alpha;
 
 	private NeuralNetwork() {
-		eta = 0.02;
+		eta = 0.5;
 		alpha = 1 - eta;
 	}
 
@@ -58,10 +59,12 @@ public class NeuralNetwork {
 	}
 
 	public void learnFromDatabase(int NCycle) {
-		// TODO getexample
+		// TODO getexample		
 		Vector<Example> examples = databaseConnector.getExamples();
 		for (int iCycle = 0; iCycle < NCycle; iCycle++) {
+			mse=0;
 			learn(examples);
+			System.out.println(mse);
 		}
 	}
 
@@ -80,8 +83,6 @@ public class NeuralNetwork {
 	}
 
 	private void learn(Example example) {
-		// mse
-		double mse = 0;
 		// check example
 		example.checkOutput(layers.get(layers.size() - 1).cells.size());
 		// run example
