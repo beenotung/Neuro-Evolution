@@ -1,5 +1,6 @@
 package myutils.connection;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
+
+import myutils.Utils;
 
 /**
  * @author beenotung
@@ -40,8 +43,7 @@ public class MyDatabaseConnector {
 			portForwardingThread.start();
 		}
 		if (connection == null) {
-			MySqlServerInfo mySqlServerInfoForm = MySecureInfo
-					.getMySqlServerInfoForm();
+			MySqlServerInfo mySqlServerInfoForm = MySecureInfo.getMySqlServerInfoForm();
 			connection = DriverManager.getConnection(
 					mySqlServerInfoForm.getUrlWithoutDB(),
 					mySqlServerInfoForm.getMysqlusername(),
@@ -64,6 +66,11 @@ public class MyDatabaseConnector {
 	public static PreparedStatement getPreparedStatement(String sql) throws SQLException {
 		checkConnection();
 		return connection.prepareStatement(sql);
+	}
+
+	public static PreparedStatement getPreparedStatementFromSQLFile(String filename)
+			throws IOException, SQLException {
+		return connection.prepareStatement(Utils.readFileAsString(filename));
 	}
 
 	/**
@@ -94,6 +101,12 @@ public class MyDatabaseConnector {
 			throws SQLException {
 		checkConnection();
 		return preparedStatement.executeQuery();
+	}
+
+	public static boolean executeSQLFile(String filename) throws IOException,
+			SQLException {
+		String sqlQuery = Utils.readFileAsString(filename);
+		return execute(sqlQuery);
 	}
 
 	/**
@@ -153,9 +166,4 @@ public class MyDatabaseConnector {
 			resultSets.add(executeQuery(preparedStatement));
 		return resultSets;
 	}
-	
-	public static void executeSqlFile(String path){
-		//Runtime
-	}
-
 }
