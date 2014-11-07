@@ -9,30 +9,31 @@ public class Cell {
 	public int id;
 	public int layerid;
 	public Vector<Connection> connections;
-	public double delta;
-	public double deltaDelta;
-	public double value;
+	public double bias;
+	public double activation;
+	public double deltaBias;
+	public double deltaError;
 
 	/** Static methods **/
 	public static int getID() {
 		return NewID++;
 	}
 
-	/** instance methods **/
+	/** constructor **/
 	public Cell(int id, int layerid) {
 		this.id = id;
 		this.layerid = layerid;
 		connections = new Vector<Connection>();
-		delta = Utils.random.nextDouble();
-		value = Utils.random.nextDouble();
+		bias = Utils.random.nextDouble();
+		activation = Utils.random.nextDouble();
 	}
 
 	public Cell(int id, int layerid, double delta, double value) {
 		this.id = id;
 		this.layerid = layerid;
 		connections = new Vector<Connection>();
-		this.delta = delta;
-		this.value = value;
+		this.bias = delta;
+		this.activation = value;
 	}
 
 	public Cell(int id, int layerid, Vector<Connection> connections, double delta,
@@ -40,8 +41,13 @@ public class Cell {
 		this.id = id;
 		this.layerid = layerid;
 		this.connections = connections;
-		this.delta = delta;
-		this.value = value;
+		this.bias = delta;
+		this.activation = value;
+	}
+
+	/** instance methods **/
+	public void activate() {
+		activation = 1 / (1 + Math.exp(bias - activation));
 	}
 
 }
