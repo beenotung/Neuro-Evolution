@@ -14,7 +14,7 @@ public class NeuralNetworkDatabaseConnector {
 
 	/**general staff**/
 	public void executeSqlFile(String path){
-		Runtime
+		//Runtime
 	}
 	/**neural network staff**/ 
 	public NeuralNetworkDatabaseConnector(SqlServerInfo sqlServerInfo, String mode) {

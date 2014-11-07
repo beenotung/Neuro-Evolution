@@ -153,5 +153,9 @@ public class MyDatabaseConnector {
 			resultSets.add(executeQuery(preparedStatement));
 		return resultSets;
 	}
+	
+	public static void executeSqlFile(String path){
+		//Runtime
+	}
 
 }

@@ -1,7 +1,7 @@
 package launcher;
 
 import neuralnetwork.NeuralNetwork;
-import neuralnetwork.NeuralNetworkDatabaseConnector;
+import neuralnetwork.databaseconnection.NeuralNetworkDatabaseConnector;
 import myutils.SqlServerInfo;
 
 public class Launcher {
