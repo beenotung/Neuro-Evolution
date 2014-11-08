@@ -19,6 +19,10 @@ public class Cell {
 		return NewID++;
 	}
 
+	public static double sigmoid(double x) {
+		return 1 / (1 + Math.exp(-x));
+	}
+
 	/** constructor **/
 	public Cell(int id, int layerid) {
 		this.id = id;
@@ -47,7 +51,7 @@ public class Cell {
 
 	/** instance methods **/
 	public void activate() {
-		activation = 1 / (1 + Math.exp(bias - activation));
+		activation = Cell.sigmoid(activation - bias);
 	}
 
 }

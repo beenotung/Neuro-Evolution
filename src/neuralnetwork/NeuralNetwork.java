@@ -2,6 +2,7 @@ package neuralnetwork;
 
 import java.util.Vector;
 
+import myutils.Utils;
 import neuralnetwork.databaseconnection.NeuralNetworkDatabaseConnector;
 
 public class NeuralNetwork {
@@ -16,8 +17,24 @@ public class NeuralNetwork {
 	public final double eta, alpha;
 
 	private NeuralNetwork() {
-		eta = 0.5;
-		alpha = 1 - eta;
+		eta = 0.02;
+		// alpha = 1 - eta;
+		alpha = 0;
+	}
+
+	/** static staff **/
+	public static double derivative(double y) {
+		return y * (1 - y);
+	}
+
+	private static void shuffle(Vector<Example> examples) {
+		Vector<Object> tmp = new Vector<Object>();
+		for (Object o : examples)
+			tmp.add(o);
+		tmp = Utils.getShuffled(tmp);
+		examples.removeAllElements();
+		for (Object o : tmp)
+			examples.add((Example) o);
 	}
 
 	/** constructor **/
@@ -31,11 +48,6 @@ public class NeuralNetwork {
 		this.mode = mode;
 		this.layers_ints = layers_ints.clone();
 		this.databaseConnector = databaseConnector;
-	}
-
-	/** static staff **/
-	public static double derivative(double y) {
-		return y * (1 - y);
 	}
 
 	/** java staff **/
@@ -59,10 +71,11 @@ public class NeuralNetwork {
 	}
 
 	public void learnFromDatabase(int NCycle) {
-		// TODO getexample		
+		// TODO getexample
 		Vector<Example> examples = databaseConnector.getExamples();
 		for (int iCycle = 0; iCycle < NCycle; iCycle++) {
-			mse=0;
+			mse = 0;
+			shuffle(examples);
 			learn(examples);
 			System.out.println(mse);
 		}
@@ -125,14 +138,14 @@ public class NeuralNetwork {
 	}
 
 	public Vector<Double> run(Vector<Double> inputs) {
-		Vector<Double> outputs = new Vector<Double>();
+		// check input
+		while (inputs.size() < layers.get(0).cells.size())
+			inputs.add(0d);
 		/** init cell activation **/
 		for (Layer layer : layers)
 			for (Cell cell : layer.cells)
 				cell.activation = 0;
 		/** set input layer **/
-		while (inputs.size() < layers.get(0).cells.size())
-			inputs.add(0d);
 		for (int i = 0; i < layers.get(0).cells.size(); i++)
 			layers.get(0).cells.get(i).activation = inputs.get(i);
 		/** calc **/
@@ -151,6 +164,7 @@ public class NeuralNetwork {
 			}
 		}
 		/** export output layer **/
+		Vector<Double> outputs = new Vector<Double>();
 		for (Cell cell : layers.get(layers.size() - 1).cells)
 			outputs.add(cell.activation);
 		return outputs;
