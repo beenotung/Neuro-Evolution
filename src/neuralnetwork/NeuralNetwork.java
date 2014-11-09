@@ -77,7 +77,7 @@ public class NeuralNetwork {
 	}
 
 	private void saveToDB() {
-		// TODO saveToDB()
+		databaseConnector.save(layers);
 	}
 
 	public void learnFromDatabase(int NCycle) {

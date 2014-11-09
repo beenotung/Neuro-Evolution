@@ -1,11 +1,16 @@
 package neuralnetwork.databaseconnection;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
+import neuralnetwork.Cell;
+import neuralnetwork.Connection;
 import neuralnetwork.Example;
+import neuralnetwork.Layer;
+import myutils.Utils;
 import myutils.connection.MyDatabaseConnector;
 
 public class NeuralNetworkDatabaseConnector {
@@ -57,5 +62,37 @@ public class NeuralNetworkDatabaseConnector {
 			e.printStackTrace();
 		}
 		return examples;
+	}
+
+	public boolean save(Vector<Layer> layers) {
+		// TODO saveToDB()
+		boolean ok;
+		try {
+			MyDatabaseConnector.executeSQLFile("res/CreateTableCells.sql");
+			MyDatabaseConnector.executeSQLFile("res/ClearTableCells.sql");
+			Vector<Cell> cells = new Vector<Cell>();
+			Vector<Connection> connections = new Vector<Connection>();
+			for (Layer layer : layers)
+				for (Cell cell : layer.cells) {
+					cells.add(cell);
+					for (Connection connection : cell.connections)
+						connections.add(connection);
+				}
+			ok = true;
+		} catch (IOException | SQLException e) {
+			ok = false;
+			if (e instanceof SQLException)
+				MyDatabaseConnector.printSQLException((SQLException) e);
+			else
+				System.out.println("File System Access Denied");
+		}
+		return ok;
+	}
+
+	private PreparedStatement getInsertCellStatement(Cell cell) throws IOException, SQLException {
+		PreparedStatement preparedStatement = MyDatabaseConnector
+				.getPreparedStatementFromSQLFile("res/InsertCell.sql");		
+		preparedStatement.setInt(1, cell.id);
+		return preparedStatement;
 	}
 }
