@@ -14,12 +14,14 @@ public class NeuralNetwork {
 	private double mse;
 
 	/** parameter **/
-	public final double eta, alpha;
+	public final double eta, alpha, minErrorRate;
 
 	private NeuralNetwork() {
-		eta = 0.03;
+		minErrorRate = 1 / 100.0 / 100.0;
+		// eta = 0.03;
+		eta = 10 / 100.0;
 		alpha = 1 - eta;
-		 //alpha = 0.3;
+		// alpha = 0.3;
 	}
 
 	/** static staff **/
@@ -79,14 +81,28 @@ public class NeuralNetwork {
 	}
 
 	public void learnFromDatabase(int NCycle) {
-		// TODO getexample
 		Vector<Example> examples = databaseConnector.getExamples();
 		for (int iCycle = 0; iCycle < NCycle; iCycle++) {
 			mse = 0;
 			shuffle(examples);
 			learn(examples);
-			System.out.printf("Training Cycle:%f%%(%d/%d)\tmse:%f\n", iCycle*100.0/NCycle,iCycle,NCycle, mse);
+			System.out.printf("Training Cycle:%f%%(%d/%d)\tmse:%f%%\n", iCycle * 100.0
+					/ NCycle, iCycle, NCycle, mse * 100.0);
 		}
+	}
+
+	public void learnFromDatabase() {
+		learnFromDatabase(minErrorRate);
+	}
+
+	public void learnFromDatabase(double minErrorRate) {
+		Vector<Example> examples = databaseConnector.getExamples();
+		do {
+			mse = 0;
+			shuffle(examples);
+			learn(examples);
+			System.out.printf("mse:%f%%\n", mse * 100.0);
+		} while (mse > minErrorRate);
 	}
 
 	/** neural network staff **/
