@@ -16,10 +16,10 @@ public class Launcher {
 		int NMiddle2 = (NInput + NOutput) / 2;
 		int NMiddle1 = (NInput + NMiddle2) / 2;
 		int NMiddle3 = (NMiddle2 + NOutput) / 2;
-		 int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
-		//int[] layers = { 2, 2, 1 };
+		// int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
+		int[] layers = { 2, 2, 1 };
 		// \\debug
-		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, 0.1);
+		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, 0.10);
 		neuralNetwork.create();
 		neuralNetwork.learnFromDatabase();
 		test(neuralNetwork, 1, 1);
