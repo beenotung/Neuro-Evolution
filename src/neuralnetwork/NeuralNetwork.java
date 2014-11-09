@@ -16,14 +16,6 @@ public class NeuralNetwork {
 	/** parameter **/
 	public final double eta, alpha, minErrorRate;
 
-	private NeuralNetwork() {
-		minErrorRate = 1 / 100.0 / 100.0;
-		// eta = 0.03;
-		eta = 10 / 100.0;
-		alpha = 1 - eta;
-		// alpha = 0.3;
-	}
-
 	/** static staff **/
 	public static double derivative(double y) {
 		return y * (1 - y);
@@ -40,8 +32,33 @@ public class NeuralNetwork {
 	}
 
 	/** constructor **/
-	public NeuralNetwork(String mode, int[] layers_ints,
-			NeuralNetworkDatabaseConnector databaseConnector) {
+	private NeuralNetwork() {
+		// eta = 0.03;
+		// alpha = 0.3;
+		minErrorRate = 1 / 100.0 / 100.0;
+		eta = 10 / 100.0;
+		alpha = 1 - eta;
+	}
+
+	private NeuralNetwork(double minErrorRate, double eta, double alpha) {
+		this.minErrorRate = minErrorRate;
+		this.eta = eta;
+		this.alpha = alpha;
+	}
+
+	private NeuralNetwork(double minErrorRate, double eta) {
+		this.minErrorRate = minErrorRate;
+		this.eta = eta;
+		this.alpha = 1 - eta;
+	}
+
+	private NeuralNetwork(double eta) {
+		this.minErrorRate = 1 / 100.0 / 100.0;
+		this.eta = eta;
+		this.alpha = 1 - eta;
+	}
+
+	public NeuralNetwork(String mode, int[] layers_ints) {
 		this();
 		if (mode != "BackNN") {
 			System.out.println("[" + "mode" + "] Mode not supported");
@@ -49,7 +66,41 @@ public class NeuralNetwork {
 		}
 		this.mode = mode;
 		this.layers_ints = layers_ints.clone();
-		this.databaseConnector = databaseConnector;
+		databaseConnector = new NeuralNetworkDatabaseConnector(mode);
+	}
+
+	public NeuralNetwork(String mode, int[] layers_ints, double minErrorRate, double eta,
+			double alpha) {
+		this(minErrorRate, eta, alpha);
+		if (mode != "BackNN") {
+			System.out.println("[" + "mode" + "] Mode not supported");
+			System.exit(1);
+		}
+		this.mode = mode;
+		this.layers_ints = layers_ints.clone();
+		databaseConnector = new NeuralNetworkDatabaseConnector(mode);
+	}
+
+	public NeuralNetwork(String mode, int[] layers_ints, double minErrorRate, double eta) {
+		this(minErrorRate, eta);
+		if (mode != "BackNN") {
+			System.out.println("[" + "mode" + "] Mode not supported");
+			System.exit(1);
+		}
+		this.mode = mode;
+		this.layers_ints = layers_ints.clone();
+		databaseConnector = new NeuralNetworkDatabaseConnector(mode);
+	}
+
+	public NeuralNetwork(String mode, int[] layers_ints, double eta) {
+		this(eta);
+		if (mode != "BackNN") {
+			System.out.println("[" + "mode" + "] Mode not supported");
+			System.exit(1);
+		}
+		this.mode = mode;
+		this.layers_ints = layers_ints.clone();
+		databaseConnector = new NeuralNetworkDatabaseConnector(mode);
 	}
 
 	/** java staff **/
@@ -76,7 +127,7 @@ public class NeuralNetwork {
 		// TODO loadFromDB()
 	}
 
-	private void saveToDB() {
+	public void saveToDB() {
 		databaseConnector.save(layers);
 	}
 
@@ -97,11 +148,13 @@ public class NeuralNetwork {
 
 	public void learnFromDatabase(double minErrorRate) {
 		Vector<Example> examples = databaseConnector.getExamples();
+		int count = 0;
 		do {
+			count++;
 			mse = 0;
 			shuffle(examples);
 			learn(examples);
-			System.out.printf("mse:%f%%\n", mse * 100.0);
+			System.out.printf("mse:%f%%\tnumber of cycle: %d\n", mse * 100.0, count);
 		} while (mse > minErrorRate);
 	}
 

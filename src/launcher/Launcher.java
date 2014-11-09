@@ -16,19 +16,17 @@ public class Launcher {
 		int NMiddle2 = (NInput + NOutput) / 2;
 		int NMiddle1 = (NInput + NMiddle2) / 2;
 		int NMiddle3 = (NMiddle2 + NOutput) / 2;
-		// int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
-		int[] layers = { 2, 2, 1 };
+		 int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
+		//int[] layers = { 2, 2, 1 };
 		// \\debug
-		NeuralNetworkDatabaseConnector databaseConnector = new NeuralNetworkDatabaseConnector(
-				mode);
-		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, databaseConnector);
+		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, 0.1);
 		neuralNetwork.create();
 		neuralNetwork.learnFromDatabase();
 		test(neuralNetwork, 1, 1);
 		test(neuralNetwork, 0, 0);
 		test(neuralNetwork, 1, 0);
 		test(neuralNetwork, 0, 1);
-		// neuralNetwork.save();
+		neuralNetwork.saveToDB();
 
 		System.out.println("main end");
 	}

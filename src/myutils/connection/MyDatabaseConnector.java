@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import myutils.Utils;
+import myutils.FileUtils;
 
 /**
  * @author beenotung
@@ -19,10 +19,7 @@ public class MyDatabaseConnector {
 	private static MyPortForwardingThread portForwardingThread = null;
 	private static Connection connection = null;
 
-	/**
-	 * @throws org.eclipse.scout.commons.exception.ProcessingException
-	 * @throws SQLException
-	 */
+	/** constructor **/
 	public MyDatabaseConnector() throws SQLException {
 		connect();
 	}
@@ -72,7 +69,7 @@ public class MyDatabaseConnector {
 	public static PreparedStatement getPreparedStatementFromSQLFile(String filename)
 			throws IOException, SQLException {
 		checkConnection();
-		return connection.prepareStatement(Utils.readFileAsString(filename));
+		return connection.prepareStatement(FileUtils.readFileAsString(filename));
 	}
 
 	/**
@@ -95,7 +92,7 @@ public class MyDatabaseConnector {
 
 	public static int executeUpdate(PreparedStatement preparedStatement)
 			throws SQLException {
-		checkConnection();
+		checkConnection();		
 		return preparedStatement.executeUpdate();
 	}
 
@@ -108,7 +105,7 @@ public class MyDatabaseConnector {
 	public static boolean executeSQLFile(String filename) throws IOException,
 			SQLException {
 		checkConnection();
-		String sqlQuery = Utils.readFileAsString(filename);
+		String sqlQuery = FileUtils.readFileAsString(filename);
 		return execute(sqlQuery);
 	}
 
