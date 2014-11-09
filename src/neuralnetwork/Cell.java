@@ -52,6 +52,7 @@ public class Cell {
 	/** instance methods **/
 	public void activate() {
 		activation = Cell.sigmoid(activation - bias);
+		// activation = (Math.signum(Cell.sigmoid(activation - bias))+1)/2.0;
 	}
 
 }

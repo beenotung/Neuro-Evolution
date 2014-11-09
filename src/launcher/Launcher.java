@@ -16,26 +16,25 @@ public class Launcher {
 		int NMiddle2 = (NInput + NOutput) / 2;
 		int NMiddle1 = (NInput + NMiddle2) / 2;
 		int NMiddle3 = (NMiddle2 + NOutput) / 2;
-		//int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
-		int[]layers={2,2,1};
+		// int[] layers = { NInput, NMiddle1, NMiddle3, NOutput };
+		int[] layers = { 2, 2, 1 };
 		// \\debug
 		NeuralNetworkDatabaseConnector databaseConnector = new NeuralNetworkDatabaseConnector(
 				mode);
 		NeuralNetwork neuralNetwork = new NeuralNetwork(mode, layers, databaseConnector);
 		neuralNetwork.create();
-		neuralNetwork.learnFromDatabase(10);
-		test(neuralNetwork,1,1);
-		test(neuralNetwork,1,1);
-		test(neuralNetwork,0,0);
-		test(neuralNetwork,1,0);
-		test(neuralNetwork,0,1);
+		neuralNetwork.learnFromDatabase();
+		test(neuralNetwork, 1, 1);
+		test(neuralNetwork, 0, 0);
+		test(neuralNetwork, 1, 0);
+		test(neuralNetwork, 0, 1);
 		// neuralNetwork.save();
 
 		System.out.println("main end");
 	}
 
 	private static void test(NeuralNetwork neuralNetwork, double i, double j) {
-		Vector<Double> inputs=new Vector<Double>();
+		Vector<Double> inputs = new Vector<Double>();
 		inputs.add(i);
 		inputs.add(j);
 		Vector<Double> output = neuralNetwork.run(inputs);

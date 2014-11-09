@@ -17,9 +17,9 @@ public class NeuralNetwork {
 	public final double eta, alpha;
 
 	private NeuralNetwork() {
-		eta = 0.02;
-		// alpha = 1 - eta;
-		alpha = 0;
+		eta = 0.03;
+		alpha = 1 - eta;
+		 //alpha = 0.3;
 	}
 
 	/** static staff **/
@@ -53,12 +53,20 @@ public class NeuralNetwork {
 	/** java staff **/
 	public void create() {
 		createLayers();
+		createConnections();
 	}
 
 	private void createLayers() {
 		layers = new Vector<Layer>();
 		for (int iLayer = 0; iLayer < layers_ints.length; iLayer++)
 			layers.add(new Layer(iLayer, layers_ints[iLayer]));
+	}
+
+	private void createConnections() {
+		for (int iLayer = 0; iLayer < layers.size() - 1; iLayer++)
+			for (Cell srcCell : layers.get(iLayer).cells)
+				for (Cell destCell : layers.get(iLayer + 1).cells)
+					srcCell.connections.add(new Connection(srcCell, destCell));
 	}
 
 	/** sql staff **/
@@ -77,7 +85,7 @@ public class NeuralNetwork {
 			mse = 0;
 			shuffle(examples);
 			learn(examples);
-			System.out.println(mse);
+			System.out.printf("Training Cycle:%f%%(%d/%d)\tmse:%f\n", iCycle*100.0/NCycle,iCycle,NCycle, mse);
 		}
 	}
 
@@ -134,10 +142,10 @@ public class NeuralNetwork {
 		for (int iCell = 0; iCell < example.output.size(); iCell++)
 			mse += Math.pow(
 					example.output.get(iCell) - layer.cells.get(iCell).activation, 2);
-		System.out.println(mse);
 	}
 
 	public Vector<Double> run(Vector<Double> inputs) {
+		/* System.out.println("run"); */
 		// check input
 		while (inputs.size() < layers.get(0).cells.size())
 			inputs.add(0d);
@@ -146,14 +154,26 @@ public class NeuralNetwork {
 			for (Cell cell : layer.cells)
 				cell.activation = 0;
 		/** set input layer **/
-		for (int i = 0; i < layers.get(0).cells.size(); i++)
-			layers.get(0).cells.get(i).activation = inputs.get(i);
+		for (int iCell = 0; iCell < layers.get(0).cells.size(); iCell++)
+			layers.get(0).cells.get(iCell).activation = inputs.get(iCell);
 		/** calc **/
 		Layer layer = layers.get(0);
-		for (Cell cell : layer.cells)
-			for (Connection connection : cell.connections)
+		for (Cell cell : layer.cells) {
+			/*
+			 * System.out.println("--");
+			 * System.out.println(cell.connections.size());
+			 */
+			for (Connection connection : cell.connections) {
+				/*
+				 * System.out.println();
+				 * System.out.println(connection.dest.activation);
+				 * System.out.println(connection.src.activation);
+				 * System.out.println(connection.weight);
+				 */
 				connection.dest.activation += connection.src.activation
 						* connection.weight;
+			}
+		}
 		for (int iLayer = 1; iLayer < layers.size(); iLayer++) {
 			layer = layers.get(iLayer);
 			for (Cell cell : layer.cells) {
