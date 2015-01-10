@@ -1,9 +1,9 @@
-package neuralnetwork;
+package neuroevolution.neuralnetwork.core;
 
 import java.util.Vector;
 
 import myutils.Utils;
-import neuralnetwork.databaseconnection.NeuralNetworkDatabaseConnector;
+import neuroevolution.neuralnetwork.databaseconnection.NeuralNetworkDatabaseConnector;
 
 public class NeuralNetwork {
 	private String mode;

@@ -1,9 +1,8 @@
-package launcher;
+package neuroevolution;
 
 import java.util.Vector;
 
-import neuralnetwork.NeuralNetwork;
-import neuralnetwork.databaseconnection.NeuralNetworkDatabaseConnector;
+import neuroevolution.neuralnetwork.core.NeuralNetwork;
 
 public class Launcher {
 

@@ -1,4 +1,4 @@
-package neuralnetwork.databaseconnection;
+package neuroevolution.neuralnetwork.databaseconnection;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -7,10 +7,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import neuralnetwork.Cell;
-import neuralnetwork.Connection;
-import neuralnetwork.Example;
-import neuralnetwork.Layer;
+import neuroevolution.neuralnetwork.core.Cell;
+import neuroevolution.neuralnetwork.core.Connection;
+import neuroevolution.neuralnetwork.core.Example;
+import neuroevolution.neuralnetwork.core.Layer;
 import myutils.FileUtils;
 import myutils.connection.MyDatabaseConnector;
 
