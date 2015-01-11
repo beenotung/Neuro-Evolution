@@ -1,4 +1,4 @@
-package neuroevolution.neuralnetwork.core;
+package neuroevolution.neuralnetwork.core_java;
 
 import java.util.Vector;
 
@@ -10,7 +10,7 @@ public class NeuralNetwork {
 	private int[] layers_ints;
 	private NeuralNetworkDatabaseConnector databaseConnector;
 
-	private Vector<Layer> layers;
+	private Vector<neuroevolution.neuralnetwork.core.Layer> layers;
 	private double mse;
 
 	/** parameter **/
@@ -110,9 +110,9 @@ public class NeuralNetwork {
 	}
 
 	private void createLayers() {
-		layers = new Vector<Layer>();
+		layers = new Vector<neuroevolution.neuralnetwork.core.Layer>();
 		for (int iLayer = 0; iLayer < layers_ints.length; iLayer++)
-			layers.add(new Layer(iLayer, layers_ints[iLayer]));
+			layers.add(new neuroevolution.neuralnetwork.core.Layer(iLayer, layers_ints[iLayer]));
 	}
 
 	private void createConnections() {
@@ -161,7 +161,7 @@ public class NeuralNetwork {
 	/** neural network staff **/
 	public void learn(Vector<Example> examples) {
 		// init training variables
-		for (Layer layer : layers)
+		for (neuroevolution.neuralnetwork.core.Layer layer : layers)
 			for (Cell cell : layer.cells) {
 				cell.deltaBias = 0;
 				for (Connection connection : cell.connections)
@@ -192,7 +192,7 @@ public class NeuralNetwork {
 			}
 		}
 		// compute delta weight, delta bias
-		for (Layer layer : layers)
+		for (neuroevolution.neuralnetwork.core.Layer layer : layers)
 			for (Cell cell : layer.cells) {
 				cell.deltaBias = alpha * cell.deltaBias - eta * cell.deltaError;
 				for (Connection connection : cell.connections)
@@ -200,14 +200,14 @@ public class NeuralNetwork {
 							* cell.activation * connection.dest.deltaError;
 			}
 		// update weight, bias
-		for (Layer layer : layers)
+		for (neuroevolution.neuralnetwork.core.Layer layer : layers)
 			for (Cell cell : layer.cells) {
 				cell.bias += cell.deltaBias;
 				for (Connection connection : cell.connections)
 					connection.weight += connection.deltaWeight;
 			}
 		// mse
-		Layer layer = layers.get(layers.size() - 1);
+		neuroevolution.neuralnetwork.core.Layer layer = layers.get(layers.size() - 1);
 		for (int iCell = 0; iCell < example.output.size(); iCell++)
 			mse += Math.pow(
 					example.output.get(iCell) - layer.cells.get(iCell).activation, 2);
@@ -219,14 +219,14 @@ public class NeuralNetwork {
 		while (inputs.size() < layers.get(0).cells.size())
 			inputs.add(0d);
 		/** init cell activation **/
-		for (Layer layer : layers)
+		for (neuroevolution.neuralnetwork.core.Layer layer : layers)
 			for (Cell cell : layer.cells)
 				cell.activation = 0;
 		/** set input layer **/
 		for (int iCell = 0; iCell < layers.get(0).cells.size(); iCell++)
 			layers.get(0).cells.get(iCell).activation = inputs.get(iCell);
 		/** calc **/
-		Layer layer = layers.get(0);
+		neuroevolution.neuralnetwork.core.Layer layer = layers.get(0);
 		for (Cell cell : layer.cells) {
 			/*
 			 * System.out.println("--");

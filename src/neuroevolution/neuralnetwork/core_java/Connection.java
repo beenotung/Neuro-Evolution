@@ -1,4 +1,4 @@
-package neuroevolution.neuralnetwork.core;
+package neuroevolution.neuralnetwork.core_java;
 
 import myutils.Utils;
 

@@ -2,9 +2,9 @@ package neuroevolution;
 
 import java.util.Vector;
 
-import neuroevolution.neuralnetwork.core.NeuralNetwork;
+import neuroevolution.neuralnetwork.core_java.NeuralNetwork;
 
-public class Launcher_OLD {
+public class Launcher_JAVA {
 
 	public static void main(String[] args) {
 		System.out.println("main start");

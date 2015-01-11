@@ -1,4 +1,4 @@
-package neuroevolution.neuralnetwork.core;
+package neuroevolution.neuralnetwork.core_java;
 
 import java.util.Vector;
 

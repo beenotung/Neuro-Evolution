@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import neuroevolution.neuralnetwork.core.Cell;
-import neuroevolution.neuralnetwork.core.Connection;
-import neuroevolution.neuralnetwork.core.Example;
+import neuroevolution.neuralnetwork.core_java.Cell;
+import neuroevolution.neuralnetwork.core_java.Connection;
+import neuroevolution.neuralnetwork.core_java.Example;
 import neuroevolution.neuralnetwork.core.Layer;
 import myutils.FileUtils;
 import myutils.connection.MyDatabaseConnector;
