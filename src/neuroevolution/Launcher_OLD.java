@@ -4,7 +4,7 @@ import java.util.Vector;
 
 import neuroevolution.neuralnetwork.core.NeuralNetwork;
 
-public class Launcher {
+public class Launcher_OLD {
 
 	public static void main(String[] args) {
 		System.out.println("main start");
