@@ -1,6 +1,7 @@
 package neuroevolution.neuralnetwork.databaseconnection;
 
 import java.io.IOException;
+import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +11,7 @@ import java.util.Vector;
 import neuroevolution.neuralnetwork.core_java.Cell;
 import neuroevolution.neuralnetwork.core_java.Connection;
 import neuroevolution.neuralnetwork.core_java.Example;
-import neuroevolution.neuralnetwork.core.Layer;
+import neuroevolution.neuralnetwork.core_java.Layer;
 import myutils.FileUtils;
 import myutils.connection.MyDatabaseConnector;
 
@@ -92,7 +93,7 @@ public class NeuralNetworkDatabaseConnector {
 
 	public static boolean clearTableCells() throws IOException, SQLException {
 		boolean ok = true;
-		List<String> sqlQuerys = FileUtils.readFileAsStrings("res/ClearTableCells.sql");
+		List<String> sqlQuerys = FileUtils.readFile(new URL("res/ClearTableCells.sql"));
 		for (String string : sqlQuerys)
 			if (string.length() > 0)
 				ok &= MyDatabaseConnector.execute(string);
@@ -102,7 +103,7 @@ public class NeuralNetworkDatabaseConnector {
 	public static boolean clearTableConnections() throws IOException, SQLException {
 		boolean ok = true;
 		List<String> sqlQuerys = FileUtils
-				.readFileAsStrings("res/ClearTableConnections.sql");
+				.readFile(new URL("res/ClearTableConnections.sql"));
 		for (String string : sqlQuerys)
 			if (string.length() > 0)
 				ok &= MyDatabaseConnector.execute(string);
