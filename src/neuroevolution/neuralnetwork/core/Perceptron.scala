@@ -22,10 +22,10 @@ object Perceptron {
     //TODO save database
   }
 
-  def create[ValueType, WeightType](frame: Array[Int], weightGen: () => WeightType): Perceptron[ValueType, WeightType] = {
-    val layers = new Array[Layer](frame.length)
+  def create[ValueType, WeightType](frame: Array[Int], weightGen: => WeightType): Perceptron[ValueType, WeightType] = {
+    val layers = new Array[Layer[ValueType, WeightType]](frame.length)
     for (i <- frame.indices)
-      layers(i) = Layer.create(frame(i), weightGen)
+      layers(i) = Layer.create[ValueType, WeightType](frame(i), weightGen)
     for (iLayer <- layers.indices)
       for (neuron <- layers(iLayer).neurons)
         for (target <- layers(iLayer - 1).neurons)
@@ -34,11 +34,11 @@ object Perceptron {
   }
 }
 
-class Perceptron[ValueType, WeightType](val layers: Array[Layer]) {
-  def run(inputs: Array[Double]): Array[Double] = {
+class Perceptron[ValueType, WeightType](val layers: Array[Layer[ValueType, WeightType]]) {
+  def run(inputs: Array[ValueType]): Array[ValueType] = {
     if (inputs.length != layers(0).neurons.length)
       throw new UnsupportedOperationException
-    var array: Array[Double] = inputs
+    var array: Array[ValueType] = inputs
     for (layer <- layers)
       array = layer.run(array)
     return array
