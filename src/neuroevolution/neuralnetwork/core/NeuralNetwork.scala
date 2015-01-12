@@ -5,6 +5,7 @@ package neuroevolution.neuralnetwork.core
  */
 
 import scala.math.exp
+import scala.util.Random
 
 abstract class ActivationFunction {
   def eval(value: Double): Double
@@ -26,11 +27,14 @@ object NeuralNetworkApplication extends App {
   }
 
   def menu: Unit = {
-    println("loading")
+    println("menu")
     test
   }
 
   def test: Unit = {
     //TODO demo test
+    val frame= Array[Int](1,4,4,1)
+    val weightGen:(()=>Double)=(()=>Random.nextDouble())
+    val perceptron=Perceptron.create[Double](frame,weightGen)
   }
 }
