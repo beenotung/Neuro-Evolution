@@ -11,18 +11,17 @@ import scala.util.Random
   val random: Random = new Random(System.currentTimeMillis())
   var lastId = initId
 
-  def create[T](weightGen:  => T): Neuron = {
+  def create[ValueType,WeightType](weightGen:  => WeightType): Neuron = {
     lastId = lastId + 1
     if (lastId == initId)
       throw new IndexOutOfBoundsException
-    new Neuron[T](lastId, weightGen)[T]
+    new Neuron[ValueType,WeightType](lastId, weightGen)[WeightType]
   }
 
 }
 
-class Neuron[T](id: BigInt, weightGen:  => T) {
-  var forwardConnections = HashMap[Neuron, T]()
-
+class Neuron[ValueType,WeightType](id: BigInt, weightGen:  => WeightType) {
+  var forwardConnections = HashMap[Neuron, WeightType]()
   def addForwardConnections(neuron: Neuron) = {
     forwardConnections.put(neuron, weightGen)
   }
