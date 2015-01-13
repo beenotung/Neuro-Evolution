@@ -33,8 +33,13 @@ object NeuralNetworkApplication extends App {
 
   def test: Unit = {
     //TODO demo test
-    val frame= Array[Int](1,4,4,1)
-    val weightGen:(()=>Double)=(()=>Random.nextDouble())
-    val perceptron=Perceptron.create[Double](frame,weightGen)
+    val frame = Array[Int](1, 4, 4, 1)
+
+    def weightGen: Double = {
+      Random.nextDouble()
+    }
+
+    val perceptron = Perceptron.create(frame, weightGen)
   }
+
 }
