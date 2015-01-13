@@ -16,10 +16,10 @@ class Layer[ValueType, WeightType](val neurons: Array[Neuron[ValueType, WeightTy
   val outputs = new Array[ValueType](neurons.length)
   val errors=null
 
-  def forwardConnect(layer: Layer): Unit = {
+  def backwardConnect(layer: Layer): Unit = {
     for (neuron <- neurons)
       for (target <- layer.neurons)
-        neuron.addForwardConnections(target)
+        neuron.addBackwardConnections(target)
   }
 
   def run(inputs: Array[ValueType]): Array[ValueType] = {

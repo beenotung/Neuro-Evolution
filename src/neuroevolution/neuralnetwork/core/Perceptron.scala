@@ -26,10 +26,10 @@ object Perceptron {
     val layers = new Array[Layer[ValueType, WeightType]](frame.length)
     for (i <- frame.indices)
       layers(i) = Layer.create[ValueType, WeightType](frame(i), weightGen)
-    for (iLayer <- layers.indices)
+    for (iLayer <- 1 to (layers.length - 1))
       for (neuron <- layers(iLayer).neurons)
         for (target <- layers(iLayer - 1).neurons)
-          neuron.addForwardConnections(target)
+          neuron.addBackwardConnections(target)
     new Perceptron[ValueType, WeightType](layers)
   }
 }

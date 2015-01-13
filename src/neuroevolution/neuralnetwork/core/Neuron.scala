@@ -34,10 +34,10 @@ object myutils {
 }
 
 class Neuron[ValueType,WeightType](id: BigInt, weightGen:  => WeightType) {
-  var forwardConnections = HashMap[Neuron[ValueType, WeightType], WeightType]()
+  var backwardConnections = HashMap[Neuron[ValueType, WeightType], WeightType]()
 
-  def addForwardConnections(neuron: Neuron[ValueType, WeightType]) = {
-    forwardConnections.put(neuron, weightGen)
+  def addBackwardConnections(neuron: Neuron[ValueType, WeightType]) = {
+    backwardConnections.put(neuron, weightGen)
   }
 
   def run(inputs: Array[ValueType]): ValueType = {
