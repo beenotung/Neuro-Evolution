@@ -1,3 +1,5 @@
+package neuroevolution.ga.core_java;
+
 import java.math.BigDecimal;
 import java.util.BitSet;
 import java.util.Random;

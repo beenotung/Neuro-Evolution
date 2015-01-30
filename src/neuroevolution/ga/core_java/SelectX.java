@@ -1,3 +1,5 @@
+package neuroevolution.ga.core_java;
+
 import java.util.Arrays;
 
 public class SelectX {

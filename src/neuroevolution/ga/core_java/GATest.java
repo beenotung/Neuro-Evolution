@@ -1,3 +1,5 @@
+package neuroevolution.ga.core_java;
+
 public class GATest {
 
 	/**

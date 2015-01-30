@@ -1,4 +1,4 @@
-// math
+package neuroevolution.ga.core_java;// math
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -17,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 
 import java.util.BitSet;
 // general utility
-
 
 public class GA {
 

@@ -1,3 +1,5 @@
+package neuroevolution.ga.core_java;
+
 class Report implements Runnable {
 	private Thread t;
 	private GA[] ga;

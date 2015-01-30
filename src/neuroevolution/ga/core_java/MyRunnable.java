@@ -1,3 +1,5 @@
+package neuroevolution.ga.core_java;
+
 public abstract class MyRunnable implements Runnable {
 	Thread t;
 	final int IThread;
