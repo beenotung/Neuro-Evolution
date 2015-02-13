@@ -3,6 +3,7 @@ package neuroevolution.neuralnetwork.core
 
 import scala.collection.mutable
 import scala.util.Random
+import myutils.Utils
 
 /**
  * Created by beenotung on 1/11/15.
@@ -12,23 +13,23 @@ object Neuron {
   val random: Random = new Random(System.currentTimeMillis())
   var lastId = initId
 
-  def create(weightGen: => Double): Neuron = {
+  def create(): Neuron = {
     lastId = lastId + 1
     if (lastId == initId)
       throw new IndexOutOfBoundsException
-    new Neuron(lastId, weightGen)
+    new Neuron(lastId)
   }
 }
 
-class Neuron(id: BigInt, weightGen: => Double) {
-  var backwardConnections = mutable.HashMap[Neuron, Double]()
+class Neuron(id: BigInt) {
+  val weights = mutable.MutableList[Float]()
+  var bias:Float=Utils.random.nextFloat
 
   def addBackwardConnections(neuron: Neuron) = {
-    backwardConnections.put(neuron, weightGen)
+    weights+=Utils.random.nextFloat
   }
 
-  def run(inputs: Array[Double]): Double = {
-    val weights = backwardConnections.values.toArray
+  def run(inputs: Array[Float]): Double = {
     var sum: Double = 0
     for (i <- inputs.indices)
       sum += inputs(i) * weights(i)
