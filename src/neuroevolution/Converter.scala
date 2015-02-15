@@ -12,13 +12,10 @@ object Converter {
   val N_HIDDEN_CELLs: List[Int] = List[Int]()
   val N_OUTPUT_CELL = 2
 
+  val bitDecimals = for (i <- 0 to 1024) yield i / 2f
 
   def Decode(rawCode: Array[Boolean], N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Perceptron = {
-    val N_BIT_WEIGHT_DIVIDER: Float = (Math.pow(2, N_BIT_WEIGHT) - 1).toFloat
-    val N_BIT_BIAS_DIVIDER: Float = (Math.pow(2, N_BIT_BIAS) - 1).toFloat
-
     var index = 0
-    var tmp = 0
     val layers: Array[Int] = new Array[Int](2)
     layers(0) = 2
     layers(1) = 2
@@ -27,28 +24,24 @@ object Converter {
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer) {
         for (iWeight: Int <- neuron.weights.indices) {
-          tmp = 0
+          neuron.weights(iWeight) = 0
           for (iBit <- Range(1, N_BIT_WEIGHT)) {
-            tmp *= 2
             if (rawCode(index))
-              tmp = tmp + 1
+              neuron.weights(iWeight) += bitDecimals(iBit)
             index += 1
           }
-          neuron.weights(iWeight) = tmp / N_BIT_WEIGHT_DIVIDER
         }
       }
     }
     //decode bias
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer) {
-        tmp = 0
+        neuron.bias = 0
         for (iBit <- Range(1, N_BIT_BIAS)) {
-          tmp *= 2
           if (rawCode(index))
-            tmp = tmp + 1
+            neuron.bias += bitDecimals(iBit)
           index += 1
         }
-        neuron.bias = tmp / N_BIT_BIAS_DIVIDER
       }
     }
     perceptron
