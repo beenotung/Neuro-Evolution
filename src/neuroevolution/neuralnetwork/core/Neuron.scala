@@ -1,9 +1,10 @@
 package neuroevolution.neuralnetwork.core
 
 
+import myutils.Utils
+
 import scala.collection.mutable
 import scala.util.Random
-import myutils.Utils
 
 /**
  * Created by beenotung on 1/11/15.
@@ -23,10 +24,10 @@ object Neuron {
 
 class Neuron(id: BigInt) {
   val weights = mutable.MutableList[Float]()
-  var bias:Float=Utils.random.nextFloat
+  var bias: Float = Utils.random.nextFloat
 
   def addBackwardConnections(neuron: Neuron) = {
-    weights+=Utils.random.nextFloat
+    weights += Utils.random.nextFloat
   }
 
   def run(inputs: Array[Float]): Double = {

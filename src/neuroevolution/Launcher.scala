@@ -15,7 +15,7 @@ object Launcher extends App {
 
   def test: Unit = {
     println("test start")
-    var perceptron:Perceptron=Perceptron.create(Array[Int](2,2,1))
+    var perceptron: Perceptron = Perceptron.create(Array[Int](2, 2, 1))
     println("test end")
   }
 }

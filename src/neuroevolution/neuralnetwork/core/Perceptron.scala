@@ -35,9 +35,6 @@ object Perceptron {
 }
 
 
-
-
-
 class Perceptron(val layers: Array[Layer]) {
   def run(inputs: Array[Double]): Array[Double] = {
     if (inputs.length != layers(0).neurons.length)

@@ -14,7 +14,7 @@ object Layer {
 
 class Layer(val neurons: Array[Neuron]) {
   val outputs = new Array[Double](neurons.length)
-  val errors=null
+  val errors = null
 
   def backwardConnect(layer: Layer): Unit = {
     for (neuron <- neurons)
