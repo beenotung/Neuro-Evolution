@@ -75,7 +75,7 @@ public class GA {
         PrintWriter writer;
         try {
             writer = new PrintWriter(filepath, coding);
-			/* Genetic Algorithm constant */
+            /* Genetic Algorithm constant */
             writer.println("/* Genetic Algorithm constant */");
             writer.println("Population Size : 50");
             writer.println("Generation Limit (Iteration Steps) : 1000");

@@ -58,7 +58,7 @@ class Report implements Runnable {
             System.out.println(s);
         }
         /*
-		 * for (Gen i : ga[0].population) { System.out.println(i.fitness); }
+         * for (Gen i : ga[0].population) { System.out.println(i.fitness); }
 		 */
         // sleep(150);
     }

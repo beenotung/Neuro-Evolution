@@ -6,6 +6,7 @@ public class SelectX {
 
     private GA[] ga;
     private SelectXThreads[] selectXThreads = new SelectXThreads[GA.NThread];
+
     SelectX(GA[] gaIN) {
         this.ga = gaIN;
     }
