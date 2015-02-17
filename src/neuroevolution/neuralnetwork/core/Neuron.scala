@@ -2,6 +2,7 @@ package neuroevolution.neuralnetwork.core
 
 
 import myutils.Utils
+import neuroevolution.neuralnetwork.core_java.NeuralNetwork
 
 import scala.collection.mutable
 import scala.util.Random
@@ -24,16 +25,19 @@ object Neuron {
 
 class Neuron(id: BigInt) {
   val weights = mutable.MutableList[Float]()
-  var bias: Float = Utils.random.nextFloat
+  var bias: Float =0f
+  var sum:Float=0f
+  var output:Float=0f
 
   def addBackwardConnections(neuron: Neuron) = {
     weights += Utils.random.nextFloat
   }
 
-  def run(inputs: Array[Float]): Double = {
-    var sum: Double = 0
+  def run(inputs: Array[Float]): Float = {
+     sum= 0
     for (i <- inputs.indices)
       sum += inputs(i) * weights(i)
-    sum
+    output=Sigmoid.eval(sum-bias)
+    output
   }
 }

@@ -13,7 +13,7 @@ object Layer {
 }
 
 class Layer(val neurons: Array[Neuron]) {
-  val outputs = new Array[Double](neurons.length)
+  val outputs = new Array[Float](neurons.length)
   val errors = null
 
   def backwardConnect(layer: Layer): Unit = {
@@ -22,7 +22,7 @@ class Layer(val neurons: Array[Neuron]) {
         neuron.addBackwardConnections(target)
   }
 
-  def run(inputs: Array[Double]): Array[Double] = {
+  def run(inputs: Array[Float]): Array[Float] = {
     for (i <- neurons.indices)
       outputs(i) = neurons(i).run(inputs)
     outputs

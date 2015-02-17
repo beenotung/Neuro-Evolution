@@ -8,12 +8,12 @@ import scala.math.exp
 import scala.util.Random
 
 abstract class ActivationFunction {
-  def eval(value: Double): Double
+  def eval(value: Float): Float
 }
 
 object Sigmoid extends ActivationFunction {
-  override def eval(value: Double): Double = {
-    1d / (1d + exp(-value))
+  override def eval(value: Float): Float = {
+    (1d / (1d + exp(-value))).toFloat
   }
 }
 
@@ -35,11 +35,7 @@ object NeuralNetworkApplication extends App {
     //TODO demo test
     val frame = Array[Int](1, 4, 4, 1)
 
-    def weightGen: Double = {
-      Random.nextDouble()
-    }
-
-    val perceptron = Perceptron.create(frame, weightGen)
+    val perceptron = Perceptron.create(frame)
   }
 
 }

@@ -36,10 +36,10 @@ object Perceptron {
 
 
 class Perceptron(val layers: Array[Layer]) {
-  def run(inputs: Array[Double]): Array[Double] = {
+  def run(inputs: Array[Float]): Array[Float] = {
     if (inputs.length != layers(0).neurons.length)
       throw new UnsupportedOperationException
-    var array: Array[Double] = inputs
+    var array: Array[Float] = inputs
     for (layer <- layers)
       array = layer.run(array)
     return array
