@@ -1,6 +1,6 @@
 package neuroevolution
 
-import neuroevolution.ga.core.Gene
+import neuroevolution.ga.core.What
 import neuroevolution.neuralnetwork.core.{Layer, Neuron, Perceptron}
 
 /**
@@ -15,7 +15,7 @@ object Converter {
 
   val bitDecimals = for (i <- 0 to 1024) yield i / 2f
 
-  def Decode(gene: Gene, perceptron: Perceptron): Unit = {
+  def Decode(gene: What, perceptron: Perceptron): Unit = {
     var index = 0
     //decode weight
     for (layer: Layer <- perceptron.layers) {
@@ -43,7 +43,7 @@ object Converter {
     }
   }
 
-  def Encode(perceptron: Perceptron, gene: Gene): Unit = {
+  def Encode(perceptron: Perceptron, gene: What): Unit = {
     var index = 0
     var tmp: Float = 0f
     //decode weight

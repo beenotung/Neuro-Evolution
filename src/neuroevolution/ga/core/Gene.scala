@@ -1,8 +1,12 @@
 package neuroevolution.ga.core
 
 /**
- * Created by 13058536A on 2/17/2015.
+ * Created by beenotung on 3/17/15.
  */
-class Gene (val rawCode: Array[Boolean], val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int){
-
+class Gene(BIT_SIZE: Int,eval_function:(Array[Boolean])=>Double) {
+  val bits: Array[Boolean] = new Array[Boolean](BIT_SIZE)
+  var fitness: Double = 0D
+  def eval={
+    fitness=eval_function(bits)
+  }
 }
