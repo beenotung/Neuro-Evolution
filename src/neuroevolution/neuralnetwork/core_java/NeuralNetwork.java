@@ -145,7 +145,7 @@ public class NeuralNetwork {
             mse = 0;
             shuffle(examples);
             learn(examples);
-            System.out.printf("Training Cycle:%f%%(%d/%d)\tmse:%f%%\n", iCycle * 100.0
+            System.out.printf("Training Cycle:%f%%(%x/%x)\tmse:%f%%\n", iCycle * 100.0
                     / NCycle, iCycle, NCycle, mse * 100.0);
         }
     }
@@ -162,7 +162,7 @@ public class NeuralNetwork {
             mse = 0;
             shuffle(examples);
             learn(examples);
-            System.out.printf("mse:%f%%\tnumber of cycle: %d\n", mse * 100.0, count);
+            System.out.printf("mse:%f%%\tnumber of cycle: %x\n", mse * 100.0, count);
         } while (mse > minErrorRate);
     }
 

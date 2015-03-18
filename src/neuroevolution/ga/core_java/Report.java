@@ -24,15 +24,15 @@ class Report implements Runnable {
     public void show() {
         Utils.gotorc(1, 1);
         System.out.println("Generation " + this.ga[0].IGENS + Utils.Space(n));
-        // for (int i = 0; i < 1 * ga[0].POPSIZE.intValue(); i++) {
+        // for (int x = 0; x < 1 * ga[0].POPSIZE.intValue(); x++) {
         for (int i = 0; i < Math.min(32, ga[0].POPSIZE.intValue()); i++) {
             if (i < 10)
                 System.out.print(" ");
             System.out.print(i);
-            // System.out.println(Utils.Space(n) + ga[0].population[i].getcode()
+            // System.out.println(DataTypes.Space(n) + ga[0].population[x].getcode()
             // +
-            // Utils.Space(n) +
-            // ga[0].population[i].getvalue()+Utils.Space(n)+ga[0].population[i].fitness.doubleValue()+Utils.Space(n));
+            // DataTypes.Space(n) +
+            // ga[0].population[x].getvalue()+DataTypes.Space(n)+ga[0].population[x].fitness.doubleValue()+DataTypes.Space(n));
             s = "";
             if (ga[0].Report_code) {
                 for (int j = 0; j < ga[0].NVAR.intValue(); j++) {
@@ -58,7 +58,7 @@ class Report implements Runnable {
             System.out.println(s);
         }
         /*
-         * for (Gen i : ga[0].population) { System.out.println(i.fitness); }
+         * for (Gen x : ga[0].population) { System.out.println(x.fitness); }
 		 */
         // sleep(150);
     }

@@ -22,8 +22,8 @@ public class SelectX {
         while (Utils.someAlive(selectXThreads))
             Utils.sleep();
 
-        // for (int i = 0; i < ga[0].population.length; i++) {
-        // ga[0].population[i].Survivor = ((double) i / ga[0].population.length)
+        // for (int x = 0; x < ga[0].population.length; x++) {
+        // ga[0].population[x].Survivor = ((double) x / ga[0].population.length)
         // <= ga[0].CUTOFF;
         // }
         ga[0].population[0].Survivor = true;

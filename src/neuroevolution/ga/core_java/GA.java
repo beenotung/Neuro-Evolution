@@ -93,7 +93,7 @@ public class GA {
 			/* Interface option */
             writer.println("/* Interface option */");
             writer.println("Report rate (in sec, e.g. 0,0.5,1) : 0.25");
-            writer.println("Report Item (i.e. code, survivor(together with two char), value, fitness)");
+            writer.println("Report Item (x.e. code, survivor(together with two char), value, fitness)");
             writer.println("Report Item : code");
             writer.println("Report Item : survivor TF");
             writer.println("Report Item : value");
@@ -257,7 +257,7 @@ public class GA {
             for (int j = 0; j < l; j++) {
                 s += "\u0008";
             }
-            // console.printf("%s", s + i.add(one) + "/" + amoung);
+            // console.printf("%s", s + x.add(one) + "/" + amoung);
             System.out.print(s + (i + 1) + "/" + amoung);
             this.population[i] = new Gen(this.NVAR, this.NSIGB, this.NSIGA);
             // sleep(150);
@@ -444,14 +444,14 @@ public class GA {
             ga.selectX.run();
             double temp = ga.Report_rate;
             ga.Report_rate = 1;
-            // ga.report(Utils.zero.toBigInteger());
+            // ga.report(DataTypes.zero.toBigInteger());
             ga.Report_rate = temp;
         }
         ga.report.start();
         for (ga.IGENS = Utils.zero.toBigInteger(); !ga.IGENS.equals(ga.MAXGENS); ga.IGENS = ga.IGENS
                 .add(Utils.one.toBigInteger())) {
             ga.nextGeneration();
-            // ga.report(ga.IGENS.add(Utils.one.toBigInteger()));
+            // ga.report(ga.IGENS.add(DataTypes.one.toBigInteger()));
         }
         ga.report.stop();
 
@@ -482,8 +482,8 @@ public class GA {
             this.NSIGA = NSIGA;
             this.code = new BitSet[NVAR.intValue()][2];
             for (int i = 0; i < NVAR.intValue(); i++) {
-                // this.code[i] = random_no_decimal_place(NSIG);
-                // this.code[i] = random_with_decimal_place(NSIG);
+                // this.code[x] = random_no_decimal_place(NSIG);
+                // this.code[x] = random_with_decimal_place(NSIG);
                 this.code[i][0] = Utils.random_bitset(NSIGB.intValue());
                 this.code[i][1] = Utils.random_bitset(NSIGA.intValue());
             }

@@ -5,7 +5,6 @@ package neuroevolution.neuralnetwork.core
  */
 
 import scala.math.exp
-import scala.util.Random
 
 abstract class ActivationFunction {
   def eval(value: Float): Float
