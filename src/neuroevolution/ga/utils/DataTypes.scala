@@ -5,12 +5,23 @@ package neuroevolution.ga.utils
  */
 object DataTypes {
 
-  implicit class BooleanNum(b: Boolean) extends AnyVal {
-    def toInt = if (b) 1 else 0
-
-    def -(x: Int) = if (b) 1 - x else -x
-
-    def -(x: Double) = if (b) 1 - x else -x
+  def -(b: Boolean, x: Int): Int = {
+    toInt(b) - x
   }
 
+  def toInt(b: Boolean): Int = {
+    if (b) 1 else 0
+  }
+
+  def -(b: Boolean, x: Double): Double = {
+    toInt(b) - x
+  }
+
+  implicit class BooleanNum(var b: Boolean)  {
+    def toInt = if (b) 1 else 0
+
+    def -(x: Int): Int = if (b) 1 - x else -x
+
+    def -(x: Double): Double = if (b) 1 - x else -x
+  }
 }
