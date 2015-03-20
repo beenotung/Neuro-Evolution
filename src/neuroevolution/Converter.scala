@@ -75,11 +75,10 @@ object Converter {
   }
 }
 
-class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int) {
-  val N_INPUT_CELL = 2
-  val N_HIDDEN_CELLs: List[Int] = List[Int]()
-  val N_OUTPUT_CELL = 2
-
+class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int,val numberOfNodes:Array[Int]) {
+//  var N_INPUT_CELL = numberOfNodes(0)
+//  var N_HIDDEN_CELLs: Array[Int] = Array[Int](numberOfNodes.length-2)
+//  var N_OUTPUT_CELL = numberOfNodes.last
   def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
     Converter.encode(perceptron, rawCode, N_BIT_WEIGHT, N_BIT_BIAS)
 
