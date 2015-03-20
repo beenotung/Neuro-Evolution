@@ -1,6 +1,7 @@
 package neuroevolution
 
-import neuroevolution.neuralnetwork.core.{Layer, Neuron, Perceptron}
+
+import neuroevolution.neuralnetwork.{Layer, Neuron, Perceptron}
 
 /**
  * Created by beenotung on 2/13/15.
@@ -59,7 +60,7 @@ object Converter {
     }
     //decode bias
     for (layer: Layer <- perceptron.layers) {
-      for (neuron: Neuron <- layer) {
+      for (neuron: Neuron <- layer.neurons) {
         tmp = neuron.bias
         for (iBit <- 1 to N_BIT_BIAS) {
           if (tmp > bitDecimals(iBit)) {
@@ -73,12 +74,24 @@ object Converter {
       }
     }
   }
+
+  def getNumberOfBits(N_BIT_WEIGHT: Int, N_BIT_BIAS: Int, numberOfNodes: Array[Int]): Int = {
+    var countBias: Int = 0
+    var countWeight: Int = 0
+    for (numberOfNode <- numberOfNodes)
+      countBias += numberOfNode
+    for (i <- 0 to (numberOfNodes.length - 2))
+      countWeight += numberOfNodes(i) * numberOfNodes(i + 1)
+    countWeight * N_BIT_WEIGHT + countBias * N_BIT_BIAS
+  }
 }
 
-class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int,val numberOfNodes:Array[Int]) {
-//  var N_INPUT_CELL = numberOfNodes(0)
-//  var N_HIDDEN_CELLs: Array[Int] = Array[Int](numberOfNodes.length-2)
-//  var N_OUTPUT_CELL = numberOfNodes.last
+class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int, val numberOfNodes: Array[Int]) {
+  //  var N_INPUT_CELL = numberOfNodes(0)
+  //  var N_HIDDEN_CELLs: Array[Int] = Array[Int](numberOfNodes.length-2)
+  //  var N_OUTPUT_CELL = numberOfNodes.last
+  val numberOfBits = Converter.getNumberOfBits(N_BIT_WEIGHT, N_BIT_BIAS, numberOfNodes)
+
   def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
     Converter.encode(perceptron, rawCode, N_BIT_WEIGHT, N_BIT_BIAS)
 

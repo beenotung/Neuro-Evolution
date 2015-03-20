@@ -6,14 +6,41 @@ import neuroevolution.utils.Utils
  * Created by beenotung on 1/30/15.
  */
 /*
-This type of genetic algorithm find rawCode rowCode for MAXIMUM fitness
+This type of genetic algorithm find rawCode rawCode for MAXIMUM fitness
 */
-class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0.01d, BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double, @deprecated MATURE_ROUND: Int = 40) extends Thread {
+class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0.01d, BIT_SIZE: Int, A_MUTATION: Double = 0.1d, var evalFitness_function: Array[Boolean] => Double, @deprecated MATURE_ROUND: Int = 40) extends Thread {
   var genes: Array[Gene] = new Array[Gene](POP_SIZE)
+  var requested: Boolean = false
+  var bestRawCode: Array[Boolean] = null
+  var millis: Long = 1L
+  var nanos: Int = 0
+
+  def this(bitSize: Int, evalFitnessFunction: Array[Boolean] => Double) =
+    this(POP_SIZE = 32, P_SELECTION = 0.25d, P_MUTATION = 0.01d, BIT_SIZE = bitSize, A_MUTATION = 0.1d, evalFitness_function = evalFitnessFunction, MATURE_ROUND = 40)
+
+  override def start = {
+    setup
+    super.start
+  }
 
   def setup: Unit = {
     for (i <- genes.indices) {
       genes(i) = new Gene(BIT_SIZE, A_MUTATION, evalFitness_function)
+    }
+  }
+
+  def request = {
+    requested = true
+  }
+
+  override def run: Unit = {
+    while (true) {
+      run
+      if (requested) {
+        bestRawCode = genes(0).rawCode.clone()
+        requested = false
+      }
+      Thread.sleep(millis, nanos)
     }
   }
 
@@ -46,7 +73,7 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
 
     for (gene <- genes)
       for (bit <- centroid.indices)
-        if (gene.rowCode(bit))
+        if (gene.rawCode(bit))
           centroid(bit) += 1
 
     for (bit <- centroid.indices)
@@ -64,11 +91,11 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
   }
 
   def crossover: Unit = {
-    var p1, p2 = 0
+    var p1, p2: Int = 0
     for (gene <- genes)
       if (!gene.selected) {
-        while (!genes(p1 = Utils.random.nextInt(POP_SIZE)).selected) {}
-        while ((!genes(p2 = Utils.random.nextInt(POP_SIZE)).selected) || (p1 == p2)) {}
+        do p1 = Utils.random.nextInt(POP_SIZE) while (!genes(p1).selected)
+        do p2 = Utils.random.nextInt(POP_SIZE) while ((!genes(p2).selected) || (p1 == p2))
         gene.crossover(genes(p1), genes(p2))
       }
   }
@@ -77,5 +104,18 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
     for (gene <- genes)
       if (Utils.random.nextDouble() < P_MUTATION)
         gene.mutation
+  }
+}
+
+abstract class EvalFitnessFunction {
+  def evalFitness(rawCodes: Array[Boolean]): Double
+}
+
+object BitCounter extends EvalFitnessFunction {
+  override def evalFitness(rawCodes: Array[Boolean]): Double = {
+    var count = 0
+    for (bit <- rawCodes)
+      if (bit) count += 1
+    count
   }
 }

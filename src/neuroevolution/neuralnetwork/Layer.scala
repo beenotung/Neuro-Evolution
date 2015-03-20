@@ -1,4 +1,4 @@
-package neuroevolution.neuralnetwork.core
+package neuroevolution.neuralnetwork
 
 /**
  * Created by beenotung on 1/11/15.
