@@ -1,12 +1,12 @@
-package neuroevolution.ga.core
+package neuroevolution.geneticalgorithm
 
-import neuroevolution.ga.utils.Utils
+import neuroevolution.utils.Utils
 
 /**
  * Created by beenotung on 1/30/15.
  */
 /*
-This type of genetic algorithm find gene bits for MAXIMUM fitness
+This type of genetic algorithm find rawCode rowCode for MAXIMUM fitness
 */
 class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0.01d, BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double, @deprecated MATURE_ROUND: Int = 40) extends Thread {
   var genes: Array[Gene] = new Array[Gene](POP_SIZE)
@@ -46,7 +46,7 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
 
     for (gene <- genes)
       for (bit <- centroid.indices)
-        if (gene.bits(bit))
+        if (gene.rowCode(bit))
           centroid(bit) += 1
 
     for (bit <- centroid.indices)

@@ -1,4 +1,4 @@
-package neuroevolution.ga.utils
+package neuroevolution.utils
 
 import scala.util.Random
 

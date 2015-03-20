@@ -1,6 +1,5 @@
 package neuroevolution
 
-import neuroevolution.ga.core.What
 import neuroevolution.neuralnetwork.core.{Layer, Neuron, Perceptron}
 
 /**
@@ -8,22 +7,17 @@ import neuroevolution.neuralnetwork.core.{Layer, Neuron, Perceptron}
  */
 
 object Converter {
+  val bitDecimals = for (i <- 0 to 1024) yield i / 2d
 
-  val N_INPUT_CELL = 2
-  val N_HIDDEN_CELLs: List[Int] = List[Int]()
-  val N_OUTPUT_CELL = 2
-
-  val bitDecimals = for (i <- 0 to 1024) yield i / 2f
-
-  def Decode(gene: What, perceptron: Perceptron): Unit = {
+  def decode(rawCode: Array[Boolean], perceptron: Perceptron, N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
     var index = 0
     //decode weight
     for (layer: Layer <- perceptron.layers) {
-      for (neuron: Neuron <- layer) {
+      for (neuron: Neuron <- layer.neurons) {
         for (iWeight: Int <- neuron.weights.indices) {
           neuron.weights(iWeight) = 0
-          for (iBit <- Range(1, gene.N_BIT_WEIGHT)) {
-            if (gene.rawCode(index))
+          for (iBit <- Range(1, N_BIT_WEIGHT)) {
+            if (rawCode(index))
               neuron.weights(iWeight) += bitDecimals(iBit)
             index += 1
           }
@@ -32,10 +26,10 @@ object Converter {
     }
     //decode bias
     for (layer: Layer <- perceptron.layers) {
-      for (neuron: Neuron <- layer) {
+      for (neuron: Neuron <- layer.neurons) {
         neuron.bias = 0
-        for (iBit <- Range(1, gene.N_BIT_BIAS)) {
-          if (gene.rawCode(index))
+        for (iBit <- Range(1, N_BIT_BIAS)) {
+          if (rawCode(index))
             neuron.bias += bitDecimals(iBit)
           index += 1
         }
@@ -43,21 +37,21 @@ object Converter {
     }
   }
 
-  def Encode(perceptron: Perceptron, gene: What): Unit = {
+  def encode(perceptron: Perceptron, rawCode: Array[Boolean], N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
     var index = 0
-    var tmp: Float = 0f
+    var tmp: Double = 0d
     //decode weight
     for (layer: Layer <- perceptron.layers) {
-      for (neuron: Neuron <- layer) {
-        for (weight: Float <- neuron.weights) {
+      for (neuron: Neuron <- layer.neurons) {
+        for (weight: Double <- neuron.weights) {
           tmp = weight
-          for (iBit <- Range(1, gene.N_BIT_WEIGHT)) {
+          for (iBit <- 1 to N_BIT_WEIGHT) {
             if (tmp > bitDecimals(iBit)) {
-              gene.rawCode(index) = true
+              rawCode(index) = true
               tmp -= bitDecimals(iBit)
             }
             else
-              gene.rawCode(index) = false
+              rawCode(index) = false
             index += 1
           }
         }
@@ -67,13 +61,13 @@ object Converter {
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer) {
         tmp = neuron.bias
-        for (iBit <- Range(1, gene.N_BIT_BIAS)) {
+        for (iBit <- 1 to N_BIT_BIAS) {
           if (tmp > bitDecimals(iBit)) {
-            gene.rawCode(index) = true
+            rawCode(index) = true
             tmp -= bitDecimals(iBit)
           }
           else
-            gene.rawCode(index) = false
+            rawCode(index) = false
           index += 1
         }
       }
@@ -81,3 +75,14 @@ object Converter {
   }
 }
 
+class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int) {
+  val N_INPUT_CELL = 2
+  val N_HIDDEN_CELLs: List[Int] = List[Int]()
+  val N_OUTPUT_CELL = 2
+
+  def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
+    Converter.encode(perceptron, rawCode, N_BIT_WEIGHT, N_BIT_BIAS)
+
+  def decode(rawCode: Array[Boolean], perceptron: Perceptron) =
+    Converter.decode(rawCode, perceptron, N_BIT_WEIGHT, N_BIT_BIAS)
+}

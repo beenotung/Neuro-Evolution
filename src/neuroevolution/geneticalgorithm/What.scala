@@ -1,4 +1,4 @@
-package neuroevolution.ga.core
+package neuroevolution.geneticalgorithm
 
 /**
  * Created by 13058536A on 2/17/2015.

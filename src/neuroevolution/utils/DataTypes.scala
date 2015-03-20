@@ -1,4 +1,4 @@
-package neuroevolution.ga.utils
+package neuroevolution.utils
 
 /**
  * Created by beenotung on 3/18/15.

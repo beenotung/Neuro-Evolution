@@ -232,7 +232,7 @@ public class NeuralNetwork {
         for (Layer layer : layers)
             for (Cell cell : layer.cells)
                 cell.activation = 0;
-        /** set input layer **/
+        /** set input nextLayer **/
         for (int iCell = 0; iCell < layers.get(0).cells.size(); iCell++)
             layers.get(0).cells.get(iCell).activation = inputs.get(iCell);
         /** calc **/
@@ -262,7 +262,7 @@ public class NeuralNetwork {
                             * connection.weight;
             }
         }
-        /** export output layer **/
+        /** export output nextLayer **/
         Vector<Double> outputs = new Vector<Double>();
         for (Cell cell : layers.get(layers.size() - 1).cells)
             outputs.add(cell.activation);

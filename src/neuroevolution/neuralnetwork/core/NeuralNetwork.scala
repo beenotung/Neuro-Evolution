@@ -7,12 +7,12 @@ package neuroevolution.neuralnetwork.core
 import scala.math.exp
 
 abstract class ActivationFunction {
-  def eval(value: Float): Float
+  def eval(value: Double): Double
 }
 
 object Sigmoid extends ActivationFunction {
-  override def eval(value: Float): Float = {
-    (1d / (1d + exp(-value))).toFloat
+  override def eval(value: Double): Double = {
+    (1d / (1d + exp(-value)))
   }
 }
 
@@ -34,7 +34,7 @@ object NeuralNetworkApplication extends App {
     //TODO demo test
     val frame = Array[Int](1, 4, 4, 1)
 
-    val perceptron = Perceptron.create(frame)
+    val perceptron = Perceptron.create_old(frame)
   }
 
 }
