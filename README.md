@@ -1,4 +1,4 @@
-# README #
+# NeuroEvolution #
 
 Neural Network
 
@@ -9,11 +9,7 @@ Saved on Database
 ```
 ```
 
-Build Neural Network on the SQL server side is too slow.
 
-Save & Load from SQL server
-
-Run on client side
 
 
 ```

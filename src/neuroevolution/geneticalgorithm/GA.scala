@@ -1,43 +1,63 @@
 package neuroevolution.geneticalgorithm
 
+
+import neuroevolution.geneticalgorithm.GA.ProblemType
+import neuroevolution.geneticalgorithm.GA.ProblemType.ProblemType
 import neuroevolution.utils.Utils
 
 /**
  * Created by beenotung on 1/30/15.
  */
+
 /*
 This type of genetic algorithm find rawCode rowCode for MAXIMUM fitness
 */
-class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0.01d, BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double, @deprecated MATURE_ROUND: Int = 40) extends Thread {
-  var genes: Array[Gene] = new Array[Gene](POP_SIZE)
 
-  def setup: Unit = {
-    for (i <- genes.indices) {
-      genes(i) = new Gene(BIT_SIZE, A_MUTATION, evalFitness_function)
-    }
+object GA {
+
+  object ProblemType extends Enumeration {
+    type ProblemType = super.Value
+    val Maximize, Minimize = Value
   }
 
-  def loop: Unit = {
+}
+
+class GA(POP_SIZE: Int, BIT_SIZE: Int, P_SELECTION: Double,
+         P_MUTATION: Double, A_MUTATION: Double,
+         EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
+         PROBLEM_TYPE: ProblemType = ProblemType.Maximize
+          ) extends Thread {
+  var genes: Array[Gene] = new Array[Gene](POP_SIZE)
+
+  def setup = {
+    for (i <- genes.indices) {
+      genes(i) = new Gene(BIT_SIZE, A_MUTATION, EVAL_FITNESS_FUNCTION)
+    }
     eval
+  }
+
+  def loop = {
     select
     crossover
     mutation
+    eval
   }
 
-  def eval(): Unit = {
+  def eval = {
     evalFitness
     evalDiversity
     for (gene <- genes)
       gene.eval(0.5D, 0.5D)
+    sort
   }
 
-  def evalFitness: Unit = {
+  def evalFitness = {
     for (gene <- genes)
       gene.evalFitness
     evalDiversity
   }
 
-  def evalDiversity: Unit = {
+  def evalDiversity = {
     //TODO diversity
     val centroid: Array[Double] = new Array[Double](BIT_SIZE)
 
@@ -56,14 +76,18 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
       gene.evalDiversity(centroid)
   }
 
-  def select = {
+  def sort = {
     genes = genes.sorted
+    if (PROBLEM_TYPE.equals(GA.ProblemType.Maximize)) genes = genes.reverse
+  }
+
+  def select = {
     val popTotal: Double = POP_SIZE * 1D
     for (i <- genes.indices)
       genes(i).selected = (i / popTotal) < P_SELECTION
   }
 
-  def crossover: Unit = {
+  def crossover = {
     var p1, p2 = 0
     for (gene <- genes)
       if (!gene.selected) {
@@ -73,9 +97,16 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
       }
   }
 
-  def mutation: Unit = {
+  def mutation = {
     for (gene <- genes)
       if (Utils.random.nextDouble() < P_MUTATION)
         gene.mutation
+  }
+
+  override def run() = {
+    setup
+    while (true) {
+      loop
+    }
   }
 }

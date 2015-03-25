@@ -1,1 +1,0 @@
-CREATE TABLE IF NOT EXISTS `nndb`.`cells` ( `cell_id` int(11) NOT NULL, `layer_id` int(11) DEFAULT NULL, `bias` double DEFAULT '0', PRIMARY KEY (`cell_id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

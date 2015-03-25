@@ -1,6 +1,6 @@
 package neuroevolution
 
-import neuroevolution.neuralnetwork.core.Perceptron
+import neuroevolution.neuralnetwork.Perceptron
 
 /**
  * Created by beenotung on 1/11/15.

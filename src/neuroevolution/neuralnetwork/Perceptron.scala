@@ -1,4 +1,4 @@
-package neuroevolution.neuralnetwork.core
+package neuroevolution.neuralnetwork
 
 /**
  * Created by beenotung on 1/11/15.
@@ -12,14 +12,18 @@ object Perceptron {
       layers(iLayer).setNextLayer(layers(iLayer+1))
     new Perceptron(layers)
   }
-  def getNumberOfNodes(perceptron: Perceptron):Array[Int]={
-    getNumberOfNodes(perceptron.layers)
-  }
+
   def getNumberOfNodes(layers: Array[Layer]):Array[Int]={
     val numberOfNodes:Array[Int]=new Array[Int](layers.length)
     for(i<-layers.indices)
       numberOfNodes(i)=layers(i).neurons.length
     numberOfNodes
+  }
+  def getNumberOfWeight(numberOfNodes: Array[Int]):Int={
+    var count:Int=0
+    for(i<-0 to (numberOfNodes.length -2))
+      count+=numberOfNodes(i)*numberOfNodes(i+1)
+    count
   }
 }
 
@@ -31,6 +35,6 @@ class Perceptron(val layers: Array[Layer]) {
     var values: Array[Double] = inputs
     for (layer <- layers)
       values = layer.run(values)
-    return values
+    values
   }
 }
