@@ -8,14 +8,41 @@
       <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
     </src_description>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/bin" />
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="inheritedJdk" />
-    <orderEntry type="module" module-name="java-myutils" />
-    <orderEntry type="library" name="scala-sdk-2.11.5" level="application" />
+    <orderEntry type="module-library">
+      <library name="mysql-connector-java-commercial-5.1.25-bin.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/mysql-connector-java-commercial-5.1.25-bin.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsch-0.1.51.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jsch-0.1.51.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mariadb-java-client-1.1.7.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/mariadb-java-client-1.1.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="scala-sdk-2.11.6" level="application" />
   </component>
 </module>
