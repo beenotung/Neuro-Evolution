@@ -10,7 +10,7 @@ import neuroevolution.utils.Utils
  */
 
 /*
-This type of genetic algorithm find rawCode rowCode for MAXIMUM fitness
+This type of genetic algorithm find rawCode rawCode for MAXIMUM fitness
 */
 
 object GA {
@@ -25,8 +25,9 @@ object GA {
 class GA(POP_SIZE: Int, BIT_SIZE: Int, P_SELECTION: Double,
          P_MUTATION: Double, A_MUTATION: Double,
          EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
-         PROBLEM_TYPE: ProblemType = ProblemType.Maximize
-          ) extends Thread {
+         PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
+         var LOOP_INTERVAL: Long = 100)
+  extends Thread {
   var genes: Array[Gene] = new Array[Gene](POP_SIZE)
 
   def setup = {
@@ -47,7 +48,7 @@ class GA(POP_SIZE: Int, BIT_SIZE: Int, P_SELECTION: Double,
     evalFitness
     evalDiversity
     for (gene <- genes)
-      gene.eval(0.5D, 0.5D)
+      gene.eval(0.5d)
     sort
   }
 
@@ -66,7 +67,7 @@ class GA(POP_SIZE: Int, BIT_SIZE: Int, P_SELECTION: Double,
 
     for (gene <- genes)
       for (bit <- centroid.indices)
-        if (gene.rowCode(bit))
+        if (gene.rawCode(bit))
           centroid(bit) += 1
 
     for (bit <- centroid.indices)
@@ -103,10 +104,17 @@ class GA(POP_SIZE: Int, BIT_SIZE: Int, P_SELECTION: Double,
         gene.mutation
   }
 
-  override def run() = {
+  override def run = {
     setup
     while (true) {
       loop
+      Thread.sleep(LOOP_INTERVAL)
     }
+  }
+  def getBestGene:Gene={
+    genes(0)
+  }
+  def getBestRawCode:Array[Boolean]={
+    getBestGene.rawCode
   }
 }
