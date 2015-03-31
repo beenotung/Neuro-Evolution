@@ -86,15 +86,22 @@ object Converter {
   }
 }
 
-class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int, val numberOfNodes: Array[Int]) {
-  //  var N_INPUT_CELL = numberOfNodes(0)
-  //  var N_HIDDEN_CELLs: Array[Int] = Array[Int](numberOfNodes.length-2)
-  //  var N_OUTPUT_CELL = numberOfNodes.last
-  val numberOfBits = Converter.getNumberOfBits(N_BIT_WEIGHT, N_BIT_BIAS, numberOfNodes)
-
-  def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
+class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int, val NUMBER_OF_NODES: Array[Int],val BIT_SIZE:Int) {
+    def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
     Converter.encode(perceptron, rawCode, N_BIT_WEIGHT, N_BIT_BIAS)
+
+  def encode(perceptron: Perceptron): Array[Boolean] = {
+    val rawCode: Array[Boolean] = new Array[Boolean](BIT_SIZE)
+    Converter.encode(perceptron, rawCode, N_BIT_WEIGHT, N_BIT_BIAS)
+    rawCode
+  }
 
   def decode(rawCode: Array[Boolean], perceptron: Perceptron) =
     Converter.decode(rawCode, perceptron, N_BIT_WEIGHT, N_BIT_BIAS)
+
+  def decode(rawCode: Array[Boolean]): Perceptron = {
+    val perceptron: Perceptron = Perceptron.create(NUMBER_OF_NODES)
+    Converter.decode(rawCode, perceptron, N_BIT_WEIGHT, N_BIT_BIAS)
+    perceptron
+  }
 }

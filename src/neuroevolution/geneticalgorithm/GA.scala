@@ -1,70 +1,62 @@
 package neuroevolution.geneticalgorithm
 
+
+import neuroevolution.geneticalgorithm.GA.ProblemType
+import neuroevolution.geneticalgorithm.GA.ProblemType.ProblemType
 import neuroevolution.utils.Utils
 
 /**
  * Created by beenotung on 1/30/15.
  */
+
 /*
 This type of genetic algorithm find rawCode rawCode for MAXIMUM fitness
 */
-class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0.01d, BIT_SIZE: Int, A_MUTATION: Double = 0.1d, var evalFitness_function: Array[Boolean] => Double, @deprecated MATURE_ROUND: Int = 40) extends Thread {
+
+object GA {
+  object ProblemType extends Enumeration {
+    type ProblemType = super.Value
+    val Maximize, Minimize = Value
+  }
+}
+
+class GA(POP_SIZE: Int, BIT_SIZE: Int, P_SELECTION: Double,
+         P_MUTATION: Double, A_MUTATION: Double,
+         EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
+         PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
+         var LOOP_INTERVAL: Long = 100)
+  extends Thread {
   var genes: Array[Gene] = new Array[Gene](POP_SIZE)
-  var requested: Boolean = false
-  var bestRawCode: Array[Boolean] = null
-  var millis: Long = 1L
-  var nanos: Int = 0
 
-  def this(bitSize: Int, evalFitnessFunction: Array[Boolean] => Double) =
-    this(POP_SIZE = 32, P_SELECTION = 0.25d, P_MUTATION = 0.01d, BIT_SIZE = bitSize, A_MUTATION = 0.1d, evalFitness_function = evalFitnessFunction, MATURE_ROUND = 40)
-
-  override def start = {
-    setup
-    super.start
-  }
-
-  def setup: Unit = {
+  def setup = {
     for (i <- genes.indices) {
-      genes(i) = new Gene(BIT_SIZE, A_MUTATION, evalFitness_function)
+      genes(i) = new Gene(BIT_SIZE, A_MUTATION, EVAL_FITNESS_FUNCTION)
     }
-  }
-
-  def request = {
-    requested = true
-  }
-
-  override def run: Unit = {
-    while (true) {
-      run
-      if (requested) {
-        bestRawCode = genes(0).rawCode.clone()
-        requested = false
-      }
-      Thread.sleep(millis, nanos)
-    }
-  }
-
-  def loop: Unit = {
     eval
+  }
+
+  def loop = {
     select
     crossover
     mutation
+    eval
   }
 
-  def eval(): Unit = {
+  def eval = {
     evalFitness
     evalDiversity
     for (gene <- genes)
-      gene.eval(0.5D, 0.5D)
+      gene.eval(0.5d)
+    sort
   }
 
-  def evalFitness: Unit = {
+  def evalFitness = {
     for (gene <- genes)
       gene.evalFitness
     evalDiversity
   }
 
-  def evalDiversity: Unit = {
+  def evalDiversity = {
     //TODO diversity
     val centroid: Array[Double] = new Array[Double](BIT_SIZE)
 
@@ -83,39 +75,45 @@ class GA(POP_SIZE: Int = 32, P_SELECTION: Double = 0.25d, P_MUTATION: Double = 0
       gene.evalDiversity(centroid)
   }
 
+  def sort = {
+    genes = genes.sorted
+    if (PROBLEM_TYPE.equals(GA.ProblemType.Maximize)) genes = genes.reverse
+  }
+
   def select = {
     genes = genes.sorted
     val popTotal: Double = POP_SIZE * 1D
     for (i <- genes.indices)
-      genes(i).selected = (i / popTotal) < P_SELECTION
+      genes(i).selected = (i / popTotal) <= P_SELECTION
   }
 
-  def crossover: Unit = {
-    var p1, p2: Int = 0
+  def crossover = {
+    var p1, p2 = 0
     for (gene <- genes)
       if (!gene.selected) {
-        do p1 = Utils.random.nextInt(POP_SIZE) while (!genes(p1).selected)
-        do p2 = Utils.random.nextInt(POP_SIZE) while ((!genes(p2).selected) || (p1 == p2))
+        do{p1 = Utils.random.nextInt(POP_SIZE)}while(genes(p1).selected)
+        do{p2 = Utils.random.nextInt(POP_SIZE)}while(genes(p1).selected|| p1.equals(p2))
         gene.crossover(genes(p1), genes(p2))
       }
   }
 
-  def mutation: Unit = {
+  def mutation = {
     for (gene <- genes)
       if (Utils.random.nextDouble() < P_MUTATION)
         gene.mutation
   }
-}
 
-abstract class EvalFitnessFunction {
-  def evalFitness(rawCodes: Array[Boolean]): Double
-}
-
-object BitCounter extends EvalFitnessFunction {
-  override def evalFitness(rawCodes: Array[Boolean]): Double = {
-    var count = 0
-    for (bit <- rawCodes)
-      if (bit) count += 1
-    count
+  override def run = {
+    setup
+    while (true) {
+      loop
+      Thread.sleep(LOOP_INTERVAL)
+    }
+  }
+  def getBestGene:Gene={
+    genes(0)
+  }
+  def getBestRawCode:Array[Boolean]={
+    getBestGene.rawCode
   }
 }

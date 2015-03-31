@@ -6,7 +6,8 @@ import neuroevolution.utils.{DataTypes, Utils}
 /**
  * Created by beenotung on 3/17/15.
  */
-class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double) extends Comparable[Gene] {
+class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double)
+  extends Comparable[Gene] {
   val rawCode: Array[Boolean] = new Array[Boolean](BIT_SIZE)
   var fitness: Double = 0D
   var diversity: Double = 1D
@@ -14,9 +15,12 @@ class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Arra
   var selected: Boolean = true
 
 
-
-  def eval(fitnessWeight: Double, diversityWeight: Double) = {
+  def eval(fitnessWeight: Double):Double = {
+    eval(fitnessWeight,1-fitnessWeight)
+  }
+  private def eval(fitnessWeight: Double, diversityWeight: Double) :Double= {
     preference = fitness * fitnessWeight + diversity * diversityWeight
+    preference
   }
 
   def evalFitness = {
