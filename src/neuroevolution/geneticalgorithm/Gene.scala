@@ -8,16 +8,16 @@ import scala.collection.parallel.mutable.ParArray
 /**
  * Created by beenotung on 3/17/15.
  */
-class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (ParArray[Boolean]) => Double)
+class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double)
   extends Comparable[Gene] {
-  var rawCode: ParArray[Boolean] = new ParArray[Boolean](BIT_SIZE)
+  var rawCode: Array[Boolean] = new Array[Boolean](BIT_SIZE)
   var fitness: Double = 0D
   var diversity: Double = 1D
   var preference: Double = 0.5D
   var selected: Boolean = true
 
   def resize(newBitSize: Int) = {
-    val newRawCode: ParArray[Boolean] = ParArray.tabulate[Boolean](newBitSize) { (i) => if (i < rawCode.length) rawCode(i) else Utils.random.nextBoolean() }
+    val newRawCode: Array[Boolean] = Array.tabulate[Boolean](newBitSize) { (i) => if (i < rawCode.length) rawCode(i) else Utils.random.nextBoolean() }
     rawCode = newRawCode
   }
 
@@ -54,7 +54,7 @@ class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (ParA
 
   def mutation: Unit = {
     Range(0, rawCode.length).par.foreach(i =>
-      if(Utils.random.nextDouble()<A_MUTATION) rawCode(i)^=true
+      if (Utils.random.nextDouble() < A_MUTATION) rawCode(i) ^= true
     )
   }
 }

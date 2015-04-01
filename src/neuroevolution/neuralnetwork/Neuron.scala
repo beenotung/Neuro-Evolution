@@ -15,7 +15,7 @@ class Neuron(var weights: Array[Double]) {
   }
 
   def setWeightNum(n: Int) = {
-    weights = new Array[Double](n)
+    weights = Array.fill[Double](n)(0d)
   }
 
   def run(inputs: Array[Double]): Double = {

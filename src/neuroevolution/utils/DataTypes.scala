@@ -17,11 +17,12 @@ object DataTypes {
     toInt(b) - x
   }
 
-  implicit class BooleanNum(var b: Boolean)  {
+  implicit class BooleanNum(var b: Boolean) {
     def toInt = if (b) 1 else 0
 
     def -(x: Int): Int = if (b) 1 - x else -x
 
     def -(x: Double): Double = if (b) 1 - x else -x
   }
+
 }

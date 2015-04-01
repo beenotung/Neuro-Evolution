@@ -86,8 +86,8 @@ object Converter {
   }
 }
 
-class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int, val NUMBER_OF_NODES: Array[Int],val BIT_SIZE:Int) {
-    def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
+class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int, val NUMBER_OF_NODES: Array[Int], val BIT_SIZE: Int) {
+  def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =
     Converter.encode(perceptron, rawCode, N_BIT_WEIGHT, N_BIT_BIAS)
 
   def encode(perceptron: Perceptron): Array[Boolean] = {
