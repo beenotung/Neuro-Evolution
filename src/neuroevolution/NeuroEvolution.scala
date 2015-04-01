@@ -6,7 +6,12 @@ import neuroevolution.geneticalgorithm.GA.ProblemType.ProblemType
 import neuroevolution.neuralnetwork.Perceptron
 
 /**
- * Created by beenotung on 3/25/15.
+ * @param eval_perceptron_function
+ * parameter
+ * [Double]: input of perceptron
+ * [Double]: output of perceptron
+ * result
+ * Double: score of the perceptron
  */
 
 class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[Int],
@@ -15,7 +20,7 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
                      var pMutation: Double = 0.01d, aMutation: Double = 0.1d,
                      val problemType: ProblemType = ProblemType.Minimize,
                      get_perceptron_input: => Array[Double],
-                     eval_perceptron_function: Array[Double] => Double,
+                     eval_perceptron_function: (Array[Double], Array[Double]) => Double,
                      var LOOP_INTERVAL: Long = 100)
   extends Thread {
   val bitSize: Int = Perceptron.getNumberOfWeight(numberOfNodes) * n_Bit_Weight + numberOfNodes.sum * n_Bit_Bias
@@ -24,7 +29,12 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
 
   def evalFitness_function(rawCode: Array[Boolean]): Double = {
     val perceptron: Perceptron = converter.decode(rawCode)
-    eval_perceptron_function(perceptron.run(get_perceptron_input))
+    val input: Array[Double] = get_perceptron_input
+    eval_perceptron_function(input, perceptron.run(input))
+  }
+
+  def getBestPerceptron = {
+    converter.decode(ga.getBestGene.rawCode)
   }
 
   override def run = {

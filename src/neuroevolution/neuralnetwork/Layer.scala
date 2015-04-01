@@ -1,28 +1,26 @@
 package neuroevolution.neuralnetwork
 
+import scala.collection.parallel.mutable.ParArray
+
 /**
  * Created by beenotung on 1/11/15.
  */
 object Layer {
   def create(n: Int): Layer = {
-    val neurons = new Array[Neuron](n)
-    for (i <- 0 to (neurons.length - 1))
-      neurons(i) = new Neuron
-    new Layer(neurons)
+    new Layer(ParArray.fill[Neuron](n)(new Neuron()))
   }
 }
 
-class Layer(val neurons: Array[Neuron]) {
-  val outputs = new Array[Double](neurons.length)
+class Layer(val neurons: ParArray[Neuron]) {
+  val outputs = Array.fill[Double](neurons.length)(0d)
 
-  def setNextLayer(nextLayer:Layer): Unit ={
-    for(neuron<-neurons)
+  def setNextLayer(nextLayer: Layer): Unit = {
+    for (neuron <- neurons)
       neuron.setWeightNum(nextLayer.neurons.length)
   }
 
   def run(inputs: Array[Double]): Array[Double] = {
-    for (i <- neurons.indices)
-      outputs(i) = neurons(i).run(inputs)
+    Range(0, neurons.length).par.foreach(i => outputs(i) = neurons(i).run(inputs))
     outputs
   }
 }
