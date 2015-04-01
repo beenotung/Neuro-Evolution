@@ -28,7 +28,7 @@ object GA {
 
 class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
          P_MUTATION: Double, A_MUTATION: Double,
-         EVAL_FITNESS_FUNCTION: ParArray[Boolean] => Double,
+         EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
          PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
          var LOOP_INTERVAL: Long = 100)
   extends Thread {
@@ -120,7 +120,7 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     }
   }
 
-  def getBestRawCode: ParArray[Boolean] = {
+  def getBestRawCode: Array[Boolean] = {
     getBestGene.rawCode
   }
 
