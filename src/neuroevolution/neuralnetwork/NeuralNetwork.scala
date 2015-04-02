@@ -6,12 +6,23 @@ package neuroevolution.neuralnetwork
 
 import scala.math.exp
 
-abstract class ActivationFunction {
+trait ActivationFunction {
   def eval(value: Double): Double
 }
 
 object Sigmoid extends ActivationFunction {
   override def eval(value: Double): Double = {
     1d / (1d + exp(-value))
+  }
+}
+
+/**
+ * input range from -1.0 to 1.0
+ * output range from -1.0 to 1.0
+ */
+object TweakedSin extends ActivationFunction {
+  val ratio=Math.PI/2d
+  override def eval(value: Double): Double = {
+    Math.sin(value*ratio)
   }
 }
