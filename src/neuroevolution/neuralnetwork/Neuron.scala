@@ -5,13 +5,13 @@ package neuroevolution.neuralnetwork
  */
 
 
-class Neuron(var weights: Array[Double],activationFunction: ActivationFunction) {
+class Neuron(var weights: Array[Double], activationFunction: ActivationFunction) {
   var bias: Double = 0d
   var sum: Double = 0d
   var output: Double = 0d
 
   def this(activationFunction: ActivationFunction) = {
-    this(weights=null,activationFunction)
+    this(weights = null, activationFunction)
   }
 
   def setWeightNum(n: Int) = {
