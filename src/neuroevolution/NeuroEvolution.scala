@@ -1,6 +1,7 @@
 package neuroevolution
 
-import neuroevolution.geneticalgorithm.GA
+import neuroevolution.geneticalgorithm.ProblemType.ProblemType
+import neuroevolution.geneticalgorithm.{GA, ProblemType}
 import neuroevolution.neuralnetwork.{ActivationFunction, Perceptron}
 
 /**
