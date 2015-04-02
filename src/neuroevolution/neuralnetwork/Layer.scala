@@ -6,8 +6,8 @@ import scala.collection.parallel.mutable.ParArray
  * Created by beenotung on 1/11/15.
  */
 object Layer {
-  def create(n: Int): Layer = {
-    new Layer(ParArray.fill[Neuron](n)(new Neuron()))
+  def create(n: Int,activationFunction: ActivationFunction): Layer = {
+    new Layer(ParArray.fill[Neuron](n)(new Neuron(activationFunction)))
   }
 }
 
