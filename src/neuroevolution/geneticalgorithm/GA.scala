@@ -3,8 +3,7 @@ package neuroevolution.geneticalgorithm
 
 import java.util.concurrent.Semaphore
 
-import neuroevolution.geneticalgorithm.GA.ProblemType
-import neuroevolution.geneticalgorithm.GA.ProblemType.ProblemType
+import neuroevolution.geneticalgorithm.ProblemType.ProblemType
 import neuroevolution.utils.Utils
 
 import scala.collection.parallel.mutable.ParArray
@@ -17,13 +16,9 @@ import scala.collection.parallel.mutable.ParArray
 This type of genetic algorithm find rawCode rawCode for MAXIMUM fitness
 */
 
-object GA {
-
-  object ProblemType extends Enumeration {
-    type ProblemType = super.Value
-    val Maximize, Minimize = Value
-  }
-
+object ProblemType extends Enumeration {
+  type ProblemType = super.Value
+  val Maximize, Minimize = Value
 }
 
 class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
@@ -86,7 +81,7 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
 
   def sort = {
     var sortedGenes: Array[Gene] = genes.toArray[Gene].sorted
-    if (PROBLEM_TYPE.equals(GA.ProblemType.Maximize)) sortedGenes = sortedGenes.reverse
+    if (PROBLEM_TYPE.equals(ProblemType.Maximize)) sortedGenes = sortedGenes.reverse
     genes = sortedGenes.toVector.toParArray
   }
 
