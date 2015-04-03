@@ -17,11 +17,15 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
                      get_perceptron_input: => Array[Double], eval_perceptron_function: (Array[Double], Array[Double]) => Double,
                      val popSize: Int = 32, var pSelection: Double = 0.25d, var pMutation: Double = 0.01d, aMutation: Double = 0.1d,
                      val problemType: ProblemType = ProblemType.Minimize,
+                     val diversityWeight: Double,
                      var LOOP_INTERVAL: Long = 100)
   extends Thread {
   val bitSize: Int = Perceptron.getNumberOfWeight(numberOfNodes) * n_Bit_Weight + numberOfNodes.sum * n_Bit_Bias
   val converter: Converter = new Converter(N_BIT_WEIGHT = n_Bit_Weight, N_BIT_BIAS = n_Bit_Bias, numberOfNodes, BIT_SIZE = bitSize, activationFunction)
-  val ga: GA = new GA(POP_SIZE = popSize, BIT_SIZE = bitSize, P_SELECTION = pSelection, P_MUTATION = pMutation, A_MUTATION = aMutation, EVAL_FITNESS_FUNCTION = evalFitness_function, PROBLEM_TYPE = problemType)
+  val ga: GA = new GA(POP_SIZE = popSize, BIT_SIZE = bitSize, P_SELECTION = pSelection, P_MUTATION = pMutation, A_MUTATION = aMutation,
+    EVAL_FITNESS_FUNCTION = evalFitness_function,
+    DIVERSITY_WEIGHT = diversityWeight,
+    PROBLEM_TYPE = problemType)
 
   def evalFitness_function(rawCode: Array[Boolean]): Double = {
     val perceptron: Perceptron = converter.decode(rawCode)

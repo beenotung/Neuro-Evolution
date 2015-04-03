@@ -11,7 +11,7 @@ class Neuron(var inputWeights: Array[Double], activationFunction: ActivationFunc
   var output: Double = 0d
 
   def this(activationFunction: ActivationFunction) = {
-    this(inputWeights = null, activationFunction)
+    this(inputWeights =Array.empty[Double], activationFunction)
   }
 
   def setInputWeightNum(n: Int) = {

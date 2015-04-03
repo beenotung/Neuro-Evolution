@@ -30,6 +30,8 @@ class Perceptron(val layers: Array[Layer]) {
   def run(inputs: Array[Double]): Array[Double] = {
     if (inputs.length != layers(0).neurons.length)
       throw new UnsupportedOperationException
-    layers.foldLeft(inputs)((values: Array[Double], layer: Layer) => layer.run(values))
+    var values=inputs
+    Range(1,layers.length).foreach(i=>values=layers(i).run(values))
+    values
   }
 }
