@@ -132,7 +132,10 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
   }
 
   def getBestGene: Gene = {
-    sortByFitness.head
+    loopSemaphore.tryAcquire()
+    val bestGene=sortByFitness.head
+    loopSemaphore.release()
+    bestGene
   }
 
   def sortedGenes(getValue: (Gene) => Double): Array[Gene] = {

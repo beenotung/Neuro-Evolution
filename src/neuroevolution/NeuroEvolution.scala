@@ -14,7 +14,7 @@ import neuroevolution.neuralnetwork.{ActivationFunction, Perceptron}
  */
 
 class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[Int], activationFunction: ActivationFunction,
-                     get_perceptron_input: => Array[Double], eval_perceptron_function: (Array[Double], Array[Double]) => Double,
+                     get_perceptron_inputs: => Array[Array[Double]], eval_perceptron_function: (Array[Double], Array[Double]) => Double,
                      val popSize: Int = 32, var pSelection: Double = 0.25d, var pMutation: Double = 0.01d, aMutation: Double = 0.1d,
                      val problemType: ProblemType = ProblemType.Minimize,
                      val diversityWeight: Double,
@@ -29,8 +29,10 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
 
   def evalFitness_function(rawCode: Array[Boolean]): Double = {
     val perceptron: Perceptron = converter.decode(rawCode)
-    val input: Array[Double] = get_perceptron_input
-    eval_perceptron_function(input, perceptron.run(input))
+    val inputs: Array[Array[Double]] = get_perceptron_inputs
+    var sum = 0d
+    inputs.foreach(input => sum += eval_perceptron_function(input, perceptron.run(input)))
+    sum
   }
 
   def getBestPerceptron = {

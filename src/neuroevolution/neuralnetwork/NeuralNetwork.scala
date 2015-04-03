@@ -27,3 +27,9 @@ object TweakedSin extends ActivationFunction {
     Math.sin(value * ratio)
   }
 }
+
+object a extends ActivationFunction{
+  override def eval(value: Double): Double = {
+
+  }
+}

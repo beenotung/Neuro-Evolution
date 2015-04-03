@@ -9,23 +9,31 @@ import scala.collection.parallel.mutable.ParArray
 /**
  * Created by beenotung on 3/17/15.
  */
-class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double, PROBLEM_TYPE: ProblemType = ProblemType.Maximize)  {
+class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double, PROBLEM_TYPE: ProblemType = ProblemType.Maximize) {
   var rawCode: Array[Boolean] = new Array[Boolean](BIT_SIZE)
   var fitness: Double = 0D
   var diversity: Double = 1D
   var preference: Double = 0.5D
   var selected: Boolean = true
 
-  def setup={
-    rawCode.indices.par.foreach(i=>rawCode(i)=Utils.random.nextBoolean())
+  def getFitness: Double = {
+    if (PROBLEM_TYPE.equals(ProblemType.Maximize))
+      fitness
+    else
+      1 / fitness
   }
+
+  def setup = {
+    rawCode.indices.par.foreach(i => rawCode(i) = Utils.random.nextBoolean())
+  }
+
   def resize(newBitSize: Int) = {
     val newRawCode: Array[Boolean] = Array.tabulate[Boolean](newBitSize) { (i) => if (i < rawCode.length) rawCode(i) else Utils.random.nextBoolean() }
     rawCode = newRawCode
   }
 
   def eval(diversityWeight: Double): Double = {
-    eval(1-diversityWeight,diversityWeight)
+    eval(1 - diversityWeight, diversityWeight)
   }
 
   private def eval(fitnessWeight: Double, diversityWeight: Double): Double = {
@@ -35,7 +43,7 @@ class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Arra
 
   def evalFitness = {
     fitness = evalFitness_function(rawCode)
-    if (PROBLEM_TYPE == ProblemType.Minimize) fitness = 1 / fitness
+    if (PROBLEM_TYPE.equals(ProblemType.Minimize)) fitness = 1 / fitness
   }
 
   def evalDiversity(centroid: ParArray[Double]) = {
