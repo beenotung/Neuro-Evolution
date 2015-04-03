@@ -15,11 +15,11 @@ object Converter {
     //decode weight
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer.neurons) {
-        for (iWeight: Int <- neuron.weights.indices) {
-          neuron.weights(iWeight) = 0
+        for (iWeight: Int <- neuron.inputWeights.indices) {
+          neuron.inputWeights(iWeight) = 0
           for (iBit <- Range(1, N_BIT_WEIGHT)) {
             if (rawCode(index))
-              neuron.weights(iWeight) += bitDecimals(iBit)
+              neuron.inputWeights(iWeight) += bitDecimals(iBit)
             index += 1
           }
         }
@@ -44,7 +44,7 @@ object Converter {
     //decode weight
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer.neurons) {
-        for (weight: Double <- neuron.weights) {
+        for (weight: Double <- neuron.inputWeights) {
           tmp = weight
           for (iBit <- 1 to N_BIT_WEIGHT) {
             if (tmp > bitDecimals(iBit)) {

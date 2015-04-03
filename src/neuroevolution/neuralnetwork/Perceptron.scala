@@ -5,11 +5,8 @@ package neuroevolution.neuralnetwork
  */
 object Perceptron {
   def create(numberOfNodes: Array[Int], activationFunction: ActivationFunction): Perceptron = {
-    val layers = new Array[Layer](numberOfNodes.length)
-    for (iLayer <- numberOfNodes.indices)
-      layers(iLayer) = Layer.create(numberOfNodes(iLayer), activationFunction)
-    for (iLayer <- 0 to (layers.length - 2))
-      layers(iLayer).setNextLayer(layers(iLayer + 1))
+    val layers=Array.tabulate[Layer](numberOfNodes.length)(i=> Layer.create(numberOfNodes(i),activationFunction))
+    Range(1,layers.length).par.foreach(i=>layers(i).setInputLayer(layers(i-1)))
     new Perceptron(layers)
   }
 
