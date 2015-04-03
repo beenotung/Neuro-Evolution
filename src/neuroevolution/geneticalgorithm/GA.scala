@@ -30,7 +30,7 @@ object ProblemType extends Enumeration {
  * @param A_MUTATION
  * @param EVAL_FITNESS_FUNCTION
  * @param PROBLEM_TYPE
- * @param DIVERSITY_WEIGHT
+ * @param diversity_weight
  * range from 0.0 to 1.0
  * @param LOOP_INTERVAL
  */
@@ -39,14 +39,14 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
          PARENT_IMMUTABLE: Boolean,
          EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
          PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
-         DIVERSITY_WEIGHT: Double,
-         var LOOP_INTERVAL: Long = 100)
+         var diversity_weight: Double,
+         var LOOP_INTERVAL: Long)
   extends Thread {
   val loopSemaphore: Semaphore = new Semaphore(1)
   var genes: ParArray[Gene] = ParArray.fill[Gene](POP_SIZE)(new Gene(BIT_SIZE, A_MUTATION, EVAL_FITNESS_FUNCTION, PROBLEM_TYPE))
 
   def resize(newBitSize: Int) = {
-    loopSemaphore.tryAcquire()
+    loopSemaphore.acquire()
     BIT_SIZE = newBitSize
     for (gene <- genes)
       gene.resize(newBitSize)
@@ -54,12 +54,13 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
   }
 
   def setup = {
+    round = 0
     genes.foreach(gene => gene.setup)
     eval
   }
 
   def loop = {
-    loopSemaphore.tryAcquire()
+    loopSemaphore.acquire()
     select
     crossover
     mutation
@@ -71,16 +72,18 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     evalFitness
     evalDiversity
     for (gene <- genes)
-      gene.eval(DIVERSITY_WEIGHT)
+      gene.eval(diversity_weight)
   }
 
   def evalFitness = {
     genes.foreach(gene => gene.evalFitness)
   }
 
+  val centroid: ParArray[Double] = ParArray.fill[Double](BIT_SIZE)(0)
+
   def evalDiversity = {
     //TODO diversity
-    val centroid: ParArray[Double] = ParArray.fill[Double](BIT_SIZE)(0)
+    Range(0, centroid.length).par.foreach(i => centroid(i) = 0d)
 
     genes.foreach(gene => Range(0, gene.rawCode.length).par.foreach(i => if (gene.rawCode(i)) centroid(i) += 1))
 
@@ -90,6 +93,10 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
 
     for (gene <- genes)
       gene.evalDiversity(centroid)
+
+    diversity_weight = 0d
+    Range(0, centroid.length).foreach(i => diversity_weight += centroid(i))
+    diversity_weight = 1 - diversity_weight / centroid.length
   }
 
 
@@ -97,9 +104,10 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     //TODO sort
     val popTotal: Double = POP_SIZE
     val fitnessList = sortByFitness
-    Range(0, genes.length).par.foreach(i => fitnessList(i).selected = (i / popTotal) <= P_SELECTION * (1 - DIVERSITY_WEIGHT))
+    Range(0, genes.length).par.foreach(i => fitnessList(i).selected = (i / popTotal) <= P_SELECTION * (1 - diversity_weight))
+    fitnessList.head.selected = true
     val diversityList = sortByDiversity
-    Range(0, genes.length).par.foreach(i => if ((i / popTotal) <= P_SELECTION * DIVERSITY_WEIGHT) diversityList(i).selected = true)
+    Range(0, genes.length).par.foreach(i => if ((i / popTotal) <= P_SELECTION * diversity_weight) diversityList(i).selected = true)
   }
 
   def crossover = {
@@ -116,14 +124,13 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
   }
 
   def mutation = {
-    genes.foreach(gene => if ((Utils.random.nextDouble() < P_MUTATION) && !(gene.selected && PARENT_IMMUTABLE)) gene.mutation)
+    genes.foreach(gene => if ((Utils.random.nextDouble() < P_MUTATION) && (!gene.selected || !PARENT_IMMUTABLE)) gene.mutation)
   }
 
   var round = 0
 
   override def run = {
     setup
-
     while (true) {
       loop
       round += 1
@@ -137,7 +144,7 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
   }
 
   def getBestGene: Gene = {
-    loopSemaphore.tryAcquire()
+    loopSemaphore.acquire()
     val bestGene = sortByFitness.head
     loopSemaphore.release()
     bestGene
@@ -165,5 +172,4 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
       fitness = 1 / fitness
     fitness
   }
-
 }
