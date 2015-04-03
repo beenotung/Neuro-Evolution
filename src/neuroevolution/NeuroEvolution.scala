@@ -14,12 +14,9 @@ import neuroevolution.neuralnetwork.{ActivationFunction, Perceptron}
  */
 
 class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[Int], activationFunction: ActivationFunction,
-                     val popSize: Int = 32,
-                     var pSelection: Double = 0.25d,
-                     var pMutation: Double = 0.01d, aMutation: Double = 0.1d,
+                     get_perceptron_input: => Array[Double], eval_perceptron_function: (Array[Double], Array[Double]) => Double,
+                     val popSize: Int = 32, var pSelection: Double = 0.25d, var pMutation: Double = 0.01d, aMutation: Double = 0.1d,
                      val problemType: ProblemType = ProblemType.Minimize,
-                     get_perceptron_input: => Array[Double],
-                     eval_perceptron_function: (Array[Double], Array[Double]) => Double,
                      var LOOP_INTERVAL: Long = 100)
   extends Thread {
   val bitSize: Int = Perceptron.getNumberOfWeight(numberOfNodes) * n_Bit_Weight + numberOfNodes.sum * n_Bit_Bias
