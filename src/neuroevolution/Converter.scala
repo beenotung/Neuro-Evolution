@@ -3,6 +3,7 @@ package neuroevolution
 
 import java.util.concurrent.ConcurrentHashMap
 
+import neuroevolution.Converter.bufferedPerceptrons
 import neuroevolution.neuralnetwork.{ActivationFunction, Layer, Neuron, Perceptron}
 
 import scala.collection.mutable.ArrayBuffer
@@ -13,18 +14,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object Converter {
   val bitDecimals = for (i <- 0 to 1024) yield i / 2d
-
-  def bitsToDouble(bits: Array[Boolean], start: Int, length: Int): Double = {
-    var value: Double = 0d
-    Range(0, length).foreach(i => if (bits(start + i))
-      value += bitDecimals(i + 1)
-    )
-    value
-  }
-
-  class WeightIndex(val iLayer: Int, val iNeuron: Int, val iWeight: Int)
-
-  class BiasIndex(val iLayer: Int, val iNeuron: Int)
+  val bufferedPerceptrons = new ConcurrentHashMap[String, Perceptron]
 
   def decode(rawCode: Array[Boolean], perceptron: Perceptron, N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
     val weightIndexes = new ArrayBuffer[WeightIndex]
@@ -46,6 +36,14 @@ object Converter {
       i => perceptron.layers(biasIndexs(i).iLayer).neurons(biasIndexs(i).iNeuron).bias =
         bitsToDouble(rawCode, offset + i * N_BIT_BIAS, N_BIT_BIAS)
     )
+  }
+
+  def bitsToDouble(bits: Array[Boolean], start: Int, length: Int): Double = {
+    var value: Double = 0d
+    Range(0, length).foreach(i => if (bits(start + i))
+      value += bitDecimals(i + 1)
+    )
+    value
   }
 
   def decode_old(rawCode: Array[Boolean], perceptron: Perceptron, N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
@@ -77,9 +75,45 @@ object Converter {
   }
 
   def encode(perceptron: Perceptron, rawCode: Array[Boolean], N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
+    val weightIndexes = new ArrayBuffer[WeightIndex]
+    val biasIndexs = new ArrayBuffer[BiasIndex]
+    perceptron.layers.indices.foreach(
+      iLayer => Range(0, perceptron.layers(iLayer).neurons.length).foreach(
+        iNeuron => {
+          perceptron.layers(iLayer).neurons(iNeuron).inputWeights.indices.foreach(
+            iWeight => weightIndexes += new WeightIndex(iLayer, iNeuron, iWeight))
+          biasIndexs += new BiasIndex(iLayer, iNeuron)
+        }
+      ))
+    weightIndexes.indices.par.foreach(
+      i => doubleToBits(
+        perceptron.layers(weightIndexes(i).iLayer).neurons(weightIndexes(i).iNeuron).inputWeights(weightIndexes(i).iWeight),
+        rawCode, i * N_BIT_WEIGHT, N_BIT_WEIGHT)
+    )
+    val offset = weightIndexes.length * N_BIT_WEIGHT
+    biasIndexs.indices.par.foreach(
+      i => doubleToBits(
+        perceptron.layers(biasIndexs(i).iLayer).neurons(biasIndexs(i).iNeuron).bias,
+        rawCode, offset + i * N_BIT_BIAS, N_BIT_BIAS)
+    )
+  }
+
+  def doubleToBits(value: Double, bits: Array[Boolean], start: Int, length: Int) = {
+    var d = value
+    for (iBit <- 1 to length) {
+      if (d > bitDecimals(iBit)) {
+        bits(start + iBit - 1) = true
+        d -= bitDecimals(iBit)
+      }
+      else
+        bits(start + iBit - 1) = false
+    }
+  }
+
+  def encode_old(perceptron: Perceptron, rawCode: Array[Boolean], N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
     var index = 0
     var tmp: Double = 0d
-    //decode weight
+    //encode weight
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer.neurons) {
         for (weight: Double <- neuron.inputWeights) {
@@ -96,7 +130,7 @@ object Converter {
         }
       }
     }
-    //decode bias
+    //encode bias
     for (layer: Layer <- perceptron.layers) {
       for (neuron: Neuron <- layer.neurons) {
         tmp = neuron.bias
@@ -123,10 +157,10 @@ object Converter {
     countWeight * N_BIT_WEIGHT + countBias * N_BIT_BIAS
   }
 
-  val bufferedPerceptrons = new ConcurrentHashMap[String, Perceptron]
-}
+  class WeightIndex(val iLayer: Int, val iNeuron: Int, val iWeight: Int)
 
-import neuroevolution.Converter.bufferedPerceptrons
+  class BiasIndex(val iLayer: Int, val iNeuron: Int)
+}
 
 class Converter(val N_BIT_WEIGHT: Int, val N_BIT_BIAS: Int, val NUMBER_OF_NODES: Array[Int], val BIT_SIZE: Int, activationFunction: ActivationFunction) {
   def encode(perceptron: Perceptron, rawCode: Array[Boolean]) =

@@ -5,8 +5,8 @@ package neuroevolution.neuralnetwork
  */
 object Perceptron {
   def create(numberOfNodes: Array[Int], activationFunction: ActivationFunction): Perceptron = {
-    val layers=Array.tabulate[Layer](numberOfNodes.length)(i=> Layer.create(numberOfNodes(i),activationFunction))
-    Range(1,layers.length).par.foreach(i=>layers(i).setInputLayer(layers(i-1)))
+    val layers = Array.tabulate[Layer](numberOfNodes.length)(i => Layer.create(numberOfNodes(i), activationFunction))
+    Range(1, layers.length).par.foreach(i => layers(i).setInputLayer(layers(i - 1)))
     new Perceptron(layers)
   }
 
@@ -30,8 +30,8 @@ class Perceptron(val layers: Array[Layer]) {
   def run(inputs: Array[Double]): Array[Double] = {
     if (inputs.length != layers(0).neurons.length)
       throw new UnsupportedOperationException
-    var values=inputs
-    Range(1,layers.length).foreach(i=>values=layers(i).run(values))
+    var values = inputs
+    Range(1, layers.length).foreach(i => values = layers(i).run(values))
     values
   }
 }

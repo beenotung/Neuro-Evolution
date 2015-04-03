@@ -27,7 +27,7 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
   val ga: GA = new GA(POP_SIZE = popSize, BIT_SIZE = bitSize, P_SELECTION = pSelection,
     P_MUTATION = pMutation, A_MUTATION = aMutation, PARENT_IMMUTABLE = parent_immutable,
     EVAL_FITNESS_FUNCTION = evalFitness_function,
-    diversity_weight = diversityWeight,
+    diversityWeight = diversityWeight,
     PROBLEM_TYPE = problemType,
     LOOP_INTERVAL = loopInterval
   )

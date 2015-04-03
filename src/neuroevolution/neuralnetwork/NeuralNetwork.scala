@@ -28,8 +28,8 @@ object TweakedSine extends ActivationFunction {
   }
 }
 
-object TweakedCosine extends ActivationFunction{
+object TweakedCosine extends ActivationFunction {
   override def eval(value: Double): Double = {
-    (-Math.cos((value)*Math.PI)+1)/2
+    (-Math.cos((value) * Math.PI) + 1) / 2
   }
 }

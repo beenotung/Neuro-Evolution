@@ -9,7 +9,7 @@ import scala.collection.parallel.mutable.ParArray
 /**
  * Created by beenotung on 3/17/15.
  */
-class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Array[Boolean]) => Double, PROBLEM_TYPE: ProblemType = ProblemType.Maximize) {
+class Gene(BIT_SIZE: Int, evalFitness_function: (Array[Boolean]) => Double, PROBLEM_TYPE: ProblemType = ProblemType.Maximize) {
   var rawCode: Array[Boolean] = new Array[Boolean](BIT_SIZE)
   var fitness: Double = 0D
   var diversity: Double = 1D
@@ -61,9 +61,9 @@ class Gene(BIT_SIZE: Int, A_MUTATION: Double = 0.1d, evalFitness_function: (Arra
         rawCode(i) = p2.rawCode(i))
   }
 
-  def mutation: Unit = {
+  def mutation(aMutation: Double): Unit = {
     Range(0, rawCode.length).par.foreach(i =>
-      if (Utils.random.nextDouble() < A_MUTATION) rawCode(i) ^= true
+      if (Utils.random.nextDouble() < aMutation) rawCode(i) ^= true
     )
   }
 }
