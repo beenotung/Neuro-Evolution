@@ -14,19 +14,30 @@ import neuroevolution.neuralnetwork.{ActivationFunction, Perceptron}
  */
 
 class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[Int], activationFunction: ActivationFunction,
-                     get_perceptron_input: => Array[Double], eval_perceptron_function: (Array[Double], Array[Double]) => Double,
-                     val popSize: Int = 32, var pSelection: Double = 0.25d, var pMutation: Double = 0.01d, aMutation: Double = 0.1d,
+                     get_perceptron_inputs: => Array[Array[Double]], eval_perceptron_function: (Array[Double], Array[Double]) => Double,
+                     val popSize: Int = 32, var pSelection: Double = 0.25d,
+                     var pMutationPow: Double = 0.01d, aMutationPow: Double = 0.1d,
+                     var parent_immutable: Boolean,
                      val problemType: ProblemType = ProblemType.Minimize,
-                     var LOOP_INTERVAL: Long = 100)
+                     val diversityWeight: Double,
+                     var loopInterval: Long = 100)
   extends Thread {
   val bitSize: Int = Perceptron.getNumberOfWeight(numberOfNodes) * n_Bit_Weight + numberOfNodes.sum * n_Bit_Bias
   val converter: Converter = new Converter(N_BIT_WEIGHT = n_Bit_Weight, N_BIT_BIAS = n_Bit_Bias, numberOfNodes, BIT_SIZE = bitSize, activationFunction)
-  val ga: GA = new GA(POP_SIZE = popSize, BIT_SIZE = bitSize, P_SELECTION = pSelection, P_MUTATION = pMutation, A_MUTATION = aMutation, EVAL_FITNESS_FUNCTION = evalFitness_function, PROBLEM_TYPE = problemType)
+  val ga: GA = new GA(POP_SIZE = popSize, BIT_SIZE = bitSize, P_SELECTION = pSelection,
+    P_MUTATION_POW = pMutationPow, A_MUTATION_POW = aMutationPow, PARENT_IMMUTABLE = parent_immutable,
+    EVAL_FITNESS_FUNCTION = evalFitness_function,
+    diversityWeight = diversityWeight,
+    PROBLEM_TYPE = problemType,
+    LOOP_INTERVAL = loopInterval
+  )
 
   def evalFitness_function(rawCode: Array[Boolean]): Double = {
     val perceptron: Perceptron = converter.decode(rawCode)
-    val input: Array[Double] = get_perceptron_input
-    eval_perceptron_function(input, perceptron.run(input))
+    val inputs: Array[Array[Double]] = get_perceptron_inputs
+    var sum = 0d
+    inputs.foreach(input => sum += eval_perceptron_function(input, perceptron.run(input)))
+    sum
   }
 
   def getBestPerceptron = {
@@ -34,18 +45,6 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
   }
 
   override def run = {
-    setup
-    while (true) {
-      loop
-      Thread.sleep(LOOP_INTERVAL)
-    }
-  }
-
-  def loop = {
-    ga.loop
-  }
-
-  def setup = {
-    ga.setup
+    ga.start()
   }
 }
