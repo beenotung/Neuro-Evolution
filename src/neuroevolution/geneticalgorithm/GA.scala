@@ -36,6 +36,7 @@ object ProblemType extends Enumeration {
  */
 class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
          P_MUTATION: Double, A_MUTATION: Double,
+         PARENT_IMMUTABLE: Boolean,
          EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
          PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
          DIVERSITY_WEIGHT: Double,
@@ -83,10 +84,9 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
 
     genes.foreach(gene => Range(0, gene.rawCode.length).par.foreach(i => if (gene.rawCode(i)) centroid(i) += 1))
 
-    Range(0, centroid.length).par.foreach(i => centroid(i) /= POP_SIZE)
+    Range(0, centroid.length).par.foreach(i => centroid(i) /= 1.0 * POP_SIZE)
 
     genes.foreach(gene => gene.evalDiversity(centroid))
-
 
     for (gene <- genes)
       gene.evalDiversity(centroid)
@@ -99,7 +99,7 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     val fitnessList = sortByFitness
     Range(0, genes.length).par.foreach(i => fitnessList(i).selected = (i / popTotal) <= P_SELECTION * (1 - DIVERSITY_WEIGHT))
     val diversityList = sortByDiversity
-    Range(0, genes.length).par.foreach(i => if ((i / popTotal) <=  P_SELECTION * DIVERSITY_WEIGHT) diversityList(i).selected = true)
+    Range(0, genes.length).par.foreach(i => if ((i / popTotal) <= P_SELECTION * DIVERSITY_WEIGHT) diversityList(i).selected = true)
   }
 
   def crossover = {
@@ -116,14 +116,19 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
   }
 
   def mutation = {
-    genes.foreach(gene => if (Utils.random.nextDouble() < P_MUTATION) gene.mutation)
+    genes.foreach(gene => if ((Utils.random.nextDouble() < P_MUTATION) && !(gene.selected && PARENT_IMMUTABLE)) gene.mutation)
   }
+
+  var round = 0
 
   override def run = {
     setup
+
     while (true) {
       loop
-      Thread.sleep(LOOP_INTERVAL)
+      round += 1
+      if (LOOP_INTERVAL > 0)
+        Thread.sleep(LOOP_INTERVAL)
     }
   }
 
@@ -133,13 +138,13 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
 
   def getBestGene: Gene = {
     loopSemaphore.tryAcquire()
-    val bestGene=sortByFitness.head
+    val bestGene = sortByFitness.head
     loopSemaphore.release()
     bestGene
   }
 
   def sortedGenes(getValue: (Gene) => Double): Array[Gene] = {
-    genes.toArray.sortWith((gene1, gene2) => getValue(gene1) >= getValue(gene2))
+    genes.toArray.sortWith((gene1, gene2) => getValue(gene1) > getValue(gene2))
   }
 
   def sortByFitness: Array[Gene] = {

@@ -20,7 +20,7 @@ object Sigmoid extends ActivationFunction {
  * input range from -1.0 to 1.0
  * output range from -1.0 to 1.0
  */
-object TweakedSin extends ActivationFunction {
+object TweakedSine extends ActivationFunction {
   val ratio = Math.PI / 2d
 
   override def eval(value: Double): Double = {
@@ -28,8 +28,8 @@ object TweakedSin extends ActivationFunction {
   }
 }
 
-object a extends ActivationFunction{
+object TweakedCosine extends ActivationFunction{
   override def eval(value: Double): Double = {
-
+    (-Math.cos((value)*Math.PI)+1)/2
   }
 }
