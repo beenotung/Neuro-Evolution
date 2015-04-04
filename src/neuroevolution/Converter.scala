@@ -101,7 +101,7 @@ object Converter {
   def doubleToBits(value: Double, bits: Array[Boolean], start: Int, length: Int) = {
     var d = value
     for (iBit <- 1 to length) {
-      if (d > bitDecimals(iBit)) {
+      if (d >= bitDecimals(iBit)) {
         bits(start + iBit - 1) = true
         d -= bitDecimals(iBit)
       }
