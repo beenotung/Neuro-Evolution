@@ -1,6 +1,7 @@
 package neuroevolution.geneticalgorithm
 
 
+import java.io.{File, FileOutputStream, ObjectOutputStream}
 import java.util.concurrent.Semaphore
 
 import neuroevolution.geneticalgorithm.ProblemType.ProblemType
@@ -20,6 +21,7 @@ object ProblemType extends Enumeration {
   type ProblemType = super.Value
   val Maximize, Minimize = Value
 }
+
 
 /**
  *
@@ -144,6 +146,32 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     getBestGene.rawCode
   }
 
+  def sortByDiversity: Array[Gene] = {
+    sortedGenes(gene => gene.diversity)
+  }
+
+  def sortByPreference: Array[Gene] = {
+    sortedGenes(gene => gene.preference)
+  }
+
+  def getBestFitness: Double = {
+    var fitness = getBestGene.fitness
+    if (PROBLEM_TYPE.equals(ProblemType.Minimize))
+      fitness = 1 / fitness
+    fitness
+  }
+
+  def saveAllToFile(filename: String, isRaw: Boolean) = {
+    loopSemaphore.acquire()
+    val rawCodes = Array.tabulate[Boolean](genes.length, genes(0).rawCode.length)((g, c) => genes(g).rawCode(c))
+    loopSemaphore.release()
+    saveToFile(rawCodes, filename, isRaw)
+  }
+
+  def saveBestToFile(filename: String, isRaw: Boolean) = {
+    saveToFile(Array(getBestGene.rawCode), filename, isRaw)
+  }
+
   def getBestGene: Gene = {
     loopSemaphore.acquire()
     val bestGene = sortByFitness.head
@@ -159,18 +187,52 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     genes.toArray.sortWith((gene1, gene2) => getValue(gene1) > getValue(gene2))
   }
 
-  def sortByDiversity: Array[Gene] = {
-    sortedGenes(gene => gene.diversity)
+  def saveToFile(rawCodes: Array[Array[Boolean]], filename: String, isRaw: Boolean) = {
+    if (isRaw)
+      saveRawToFile(rawCodes, filename)
+    else
+      saveStringToFile(rawCodes, new File(filename + ".perceptron.gene"))
   }
 
-  def sortByPreference: Array[Gene] = {
-    sortedGenes(gene => gene.preference)
+  def saveRawToFile(rawCodes: Array[Array[Boolean]], filename: String) = {
+    Utils.printToFile(new File(filename + ".perceptron.gene.ini")) { p => p.println(getIniString) }
+    val out = new ObjectOutputStream(new FileOutputStream(filename + ".perceptron.gene.raw"))
+    rawCodes.foreach(rawCode => out.writeObject(rawCode))
+    out.close()
   }
 
-  def getBestFitness: Double = {
-    var fitness = getBestGene.fitness
-    if (PROBLEM_TYPE.equals(ProblemType.Minimize))
-      fitness = 1 / fitness
-    fitness
+  def getIniString: String = {
+    var message = "POP_SIZE"
+    message += "\n" + POP_SIZE
+    message += "\n" + "BIT_SIZE"
+    message += "\n" + BIT_SIZE
+    message += "\n" + "P_SELECTION"
+    message += "\n" + P_SELECTION
+    message += "\n" + "P_MUTATION_POW"
+    message += "\n" + P_MUTATION_POW
+    message += "\n" + "A_MUTATION_POW"
+    message += "\n" + A_MUTATION_POW
+    message += "\n" + "PARENT_IMMUTABLE"
+    message += "\n" + PARENT_IMMUTABLE
+    message += "\n" + "ProblemType"
+    message += "\n" + PROBLEM_TYPE
+    message += "\n" + "diversityWeight"
+    message += "\n" + diversityWeight
+    message
   }
+
+  def saveStringToFile(rawCodes: Array[Array[Boolean]], file: File) = {
+    Utils.printToFile(file) { p =>
+      p.println(getIniString)
+      p.println()
+      rawCodes.foreach(rawCode => {
+        rawCode.foreach(b =>
+          if (b) p.print(1)
+          else p.print(0)
+        )
+        p.println()
+      })
+    }
+  }
+
 }

@@ -9,7 +9,8 @@ import scala.collection.parallel.mutable.ParArray
 /**
  * Created by beenotung on 3/17/15.
  */
-class Gene(BIT_SIZE: Int, evalFitness_function: (Array[Boolean]) => Double, PROBLEM_TYPE: ProblemType = ProblemType.Maximize) {
+class Gene(BIT_SIZE: Int, evalFitness_function: (Array[Boolean]) => Double, PROBLEM_TYPE: ProblemType = ProblemType.Maximize)
+  extends Cloneable {
   var rawCode: Array[Boolean] = new Array[Boolean](BIT_SIZE)
   var fitness: Double = 0D
   var diversity: Double = 1D
