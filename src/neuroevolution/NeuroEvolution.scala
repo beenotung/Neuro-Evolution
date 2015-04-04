@@ -35,9 +35,12 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
   def evalFitness_function(rawCode: Array[Boolean]): Double = {
     val perceptron: Perceptron = converter.decode(rawCode)
     val inputs: Array[Array[Double]] = get_perceptron_inputs
-    var sum = 0d
-    inputs.foreach(input => sum += eval_perceptron_function(input, perceptron.run(input)))
-    sum
+    val output_fitness: Array[Double] = Array.fill[Double](inputs.length)(0d)
+    inputs.indices.par.foreach(i => output_fitness(i) = eval_perceptron_function(inputs(i), perceptron.run(inputs(i))))
+    val avg: Double = output_fitness.sum * 1d / output_fitness.length
+    var overallFitness: Double = avg
+    output_fitness.foreach(fitness => overallFitness += Math.pow(fitness - avg, 2))
+    overallFitness
   }
 
   def getBestPerceptron = {
@@ -45,6 +48,14 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
   }
 
   override def run = {
-    ga.start()
+    ga.start
+  }
+
+  def saveAllToFile(filename: String, isRaw: Boolean) = {
+    ga.saveAllToFile(filename, isRaw)
+  }
+
+  def saveBestToFile(filename: String, isRaw: Boolean) = {
+    ga.saveBestToFile(filename, isRaw)
   }
 }
