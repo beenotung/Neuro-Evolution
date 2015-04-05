@@ -32,8 +32,6 @@ object ProblemType extends Enumeration {
  * @param A_MUTATION_POW
  * @param EVAL_FITNESS_FUNCTION
  * @param PROBLEM_TYPE
- * @param diversityWeight
- * range from 0.0 to 1.0
  * @param LOOP_INTERVAL
  */
 class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
