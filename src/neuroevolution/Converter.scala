@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
  */
 
 object Converter {
-  val bitDecimals = for (i <- 0 to 1024) yield i / 2d
+  val bitDecimals = for (i <- 0 to 1024) yield Math.pow(2,-i)
   val bufferedPerceptrons = new ConcurrentHashMap[String, Perceptron]
 
   def decode(rawCode: Array[Boolean], perceptron: Perceptron, N_BIT_WEIGHT: Int, N_BIT_BIAS: Int): Unit = {
