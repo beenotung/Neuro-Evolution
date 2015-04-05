@@ -41,14 +41,14 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
          PARENT_IMMUTABLE: Boolean,
          EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
          PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
-         var diversityWeight: Double,
          var LOOP_INTERVAL: Long)
   extends Thread {
   val loopSemaphore: Semaphore = new Semaphore(1)
   val centroid: ParArray[Double] = ParArray.fill[Double](BIT_SIZE)(0)
   var genes: ParArray[Gene] = ParArray.fill[Gene](POP_SIZE)(new Gene(BIT_SIZE, EVAL_FITNESS_FUNCTION, PROBLEM_TYPE))
-  var overallDiversity: Double = 0d
+  var overallDiversity: Double = 0.5d
   var round = 0
+  var diversityWeight: Double = 0.5d
 
   def resize(newBitSize: Int) = {
     loopSemaphore.acquire()
@@ -100,7 +100,7 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     overallDiversity = 0d
     Range(0, centroid.length).foreach(i => overallDiversity += centroid(i))
     overallDiversity = 1 - overallDiversity / centroid.length
-    diversityWeight = overallDiversity
+    diversityWeight = 1 - overallDiversity
   }
 
   def select = {
@@ -154,6 +154,10 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     sortedGenes(gene => gene.preference)
   }
 
+  def sortedGenes(getValue: (Gene) => Double): Array[Gene] = {
+    genes.toArray.sortWith((gene1, gene2) => getValue(gene1) > getValue(gene2))
+  }
+
   def getBestFitness: Double = {
     var fitness = getBestGene.fitness
     if (PROBLEM_TYPE.equals(ProblemType.Minimize))
@@ -168,25 +172,6 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     saveToFile(rawCodes, filename, isRaw)
   }
 
-  def saveBestToFile(filename: String, isRaw: Boolean) = {
-    saveToFile(Array(getBestGene.rawCode), filename, isRaw)
-  }
-
-  def getBestGene: Gene = {
-    loopSemaphore.acquire()
-    val bestGene = sortByFitness.head
-    loopSemaphore.release()
-    bestGene
-  }
-
-  def sortByFitness: Array[Gene] = {
-    sortedGenes(gene => gene.fitness)
-  }
-
-  def sortedGenes(getValue: (Gene) => Double): Array[Gene] = {
-    genes.toArray.sortWith((gene1, gene2) => getValue(gene1) > getValue(gene2))
-  }
-
   def saveToFile(rawCodes: Array[Array[Boolean]], filename: String, isRaw: Boolean) = {
     if (isRaw)
       saveRawToFile(rawCodes, filename)
@@ -199,6 +184,20 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     val out = new ObjectOutputStream(new FileOutputStream(filename + ".perceptron.gene.raw"))
     rawCodes.foreach(rawCode => out.writeObject(rawCode))
     out.close()
+  }
+
+  def saveStringToFile(rawCodes: Array[Array[Boolean]], file: File) = {
+    Utils.printToFile(file) { p =>
+      p.println(getIniString)
+      p.println()
+      rawCodes.foreach(rawCode => {
+        rawCode.foreach(b =>
+          if (b) p.print(1)
+          else p.print(0)
+        )
+        p.println()
+      })
+    }
   }
 
   def getIniString: String = {
@@ -216,23 +215,22 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
     message += "\n" + PARENT_IMMUTABLE
     message += "\n" + "ProblemType"
     message += "\n" + PROBLEM_TYPE
-    message += "\n" + "diversityWeight"
-    message += "\n" + diversityWeight
     message
   }
 
-  def saveStringToFile(rawCodes: Array[Array[Boolean]], file: File) = {
-    Utils.printToFile(file) { p =>
-      p.println(getIniString)
-      p.println()
-      rawCodes.foreach(rawCode => {
-        rawCode.foreach(b =>
-          if (b) p.print(1)
-          else p.print(0)
-        )
-        p.println()
-      })
-    }
+  def saveBestToFile(filename: String, isRaw: Boolean) = {
+    saveToFile(Array(getBestGene.rawCode), filename, isRaw)
+  }
+
+  def getBestGene: Gene = {
+    loopSemaphore.acquire()
+    val bestGene = sortByFitness.head
+    loopSemaphore.release()
+    bestGene
+  }
+
+  def sortByFitness: Array[Gene] = {
+    sortedGenes(gene => gene.fitness)
   }
 
 }

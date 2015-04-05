@@ -19,7 +19,6 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
                      var pMutationPow: Double = 0.01d, aMutationPow: Double = 0.1d,
                      var parent_immutable: Boolean,
                      val problemType: ProblemType = ProblemType.Minimize,
-                     val diversityWeight: Double,
                      var loopInterval: Long = 100)
   extends Thread {
   val bitSize: Int = Perceptron.getNumberOfWeight(numberOfNodes) * n_Bit_Weight + numberOfNodes.sum * n_Bit_Bias
@@ -27,7 +26,6 @@ class NeuroEvolution(n_Bit_Weight: Int, n_Bit_Bias: Int, numberOfNodes: Array[In
   val ga: GA = new GA(POP_SIZE = popSize, BIT_SIZE = bitSize, P_SELECTION = pSelection,
     P_MUTATION_POW = pMutationPow, A_MUTATION_POW = aMutationPow, PARENT_IMMUTABLE = parent_immutable,
     EVAL_FITNESS_FUNCTION = evalFitness_function,
-    diversityWeight = diversityWeight,
     PROBLEM_TYPE = problemType,
     LOOP_INTERVAL = loopInterval
   )
