@@ -48,11 +48,11 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
   var round = 0
   var diversityWeight: Double = 0.5d
 
-  def resize(newBitSize: Int) = {
+  def resize(getNewBitSize_with_op_func: => Int) = {
     loopSemaphore.acquire()
-    BIT_SIZE = newBitSize
+    BIT_SIZE = getNewBitSize_with_op_func
     for (gene <- genes)
-      gene.resize(newBitSize)
+      gene.resize(BIT_SIZE)
     loopSemaphore.release()
   }
 
