@@ -10,8 +10,8 @@ import neuroevolution.utils.Utils
 import scala.collection.parallel.mutable.ParArray
 
 /**
- * Created by beenotung on 1/30/15.
- */
+  * Created by beenotung on 1/30/15.
+  */
 
 /*
 This type of genetic algorithm find rawCode rawCode for MAXIMUM fitness
@@ -24,29 +24,33 @@ object ProblemType extends Enumeration {
 
 
 /**
- *
- * @param POP_SIZE
- * @param BIT_SIZE
- * @param P_SELECTION
- * @param P_MUTATION_POW
- * @param A_MUTATION_POW
- * @param EVAL_FITNESS_FUNCTION
- * @param PROBLEM_TYPE
- * @param LOOP_INTERVAL
- */
-class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
-         P_MUTATION_POW: Double, A_MUTATION_POW: Double,
-         PARENT_IMMUTABLE: Boolean,
-         EVAL_FITNESS_FUNCTION: Array[Boolean] => Double,
-         PROBLEM_TYPE: ProblemType = ProblemType.Maximize,
-         var LOOP_INTERVAL: Long)
+  *
+  * @param POP_SIZE
+  * @param BIT_SIZE
+  * @param P_SELECTION
+  * @param P_MUTATION_POW
+  * @param A_MUTATION_POW
+  * @param PARENT_IMMUTABLE
+  * @param EVAL_FITNESS_FUNCTION
+  * @param PROBLEM_TYPE
+  * @param LOOP_INTERVAL
+  */
+class GA(
+          POP_SIZE: Int, var BIT_SIZE: Int
+          , P_SELECTION: Double
+          , P_MUTATION_POW: Double, A_MUTATION_POW: Double
+          , PARENT_IMMUTABLE: Boolean
+          , EVAL_FITNESS_FUNCTION: Array[Boolean] => Double
+          , PROBLEM_TYPE: ProblemType = ProblemType.Maximize
+          , var LOOP_INTERVAL: Long = 0
+          , var diversityWeight: Double = 0.5d
+        )
   extends Thread {
   val loopSemaphore: Semaphore = new Semaphore(1)
   val centroid: ParArray[Double] = ParArray.fill[Double](BIT_SIZE)(0)
   var genes: ParArray[Gene] = ParArray.fill[Gene](POP_SIZE)(new Gene(BIT_SIZE, EVAL_FITNESS_FUNCTION, PROBLEM_TYPE))
-  var overallDiversity: Double = 0.5d
   var round = 0
-  var diversityWeight: Double = 0.5d
+  var overallDiversity: Double = 0.5d
 
   def resize(getNewBitSize_with_op_func: => Int) = {
     loopSemaphore.acquire()
@@ -130,9 +134,38 @@ class GA(POP_SIZE: Int, var BIT_SIZE: Int, P_SELECTION: Double,
       gene.mutation(Math.pow(overallDiversity, A_MUTATION_POW)))
   }
 
+  var shouldLoop = false
+
   override def run = {
     setup
-    while (true) {
+    shouldLoop = true
+    while (shouldLoop) {
+      loop
+      round += 1
+      if (LOOP_INTERVAL > 0)
+        Thread.sleep(LOOP_INTERVAL)
+    }
+  }
+
+  def runAutoRestart(nRound: Int) = {
+    setup
+    loop
+    round = 1
+    shouldLoop = true
+    var lastBestFitness = getBestFitness
+    var iRound = 0
+    while (shouldLoop) {
+      val bestFitness = getBestFitness
+      if (bestFitness == lastBestFitness) {
+        iRound += 1
+        if (iRound > nRound) {
+          setup
+          iRound = 0
+        }
+      } else {
+        lastBestFitness = bestFitness
+        iRound = 0
+      }
       loop
       round += 1
       if (LOOP_INTERVAL > 0)
