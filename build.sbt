@@ -1,5 +1,5 @@
 // Name of the project
-name := "neuroevolution"
+name := "neuro-evolution"
 
 // Project version
 version := "1.1.0"

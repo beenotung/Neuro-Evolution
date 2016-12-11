@@ -133,4 +133,4 @@ project/boot/
 .nfs*
 
 ### Custom
-classes/
+.idea/

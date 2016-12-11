@@ -1,3 +1,0 @@
-#!/bin/bash -v
-g++ utility.h BackNN_train.h BackNN_test.h main.cpp -lm -o BackNN
-./BackNN
